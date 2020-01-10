@@ -1,4 +1,4 @@
-mutable struct Cell{V,M,J,G,O,P,NP,C,S,A<:AlgControl}
+mutable struct Cell{V,M,J,G,O,P,NP,C,S,A<:AlgControl,B<:Bool}
     M::M        # Mass Matrix
     Jac::J      # Jacobian pattern
     g::G        # Grid
@@ -9,6 +9,7 @@ mutable struct Cell{V,M,J,G,O,P,NP,C,S,A<:AlgControl}
     mode::S     # :cc  closes circuit, :oc open circuit, :precondition
     alg_ctl::A  # Alg control type
     u0::V       # Initial_conditions
+    initialized::B
 end
 
 
@@ -29,5 +30,5 @@ function Cell(
     massMatrix   = mass_matrix(grid, ndim;mode=mode)
     Jac = get_jac_sparse_pattern(grid;mode=mode)
     u0 = init_guess(grid,ndim)
-    Cell(massMatrix,Jac,grid,operators,p,ndim,rhs,mode,alg_ctl,u0)
+    Cell(massMatrix,Jac,grid,operators,p,ndim,rhs,mode,alg_ctl,u0,false)
 end
