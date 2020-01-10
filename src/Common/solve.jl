@@ -23,7 +23,7 @@ function solve(c::Cell)
     prob = ODEProblem(odefun,u0,tspan,c)
     solve(prob,c.alg_ctl.alg;
         progress_steps = 50,
-        progress_bar = true,
+        progress = true,
         callback = callbacks,
         dt = 1e-20,
         dtmin = 1e-20,
