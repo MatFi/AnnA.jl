@@ -1,6 +1,8 @@
 function solve(c::Cell)
-
-    initial_conditions!(c)
+    if !c.initialized
+        initial_conditions!(c)
+        c.initialized=true
+    end
     u0 = c.u0
 
     colorvec = matrix_colors(c.Jac)
