@@ -33,7 +33,7 @@ Base.iterate(var::DDTransientVariable, state=1) = state > length(var.v) ? nothin
 A struct used to save values of the time in `t::Vector{tType}` and
 solution variables `I::Vector{vvType}, ϕ::Vector{vvType}, n::Vector{vvType}, p::Vector{vvType}`.
 """
-struct DDTransientSolution{ C<:Cell,tType<:Number, jType<:Number,D1,D2,D3,D4}
+struct DDTransientSolution{ C<:Cell,tType<:Number, jType<:Number,VType<:Number,D1,D2,D3,D4}
     cell::C
     t::Vector{tType}
     P::D1 #DDTransientVariable
@@ -41,6 +41,7 @@ struct DDTransientSolution{ C<:Cell,tType<:Number, jType<:Number,D1,D2,D3,D4}
     n::D3 #DDTransientVariable
     p::D4 #DDTransientVariable
     J::Vector{jType}
+    V::Vector{VType}
     #C
 end
 
@@ -54,6 +55,7 @@ function DDTransientSolution(c::Cell)
     t = 1.0*c.parameters.τᵢ
     u = c.g(c.u0)
     J = calculate_currents(c, u, 0.1, u) * c.parameters.jay
+    V = u[2][3][end]*c.ndim.Vbi*c.parameters.VT
     u = rdim_sol(c,u)
     P = DDSpacialVariable.(u[1])
     ϕ = DDSpacialVariable.(u[2])
@@ -66,7 +68,7 @@ function DDTransientSolution(c::Cell)
     p = DDTransientVariable([c.g.x,c.g.xₕ], Vector{typeof(p)}())
 
     DDTransientSolution(
-        c, Vector{typeof(t)}(), P, ϕ, n, p, Vector{typeof(J)}()
+        c, Vector{typeof(t)}(), P, ϕ, n, p, Vector{typeof(J)}(), Vector{typeof(V)}()
     )
 end
 
@@ -84,10 +86,11 @@ function (affect!::SavingAffect)(integrator)
     else
         J= calculate_currents(integrator.p, u, 0, u) * integrator.p.parameters.jay
     end
+
     affect!.saveiter += 1
     u = rdim_sol(integrator.p,u)
-
-    @debug abs(integrator.p.g(integrator.u)[2][3][end]-integrator.p.g(integrator.p.u0)[2][3][end])
+    V  =u[2][3][end]+integrator.p.ndim.Vbi*integrator.p.parameters.VT
+    @debug abs(V)
 #=
     if (integrator.p.mode == :oc && integrator.t> 1 && abs(integrator.p.g(integrator.u)[2][3][end]-integrator.p.g(integrator.p.u0)[2][3][end]) < 1e-20)
         terminate!(integrator)
@@ -95,6 +98,7 @@ function (affect!::SavingAffect)(integrator)
 =#
     copyat_or_push!(affect!.saved_values.t, affect!.saveiter, integrator.t*integrator.p.parameters.τᵢ)
     copyat_or_push!(affect!.saved_values.J, affect!.saveiter, J)
+    copyat_or_push!(affect!.saved_values.V, affect!.saveiter, V)
     copyat_or_push!(affect!.saved_values.P.v, affect!.saveiter, DDSpacialVariable.(u[1]), Val{false})
     copyat_or_push!(affect!.saved_values.ϕ.v, affect!.saveiter, DDSpacialVariable.(u[2]), Val{false})
     copyat_or_push!(affect!.saved_values.n.v, affect!.saveiter, DDSpacialVariable.(u[3]), Val{false})
