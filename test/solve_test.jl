@@ -21,8 +21,8 @@
 
 
     @test isapprox(
-        AnnABase.rdim_sol(cell, cell.g(cell.u0))[2][3][end],
-        -cell.ndim.Vbi * cell.parameters.VT,atol = 1e-6
+        ustrip(AnnABase.rdim_sol(cell, cell.g(cell.u0))[2][3][end]),
+        ustrip(-cell.ndim.Vbi * cell.parameters.VT),atol = 1e-4
     )
 
 end
