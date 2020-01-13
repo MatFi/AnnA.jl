@@ -82,3 +82,23 @@ function pulse(;Δh = 1.0, h₀ = 0.0, w = (1.0-2e-12), Δt = 1.0e-12, tₑ = 1.
     itp = interpolate(ts, hs ,SteffenMonotonicInterpolation())
     Pulse(Δh, h₀, w, Δt, tₑ, ts, hs, itp)
 end
+
+"""
+    unpac_struct(s...)
+
+Returns a `OrderedDict` containing all `field => value` pairs. Allows for multiple structs as input. The result is then a single Dict. The letter arguments will overwrite previous one is existing already
+"""
+function unpac_struct(s...)
+
+    p=OrderedDict{Symbol,Any}()
+    for arg in s
+        prm_names = fieldnames(typeof(arg))
+        for n in prm_names
+            #@eval $n = $p.$(n)
+            p[n] = getfield(arg,n)
+        end
+    end
+    return p
+end
+
+fieldnames(Dict)

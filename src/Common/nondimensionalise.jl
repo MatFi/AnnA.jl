@@ -81,46 +81,44 @@ end
 
 Performs the nondimensionalisation of the input parameters and returns a `NodimParameters` struct
 """
-function NonDimensionalize(p::AbstractParameters)
+function NonDimensionalize(prm::AbstractParameters)
 
     #Unpack parameters
-    for n in fieldnames(Parameters)
-        @eval $n = $p.$(n)
-    end
+    p=unpac_struct(prm)
 
     #pack filednames to dict
     d=OrderedDict{Symbol,Any}()
     for key in fieldnames(NodimParameters)
         d[key]=0.0
     end
-    LD= sqrt(kB*T*εₚ/(q^2*N₀))
-    d[:λ]   = LD/b
+    LD= sqrt(p[:kB]*p[:T]*p[:εₚ]/(p[:q]^2*p[:N₀]))
+    d[:λ]   = LD/p[:b]
     d[:λ²]  = d[:λ]^2
     #d[:nᵢ²] = nᵢ^2/(dₑ*dₕ)
-    d[:δ]   = dₑ/N₀
-    d[:χ]   = dₕ/dₑ
-    d[:σ]   = dₑ/(G₀*τᵢ)
-    d[:κₚ]  = Dₚ*dₕ/(G₀*b^2)
-    d[:κₙ]  = Dₙ*dₑ/(G₀*b^2)
-    d[:αb]  = α*b
-    d[:dpt] = εₚ*VT/(q*G₀*b^2*τᵢ)
-    d[:dpf] = Dᵢ*N₀/(G₀*b^2)
-    d[:Vbi] = Vbi/VT/q
-    d[:wₑ]  = bₑ/b
-    d[:wₕ]  = bₕ/b
-    d[:κₑ]  = Dₑ*d[:κₙ]/Dₙ
-    d[:κₕ]  = Dₕ*d[:κₚ]/Dₚ
-    d[:rₑ]  = εₑ/εₚ
-    d[:rₕ]  = εₕ/εₚ
-    d[:λₑ²] = d[:rₑ]*N₀/dₑ*d[:λ²]
+    d[:δ]   = p[:dₑ]/p[:N₀]
+    d[:χ]   = p[:dₕ]/p[:dₑ]
+    d[:σ]   = p[:dₑ]/(p[:G₀]*p[:τᵢ])
+    d[:κₚ]  = p[:Dₚ]*p[:dₕ]/(p[:G₀]*p[:b]^2)
+    d[:κₙ]  = p[:Dₙ]*p[:dₑ]/(p[:G₀]*p[:b]^2)
+    d[:αb]  = p[:α]*p[:b]
+    d[:dpt] = p[:εₚ]*p[:VT]/(p[:q]*p[:G₀]*p[:b]^2*p[:τᵢ])
+    d[:dpf] = p[:Dᵢ]*p[:N₀]/(p[:G₀]*p[:b]^2)
+    d[:Vbi] = p[:Vbi]/p[:VT]/p[:q]
+    d[:wₑ]  = p[:bₑ]/p[:b]
+    d[:wₕ]  = p[:bₕ]/p[:b]
+    d[:κₑ]  = p[:Dₑ]*d[:κₙ]/p[:Dₙ]
+    d[:κₕ]  = p[:Dₕ]*d[:κₚ]/p[:Dₚ]
+    d[:rₑ]  = p[:εₑ]/p[:εₚ]
+    d[:rₕ]  = p[:εₕ]/p[:εₚ]
+    d[:λₑ²] = d[:rₑ]*p[:N₀]/p[:dₑ]*d[:λ²]
     d[:λₑ]  = sqrt(d[:λₑ²])
-    d[:λₕ²] = d[:rₕ]*N₀/dₕ*d[:λ²]
+    d[:λₕ²] = d[:rₕ]*p[:N₀]/p[:dₕ]*d[:λ²]
     d[:λₕ]  = sqrt(d[:λₕ²])
 
-    d[:kₑ]  = gc/gcₑ*exp((Ecₑ-Ec)/(kB*T))
-    d[:kₕ]  = gv/gvₕ*exp((Ev-Evₕ)/(kB*T))
+    d[:kₑ]  = p[:gc]/p[:gcₑ]*exp((p[:Ecₑ]-p[:Ec])/(p[:kB]*p[:T]))
+    d[:kₕ]  = p[:gv]/p[:gvₕ]*exp((p[:Ev]-p[:Evₕ])/(p[:kB]*p[:T]))
 
-    d[:σₛₕ] = VT/Rₛₕ/jay
+    d[:σₛₕ] = p[:VT]/p[:Rₛₕ]/p[:jay]
     #Test for nodimensionalty
     for i in eachindex(d)
         if typeof(d[i]) <: Unitful.Quantity
