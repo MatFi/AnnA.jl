@@ -12,16 +12,17 @@ function initial_conditions(c::Cell)
     u0 = c.u0
     # NLSolve will do the rest in no time! Actually this onnly works because
     # the algebraic varibles nowher apper as timederivative in the massmatrix
-    if c.mode == :oc
-        p_init = setproperties(c.parameters, V = t -> 0) #ensure that we initialize to
-        c_init= setproperties(c, parameters = p_init,
+    cc =deepcopy(c)
+    #if c.mode == :oc
+        p_init = setproperties(cc.parameters, V = t -> 0) #ensure that we initialize to
+        c_init= setproperties(cc, parameters = p_init,
             mode = :precondition,
-            Jac = get_jac_sparse_pattern(c.g; mode = :precondition))
-    else
-        c_init= deepcopy(c)
-    end
+            Jac = get_jac_sparse_pattern(cc.g; mode = :precondition))
+    #else
+#        c_init= deepcopy(c)
+#    end
 
-    u1 = nl_solve_intiter(c_init,u0;ftol=c.alg_ctl.ss_tol,factor=1)
+#    u1 = nl_solve_intiter(c_init,u0;ftol=c.alg_ctl.ss_tol,factor=1)
 
     # in :oc mode a second init step is needed (in case we have light)
     if c.mode == :occ  #legacy
@@ -37,11 +38,11 @@ function initial_conditions(c::Cell)
 
     prob = SteadyStateProblem(
         odefun,
-        u1.zero,
+        u0,
         c;
     )
 
-    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-8,reltol=1e-6,tspan=1e6),progress = true, progress_steps=50,force_dtmin =true , dtmin=1e-15)
+    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-10,reltol=1e-6,tspan=1e6),progress = true, progress_steps=10,force_dtmin =true , dtmin=1e-15)
 
     return sol.u
 
@@ -99,8 +100,8 @@ is needed to guarantee consitancy of the guess.
 function init_guess(g::Grid, ndim::NodimParameters)
     P_init = ones(size(g.x))
     phi_init = zeros(size(g.x))
-    p_init = ones(size(g.x)) * ndim.kₕ .* range(0, 1, length = g.N + 1) * 1e-1
-    n_init = ones(size(g.x)) * ndim.kₑ .* range(1, 0, length = g.N + 1) * 1e-1
+    p_init = ones(size(g.x)) * ndim.kₕ .* range(0, 1, length = g.N + 1) #* 1e-1
+    n_init = ones(size(g.x)) * ndim.kₑ .* range(1, 0, length = g.N + 1) #* 1e-1
     phiE_init = zeros(size(g.xₑ))
     nE_init = ones(size(g.xₑ)) .* range(1, n_init[1] / ndim.kₑ, length = g.Nₑ)
     phiH_init = zeros(size(g.xₕ))
