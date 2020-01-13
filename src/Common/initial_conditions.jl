@@ -37,11 +37,11 @@ function initial_conditions(c::Cell)
 
     prob = SteadyStateProblem(
         odefun,
-        u0,
+        u1.zero,
         c;
     )
 
-    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-8,reltol=1e-6,tspan=1e3),progress = true, progress_steps=50)
+    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-8,reltol=1e-6,tspan=1e6),progress = true, progress_steps=50,force_dtmin =true , dtmin=1e-15)
 
     return sol.u
 

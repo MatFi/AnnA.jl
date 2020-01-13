@@ -19,6 +19,7 @@
     sol = AnnABase.solve(cell)
     @test AnnABase.integrate(cell.g.x, cell.g(cell.u0)[1][1]) ≈ 1
 
+
     @test isapprox(
         AnnABase.rdim_sol(cell, cell.g(cell.u0))[2][3][end],
         -cell.ndim.Vbi * cell.parameters.VT,
