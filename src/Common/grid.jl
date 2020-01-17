@@ -31,9 +31,13 @@ function Grid(p::Parameters)
     wₕ=bₕ/b
     LD= sqrt(kB*T*εₚ/(q^2*N₀))
     λ  = LD/b
-    tanfun = st-> λ-(tanh(st*(2*X-1))/tanh(st)+1)/2
-    st = find_zero(tanfun, 2,xatol=1e-8)
-
+    #@show λ
+    if λ <0.1
+        tanfun = st-> λ-(tanh(st*(2*X-1))/tanh(st)+1)/2
+        st = find_zero(tanfun, 2,xatol=1e-8)
+    else
+        st =1.0
+    end
     A  = b -> (tanh(st*(1-2/N))-(1.0-b)*tanh(st))/b
 
 
@@ -71,36 +75,42 @@ gives the length of the input-array which is ` 4*g.N+4+2*g.Nₑ+2*g.Nₕ`
 """
 length(g::Grid) = 4*g.N+4+2*g.Nₑ+2*g.Nₕ
 
-
-function (decompose::Grid)(u::Array{Float64,1})
-    N = decompose.N
-    Nₑ = decompose.Nₑ
-    Nₕ = decompose.Nₕ
-
-    P   = Array{Float64}(undef,N+1)
-    ϕ   = Array{Float64}(undef,N+1)
-    n   = Array{Float64}(undef,N+1)
-    p   = Array{Float64}(undef,N+1)
-    @inbounds @simd for i in 1:N+1
-        P[i]   = u[i]
-        ϕ[i]    = u[N+1+i]
-        n[i]    = u[2*N+2+i]
-        p[i]    = u[3*N+3+i]
-    end
-
-    ϕₑ  = Array{Float64}(undef,Nₑ)
-    nₑ  = Array{Float64}(undef,Nₑ)
-    @inbounds @simd for i in 1:Nₑ
-        ϕₑ[i]   = u[4*N+4+i]
-        nₑ[i]   = u[4*N+Nₑ+4+i]
-    end
-
-    ϕₕ  = Array{Float64}(undef,Nₕ)
-    pₕ  = Array{Float64}(undef,Nₕ)
-    @inbounds @simd for i in 1:Nₕ
-        ϕₕ[i]  = u[4*N+2*Nₑ+4+i]
-        pₕ[i]  = u[4*N+2*Nₑ+Nₕ+4+i]
-    end
-
-    [[P], [ϕₑ,ϕ,ϕₕ], [nₑ,n], [p,pₕ]]
+#lagacy wrapper, better use `decompose(u::Array{Float64,1},g::Grid)`
+function (decomp::Grid)(u::Array{Float64,1})
+    decompose(u,decomp)
  end
+
+ decompose(u::Array{Array{Float64,1},1},g::Grid) = decompose.(u,g)
+
+ function decompose(u::Array{Float64,1},g::Grid)
+     N = g.N
+     Nₑ = g.Nₑ
+     Nₕ = g.Nₕ
+
+     P   = Array{Float64}(undef,N+1)
+     ϕ   = Array{Float64}(undef,N+1)
+     n   = Array{Float64}(undef,N+1)
+     p   = Array{Float64}(undef,N+1)
+     @inbounds @simd for i in 1:N+1
+         P[i]   = u[i]
+         ϕ[i]    = u[N+1+i]
+         n[i]    = u[2*N+2+i]
+         p[i]    = u[3*N+3+i]
+     end
+
+     ϕₑ  = Array{Float64}(undef,Nₑ)
+     nₑ  = Array{Float64}(undef,Nₑ)
+     @inbounds @simd for i in 1:Nₑ
+         ϕₑ[i]   = u[4*N+4+i]
+         nₑ[i]   = u[4*N+Nₑ+4+i]
+     end
+
+     ϕₕ  = Array{Float64}(undef,Nₕ)
+     pₕ  = Array{Float64}(undef,Nₕ)
+     @inbounds @simd for i in 1:Nₕ
+         ϕₕ[i]  = u[4*N+2*Nₑ+4+i]
+         pₕ[i]  = u[4*N+2*Nₑ+Nₕ+4+i]
+     end
+
+     [[P], [ϕₑ,ϕ,ϕₕ], [nₑ,n], [p,pₕ]]
+  end
