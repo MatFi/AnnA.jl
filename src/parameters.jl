@@ -41,8 +41,8 @@ Base.@kwdef struct Parameters <: AbstractParameters
     τₚ::Number = 3e-7u"s"           # hole pseudo lifetime
     k₂::Number = 0u"m^3/s"          # second order rate constant
     # Interface Recombination
-    k₂ₑ::Number = 0u"m^3/s"         # ETL/perovskite bimolecular recombination rate
-    k₂ₕ::Number = 0u"m^3/s"         # perovskite/HTL bimolecular recombination rate
+    k₂ₑ::Number = 0u"m^4/s"         # ETL/perovskite bimolecular recombination rate
+    k₂ₕ::Number = 0u"m^4/s"         # perovskite/HTL bimolecular recombination rate
     vₙₑ::Number = 1e5u"m/s"         # electron recombination velocity for SHR/ETL
     vₚₑ::Number = 10u"m/s"          # hole recombination velocity for SHR/ETL
     vₙₕ::Number = 0.1u"m/s"         # electron recombination velocity for SHR/HTL

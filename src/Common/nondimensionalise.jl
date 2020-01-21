@@ -91,6 +91,9 @@ function NonDimensionalize(prm::AbstractParameters)
     for key in fieldnames(NodimParameters)
         d[key]=0.0
     end
+    #recalc
+
+
     LD= sqrt(p[:kB]*p[:T]*p[:εₚ]/(p[:q]^2*p[:N₀]))
     d[:λ]   = LD/p[:b]
     d[:λ²]  = d[:λ]^2
@@ -130,14 +133,14 @@ function NonDimensionalize(prm::AbstractParameters)
         end
     end
 
-    nᵢ² = uconvert(Unitful.NoUnits,nᵢ^2/(dₑ*dₕ))
+    nᵢ² = uconvert(Unitful.NoUnits,p[:nᵢ]^2/(p[:dₑ]*p[:dₕ]))
     """Bulk Recombination"""
-    if !iszero(τₚ)# && τₙ>0u"s"
+    if !iszero(p[:τₚ])# && τₙ>0u"s"
 
-        kk  = uconvert(Unitful.NoUnits,k₂*dₑ*dₕ/G₀)
-        γ   = uconvert(Unitful.NoUnits,dₕ/(τₚ*G₀))
-        τᵣ  = uconvert(Unitful.NoUnits,τₙ*dₕ/(τₚ*dₑ))
-        rtrap = uconvert(Unitful.NoUnits,(τₙ+τₚ)*nᵢ/(τₚ*dₑ))
+        kk  = uconvert(Unitful.NoUnits,p[:k₂]*p[:dₑ]*p[:dₕ]/p[:G₀])
+        γ   = uconvert(Unitful.NoUnits,p[:dₕ]/(p[:τₚ]*p[:G₀]))
+        τᵣ  = uconvert(Unitful.NoUnits,p[:τₙ]*p[:dₕ]/(p[:τₚ]*p[:dₑ]))
+        rtrap = uconvert(Unitful.NoUnits,(p[:τₙ]+p[:τₚ])*p[:nᵢ]/(p[:τₚ]*p[:dₑ]))
 
         d[:R]= Rec_function(nᵢ²,kk,γ,τᵣ,rtrap)
     #    d[:R]= R!(R,n,p) -> @. R = (n*p-nᵢ²)*(kk+γ/(n+τᵣ*p+rtrap))
@@ -146,31 +149,29 @@ function NonDimensionalize(prm::AbstractParameters)
     end
 
     """Interface ETM recombination"""
-    if !iszero(vₚₑ) #&& vₙₑ>0u"m/s"
-        kk  = uconvert(Unitful.NoUnits,k₂ₑ*dₑ*dₕ/G₀)
-        γ   = uconvert(Unitful.NoUnits,dₕ*vₚₑ/(b*G₀))
-        τᵣ  = uconvert(Unitful.NoUnits,dₕ*vₚₑ/(vₙₑ*dₑ))
-        rtrap = uconvert(Unitful.NoUnits,(1/d[:kₑ]+vₚₑ/vₙₑ)*nᵢ/dₑ)
+    if !iszero(p[:vₙₑ]) #&& vₙₑ>0u"m/s
+        kk  = uconvert(Unitful.NoUnits,p[:k₂ₑ]*p[:dₑ]*p[:dₕ]/(p[:b]*p[:G₀]))
+        γ   = uconvert(Unitful.NoUnits,p[:dₕ]*p[:vₚₑ]/(p[:b]*p[:G₀]))
+        τᵣ  = uconvert(Unitful.NoUnits,p[:dₕ]*p[:vₚₑ]/(p[:vₙₑ]*p[:dₑ]))
+        rtrap = uconvert(Unitful.NoUnits,(1/d[:kₑ]+p[:vₚₑ]/p[:vₙₑ])*p[:nᵢ]/p[:dₑ])
         d[:Rₗ]= Rec_function(nᵢ²,kk,γ,τᵣ,rtrap)
     else
         d[:Rₗ]= (n,p)-> @. 0*n
     end
 
     """Interface HTM recombination"""
-    if !iszero(vₚₕ) # && vₙₕ>0u"m/s"
-        kk  = uconvert(Unitful.NoUnits,k₂ₕ*dₑ*dₕ/G₀)
-        γ   = uconvert(Unitful.NoUnits,dₑ*vₙₕ/(b*G₀))
-        τᵣ  = uconvert(Unitful.NoUnits,dₑ*vₙₕ/(vₚₕ*dₕ))
-        rtrap = uconvert(Unitful.NoUnits,(1/d[:kₕ]+vₙₕ/vₚₕ)*nᵢ/dₕ)
+    if !iszero(p[:vₚₕ]) # && vₙₕ>0u"m/s"
+        kk  = uconvert(Unitful.NoUnits,p[:k₂ₕ]*p[:dₑ]*p[:dₕ]/(p[:b]*p[:G₀]))
+        γ   = uconvert(Unitful.NoUnits,p[:dₑ]*p[:vₙₕ]/(p[:b]*p[:G₀]))
+        τᵣ  = uconvert(Unitful.NoUnits,p[:dₑ]*p[:vₙₕ]/(p[:vₚₕ]*p[:dₕ]))
+        rtrap = uconvert(Unitful.NoUnits,(1/d[:kₕ]+p[:vₙₕ]/p[:vₚₕ])*p[:nᵢ]/p[:dₕ])
         d[:Rᵣ]= Rec_function(nᵢ²,kk,γ,τᵣ,rtrap)
     else
         d[:Rᵣ]= (n,p)-> @. 0*n
     end
 
-#    d[:G₀]  = Fₚₕ/b*(1-exp(-α*b))
-    d[:G] = Gen_function(α*b, Float64(dir), t -> light(t*ustrip(τᵢ)), uconvert(Unitful.NoUnits,τᵢ/1u"s"))
-    d[:V] = Pot_function(uconvert(Unitful.NoUnits,VT/1u"V"),V,uconvert(Unitful.NoUnits,τᵢ/1u"s"))
-
+    d[:G] = Gen_function(p[:α]*p[:b], Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ])), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
+    d[:V] = Pot_function(uconvert(Unitful.NoUnits,p[:VT]/1u"V"),p[:V],uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
 
     NodimParameters(collect(values(d))...)
 end

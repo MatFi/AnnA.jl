@@ -1,3 +1,4 @@
+
 function rdim_sol(c::Cell,sol)
 #    [[P], [ϕₑ,ϕ,ϕₕ], [nₑ,n], [p,pₕ]]
     P   = sol[1].*c.parameters.N₀
@@ -7,3 +8,5 @@ function rdim_sol(c::Cell,sol)
 
     return  [P, ϕ ,n, p]
 end
+
+rdim_sol(c::Cell,sol::Vector{Float64}) = rdim_sol(c,decompose(sol,c.g))

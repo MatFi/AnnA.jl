@@ -32,11 +32,12 @@ function Grid(p::Parameters)
     LD= sqrt(kB*T*εₚ/(q^2*N₀))
     λ  = LD/b
     #@show λ
-    if λ <0.1
+    st=1.0
+    try
         tanfun = st-> λ-(tanh(st*(2*X-1))/tanh(st)+1)/2
-        st = find_zero(tanfun, 2,xatol=1e-8)
-    else
-        st =1.0
+        st = find_zero(tanfun, 2,atol=1e-3)
+    catch e
+
     end
     A  = b -> (tanh(st*(1-2/N))-(1.0-b)*tanh(st))/b
 

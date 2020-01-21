@@ -222,13 +222,13 @@ VectorOfArray
     du[2*N+2] = rₕ*mEₕ[1]-mE[end] -c.g.dx[end]*(1/2-P[end-1]/6-P[end]/3+δ*(n[end-1]/6+n[end]/3-χ*(p[end-1]/6+p[end]/3)))/λ² -rₕ*c.g.dxₕ[1]*(1/2-pₕ[1]/3-pₕ[2]/6)/λₕ²; #continuity
 
     # n BC
-    du[2*N+3] = fn[1]-fnₑ[end]+(c.g.dx[1]*GR[1])/2#-c.ndim.Rₗ(nₑ[end],p[1]); # continuity
-    du[3*N+3] = -fn[end]+c.g.dx[N]*GR[N]/2#-c.ndim.Rᵣ(n[N+1],pₕ[1]);
+    du[2*N+3] = fn[1]-fnₑ[end]+(c.g.dx[1]*GR[1])/2 -c.ndim.Rₗ(nₑ[end],p[1]) # continuity
+    du[3*N+3] = -fn[end]+c.g.dx[N]*GR[N]/2 -c.ndim.Rᵣ(n[N+1],pₕ[1])
 #    println(du[3*N+3])
 
     # p BC
-    du[3*N+4] = fp[1]+c.g.dx[1]*GR[1]/2#-c.ndim.Rₗ(nₑ[end],p[1]);
-    du[4*N+4] = fpₕ[1]-fp[end]+(c.g.dx[end]*GR[end])/2#-c.ndim.Rᵣ(n[N+1],pₕ[1]); # continuity
+    du[3*N+4] = fp[1]+c.g.dx[1]*GR[1]/2 -c.ndim.Rₗ(nₑ[end],p[1])
+    du[4*N+4] = fpₕ[1]-fp[end]+(c.g.dx[end]*GR[end])/2 -c.ndim.Rᵣ(n[N+1],pₕ[1]); # continuity
     @inbounds @simd for i in 1:N-1
         du[i+1] = FP[i+1] - FP[i];
         du[N+2+i] = mE[i+1]-mE[i]-cd[i]/λ²;
@@ -254,10 +254,12 @@ VectorOfArray
     elseif c.mode == :oc #oopen circuit
         du[4*N+5] = (fnₑ[1]-( ϕₕ[end] +c.ndim.Vbi) *c.ndim.σₛₕ) ;  # no flux and shunt
         du[4*N+2*Nₑ+Nₕ+4] =  ϕₑ[1] # Potential reference at etl contact
+        #du[N+1] = integrate(c.g.x,P)-1;
         #du[N+1] = integrate(c.g.x,P)-1)^4;
     elseif c.mode == :precondition
         # Overwrite right-hand BC to ensure conservation of ion vacancies
-        du[N+1] = integrate(c.g.x,P)-1;
+        #du[4*N+2*Nₑ+Nₕ+4] =  ϕₑ[1]
+        du[N+1] = ((integrate(c.g.x,abs.(P))-1));
         #du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] +c.ndim.Vbi - c.ndim.V(t)
     else
         error("simulation mode $(c.mode) is not recongnized")

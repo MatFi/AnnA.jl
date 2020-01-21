@@ -8,7 +8,7 @@ time `t = 0`.
 """
 function initial_conditions(c::Cell)
 
-    @info "initialisation : nlsolve on first guess in :precondition mode"
+    #@info "initialisation : nlsolve on first guess in :precondition mode"
     u0 = c.u0
     # NLSolve will do the rest in no time! Actually this onnly works because
     # the algebraic varibles nowher apper as timederivative in the massmatrix
@@ -22,41 +22,63 @@ function initial_conditions(c::Cell)
 #        c_init= deepcopy(c)
 #    end
 
-#    u1 = nl_solve_intiter(c_init,u0;ftol=c.alg_ctl.ss_tol,factor=1)
-
+    #u0 = nl_solve_intiter(c_init,u0;ftol=c.alg_ctl.ss_tol,factor=2).zero
+#    return u0
     # in :oc mode a second init step is needed (in case we have light)
     if c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
-        u1 = nl_solve_intiter(c,u1.zero;ftol=c.alg_ctl.ss_tol,factor=u1.ftol)
+        u0 = nl_solve_intiter(c,u1.zero;ftol=c.alg_ctl.ss_tol,factor=u1.ftol).zero
     end
+    c_init=deepcopy(c)
+
+    @info "Init_Solve"
 
     odefun = ODEFunction((dx,x,p,t) -> c.rhs(dx, x, p, 0);
-        mass_matrix = c.M,
-        jac_prototype = c.Jac,
-        colorvec = matrix_colors(c.Jac),
+        mass_matrix = c_init.M,
+        jac_prototype = c_init.Jac,
+        colorvec = matrix_colors(c_init.Jac),
+    )
+    τᵢ = c_init.parameters.τᵢ
+    prob = ODEProblem(odefun,u0,(0,50*ustrip(τᵢ)),c_init)
+
+    sol = solve(prob,c_init.alg_ctl.alg;
+        progress_steps = 50,
+        progress = true,
+        callback = AutoAbstol(false;init_curmax=u0 .+ 0.1),
+        dt =1e-15*ustrip(τᵢ),
+        dtmin = ustrip(1e-20*τᵢ), #1e-20,
+        force_dtmin = true,
+        reltol = c_init.alg_ctl.reltol,
+        abstol = u0 .* 0, #1e-12,#c.u0 .* 0,
+        maxiters= 5000,
     )
 
+    return (sol.u[end],sol.retcode)
+
+#=
     prob = SteadyStateProblem(
         odefun,
         u0,
-        c;
+        c_init;
     )
-
-    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-10,reltol=1e-6,tspan=1e6),progress = true, progress_steps=10,force_dtmin =true , dtmin=1e-15)
-
-    return sol.u
+    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-4,reltol=1e-6,tspan= ustrip(1e4u"s"/c.parameters.τᵢ)),progress = true, progress_steps=10,force_dtmin =true ,callback = AutoAbstol(false;init_curmax=u0 .+ 0.1), dtmin=1e-10*ustrip(τᵢ),abstol=u0.*0,reltol=1e-6)
+    if sol.retcode !=:Success
+        #return u0
+    end
+    return sol
 
 #    return u1.zero
+=#
 end
 
-function nl_solve_intiter(c::Cell,u0;ftol=1e-6,factor=1)
-    c_init = c
+
+function nl_solve_intiter(c_init::Cell,u0;ftol=1e-6,factor=1)
     # get the sparse colored jacobian for fast NLsolve
     function j!(jac, x, c_init)
         colors = matrix_colors(c_init.Jac)
         forwarddiff_color_jacobian!(
             jac,
-            (dx, x) -> c.rhs(dx, x, c_init, 0),
+            (dx, x) -> c_init.rhs(dx, x, c_init, 0.0),
             x;
             colorvec = colors,
             sparsity = c_init.Jac,
@@ -65,7 +87,7 @@ function nl_solve_intiter(c::Cell,u0;ftol=1e-6,factor=1)
     end
 
     df = OnceDifferentiable(
-        (dx, x) -> c.rhs(dx, x, c_init, 0),
+        (dx, x) -> c_init.rhs(dx, x, c_init, 0.0),
         (jac, x) -> j!(jac, x, c_init),
         u0,
         copy(u0),
@@ -78,6 +100,7 @@ function nl_solve_intiter(c::Cell,u0;ftol=1e-6,factor=1)
         ftol = ftol,
         factor = factor,
         show_trace = haskey(ENV, "JULIA_DEBUG"),
+        method = :newton,
     )
     @debug "NLsolve: " u1.f_converged u1.iterations u1.residual_norm
     return u1
@@ -88,7 +111,8 @@ end
 Inplace mutation variant of `initial_conditions(c::Cell)``
 """
 function initial_conditions!(c::Cell)
-    c.u0 = initial_conditions(c::Cell)
+    c.u0 = initial_conditions(c)[1]
+
 end
 
 """
