@@ -14,7 +14,7 @@ struct Grid{A<:Integer,B<:AbstractArray} <:Function
     ddH::B
 end
 
-function Grid(p::Parameters)
+function Grid(p::AbstractParameters)
     #Unpack parameters
     for n in fieldnames(Parameters)
         @eval $n = $p.$(n)
