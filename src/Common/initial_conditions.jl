@@ -39,21 +39,21 @@ function initial_conditions(c::Cell)
         colorvec = matrix_colors(c_init.Jac),
     )
     τᵢ = c_init.parameters.τᵢ
-    prob = ODEProblem(odefun,u0,(0,50*ustrip(τᵢ)),c_init)
+    prob = ODEProblem(odefun,u0,(0,50*ustrip(τᵢ |> u"s")),c_init)
 
     sol = solve(prob,c_init.alg_ctl.alg;
         progress_steps = 50,
         progress = true,
         callback = AutoAbstol(false;init_curmax=u0 .+ 0.1),
-        dt =1e-15*ustrip(τᵢ),
-        dtmin = ustrip(1e-20*τᵢ), #1e-20,
+        dt =1e-15*ustrip(τᵢ  |> u"s"),
+        dtmin = ustrip(1e-20*τᵢ |> u"s"), #1e-20,
         force_dtmin = true,
         reltol = c_init.alg_ctl.reltol,
         abstol = u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,
     )
 
-    return (sol.u[end],sol.retcode)
+    return sol
 
 #=
     prob = SteadyStateProblem(
@@ -111,7 +111,7 @@ end
 Inplace mutation variant of `initial_conditions(c::Cell)``
 """
 function initial_conditions!(c::Cell)
-    c.u0 = initial_conditions(c)[1]
+    c.u0 = initial_conditions(c).u[end]
 
 end
 
