@@ -1,5 +1,5 @@
 @testset "Rhs" begin
-    prm = AnnABase.Parameters(vₚₑ = 0)
+    prm = AnnABase.Parameters(vₚₑ = 0u"m/s")
     cell = AnnABase.Cell(prm)
     u = rand(length(cell.g))
     du = similar(u)
