@@ -1,4 +1,4 @@
-function solve(c::Cell;tend=20)
+function solve(c::Cell;tend=20u"s")
     if (c.initialized==:false)
         initial_conditions!(c)
     #    if c.initialized != :Sucess
@@ -12,7 +12,7 @@ function solve(c::Cell;tend=20)
     (sav_callback, sav_sol) = SavingCallback(c)
     callbacks = CallbackSet(sav_callback, tol_callback )
     @info "Solve"
-    #TODO: abstol needs to bedone more nice
+    #TODO: ,tspan and abstol needs to bedone more nice
     sol = solve(prob,c.alg_ctl.alg;
         progress_steps = 50,
         progress = true,
@@ -27,7 +27,7 @@ function solve(c::Cell;tend=20)
     c.sol = sav_sol
     return sol
 end
-function get_problem(c::Cell;tend = 20.0)
+function get_problem(c::Cell;tend = 20.0u"s")
     u0 = c.u0
 
     colorvec = matrix_colors(c.Jac)
@@ -37,8 +37,7 @@ function get_problem(c::Cell;tend = 20.0)
         jac_prototype = c.Jac,
         colorvec = matrix_colors(c.Jac),
     )
-
-    tspan = (0.0,ustrip(tend/c.parameters.τᵢ))
+    tspan = (0.0, convert(Float64,(tend/c.parameters.τᵢ)))
 
 
 
