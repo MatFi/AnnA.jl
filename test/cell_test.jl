@@ -1,12 +1,12 @@
 @testset "Cell" begin
     @testset "Zeros in Recombination" begin
-        prm = AnnABase.Parameters(vₚₑ=0)
+        prm = AnnABase.Parameters(vₚₑ=0u"m/s")
         @test_nowarn AnnABase.Cell(prm)
 
-        prm = AnnABase.Parameters(vₚₕ=0)
+        prm = AnnABase.Parameters(vₚₕ=0u"m/s")
         @test_nowarn AnnABase.Cell(prm)
 
-        prm = AnnABase.Parameters(τₚ=0)
+        prm = AnnABase.Parameters(τₚ=0u"m/s")
         @test_nowarn AnnABase.Cell(prm)
 
         #give a initialisation warning

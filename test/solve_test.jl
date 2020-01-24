@@ -17,7 +17,7 @@
         alg_ctl = AnnABase.AlgControl(ss_tol = 1e-8, reltol = 1e-6),
     )
     sol = AnnABase.solve(cell)
-    @test AnnABase.integrate(cell.g.x, cell.g(cell.u0)[1][1]) ≈ 1
+    @test isapprox(AnnABase.integrate(cell.g.x, cell.g(cell.u0)[1][1]) , 1,atol = 1e-4)
 
 
     @test isapprox(
