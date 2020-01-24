@@ -170,7 +170,7 @@ function NonDimensionalize(prm::AbstractParameters)
         d[:Rᵣ]= (n,p)-> @. 0*n
     end
 
-    d[:G] = Gen_function(p[:α]*p[:b], Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ])), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
+    d[:G] = Gen_function(p[:α]*p[:b], Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ]|> u"s")), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
     d[:V] = Pot_function(uconvert(Unitful.NoUnits,p[:VT]/1u"V"),p[:V],uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
 
     NodimParameters(collect(values(d))...)
