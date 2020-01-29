@@ -6,6 +6,7 @@ using Setfield
 using LinearAlgebra
 using BenchmarkTools
 using Logging
+using Unitful
 
 @testset "Test all" begin
     include("jacobian_test.jl")
