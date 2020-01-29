@@ -74,7 +74,7 @@ Base.@kwdef struct Parameters <: AbstractParameters
     G₀::Number = Fₚₕ/b*(1-exp(-α*b))        #typical rate of photogeneration
 #    G::Function = (x,t) -> @. light(t)*α*b/(1-exp(-α*b))*exp(-α*b*(dir*x + (1-dir)/2));
     VT::Number = kB*T/q      #Thermal voltage
-    jay::Number = q*G₀*b  # rescaling factor for current density to be in mAcm^-2
+    jay::Number = q*G₀*b  # rescaling factor for current density to be in Am^-2
 
     n0::Number = dₑ* gc/gcₑ*exp((Ecₑ-Ec)/(kB*T)) #typical electron density in perovskite
     p0::Number = dₕ* gv/gvₕ*exp((Ev-Evₕ)/(kB*T)) #typical hole density in perovskite
