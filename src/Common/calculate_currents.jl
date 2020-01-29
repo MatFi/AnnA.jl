@@ -3,7 +3,6 @@
 
 Calculates the total current in the center of the device see: DOI: 0.1007/s10825-019-01396-2
 """
-
 function calculate_currents(c::Cell, sol, dt, sol_prev)
     if dt == 0
         dt = Inf
@@ -24,7 +23,7 @@ function calculate_currents(c::Cell, sol, dt, sol_prev)
     n = sol[3][2]
     p = sol[4][1]
 
-    
+
     dx = c.g.dx
     pos = ceil(Int, (N + 1) / 2) + 0# *0+100  # mid of grid
 
@@ -39,5 +38,14 @@ function calculate_currents(c::Cell, sol, dt, sol_prev)
 
     jₛₕ = -(sol[2][3][end] +c.ndim.Vbi) *c.ndim.σₛₕ
     return jn+ jp -jf - jd + jₛₕ
+end
 
+function calculate_currents(sol::DiffEqBase.ODESolution)
+    p = sol.prob.p
+    J = Array{typeof(p.parameters.jay |> u"mA/cm^2")}(undef,length(sol.t)-1)
+    u = decompose(sol.u,p.g)
+    for (u,dt,u_prev,i) in zip(u[2:end],diff(sol.t),u[1:end-1],1:length(sol.t)-1)
+        J[i]= calculate_currents(p, u, dt, u_prev) * p.parameters.jay
+    end
+    return J
 end
