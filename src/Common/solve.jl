@@ -1,4 +1,4 @@
-function solve(c::Cell;tend=20u"s")
+function solve(c::Cell;tend=c.alg_ctl.tend)
     if (c.initialized==:false)
         initial_conditions!(c)
     #    if c.initialized != :Sucess
@@ -10,20 +10,10 @@ function solve(c::Cell;tend=20u"s")
 
     tol_callback = AutoAbstol(false;init_curmax=c.u0 .+ 000.00001)
     (sav_callback, sav_sol) = SavingCallback(c)
-    callbacks = CallbackSet(sav_callback, tol_callback )
+    callbacks = CallbackSet(sav_callback, )
     @info "Solve"
     #TODO: ,tspan and abstol needs to bedone more nice
-    sol = solve(prob,c.alg_ctl.alg;
-        progress_steps = 50,
-        progress = true,
-        callback = sav_callback,#callbacks,
-        dt =  1e-15,
-        dtmin = 1e-20,# ustrip(1e-20*c.parameters.τᵢ), #1e-20,
-        force_dtmin = true,
-        reltol = c.alg_ctl.reltol,
-        abstol = 1e-12,#c.u0 .* 0, #1e-12,#c.u0 .* 0,
-        maxiters= 5000
-    )
+    sol = solve(prob,c.alg_ctl.alg;callback=callbacks, c.alg_ctl.kwargs... )
     c.sol = sav_sol
     return sol
 end

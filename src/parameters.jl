@@ -88,6 +88,24 @@ Base.@kwdef struct AlgControl
 
     ss_tol::Float64     = 1e-6      # ftol for steady state detection
     reltol::Float64     = 1e-6      # Relative tolerance for the solvers (auto_abstol =  u*reltol)
+    abstol              = 1e-9
     autodiff::Bool      = true      # Enable autodifferentiation (higly suggested)
     alg     = Rodas4P(autodiff=autodiff) # Integrator Algorithm. Optinal suggestions are: Rodas5(), ROS34PW2(), ROS3P(), QBDF(), QNDF()
+    dtmin   = 1e-15
+    dt      = 1e-14
+    force_dtmin = true
+    progress = true
+    progress_steps = 50
+    maxiters = 5000
+    tend = 1e5u"s"
+
+    kwargs = (; :reltol => reltol,
+        :abstol => abstol,
+        :dtmin => dtmin,
+        :dt => dt,
+        :force_dtmin => force_dtmin,
+        :progress_steps => progress_steps,
+        :progress => progress,
+        :maxiters => maxiters)
+
 end
