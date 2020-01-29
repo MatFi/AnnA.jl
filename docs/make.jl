@@ -16,5 +16,5 @@ makedocs(
              "Home" => "index.md",
              "API"  => "api.md"
              ],
-         repo = "https://gitlab.com/MatFi/julionmonger.jl/blob/{commit}{path}#{line}"
+         repo = "https://gitlab.com/MatFi/AnnABase.jl/blob/{commit}{path}#{line}"
          )
