@@ -16,6 +16,7 @@ end
 
 function Cell(
     p::AbstractParameters;
+    u0=missing,
     op_flavor::Symbol=:sparse,
     mode::Symbol=:cc,
     alg_ctl::AlgControl=AlgControl()
@@ -30,6 +31,6 @@ function Cell(
     rhs = Rhs(grid)
     massMatrix   = mass_matrix(grid, ndim;mode=mode)
     Jac = get_jac_sparse_pattern(grid;mode=mode)
-    u0 = init_guess(grid,ndim)
-    Cell(massMatrix,Jac,grid,operators,p,ndim,rhs,mode,alg_ctl,u0,:false,nothing)
+    u_ini = u0 isa Missing ? init_guess(grid,ndim) : u0
+    Cell(massMatrix,Jac,grid,operators,p,ndim,rhs,mode,alg_ctl,u_ini,!(u0 isa Missing),nothing)
 end
