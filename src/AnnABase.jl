@@ -23,6 +23,11 @@ module AnnABase
     import DiffEqBase.solve
     import Base.length
 
+    abstract type AbstractSolution end
+    abstract type AbstractProblemSolution <: AbstractSolution end
+
+    const CurrentDensity = Union{Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}, Level{L,S,Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}} where S where L} where U where T
+
     include("./Common/helpers.jl")
     include("parameters.jl")
     include("./Common/nondimensionalise.jl")

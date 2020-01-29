@@ -62,6 +62,14 @@ function IVProblem(
 
 end
 
+struct IVSolution <: AbstractProblemSolution
+    sol_fwd::Union{DiffEqBase.ODESolution,Nothing}
+    sol_rwd::Union{DiffEqBase.ODESolution,Nothing}
+    prob::IVProblem
+    I::CurrentDensity
+    V::Unitful.Voltage
+end
+
 function solve(p::IVProblem, args...)
     tend = (maximum(p.voltage_range) - minimum(p.voltage_range)) / abs(p.sweep_rate)
     #init
@@ -94,6 +102,7 @@ function solve(p::IVProblem, args...)
         s2 = solve(init_c)
         s1 = (s1, s2)
     end
+    #TODO: return as IVSolution
     return s1
 end
 
