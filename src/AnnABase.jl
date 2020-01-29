@@ -6,7 +6,7 @@ module AnnABase
     using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using DiffEqBase: get_tmp
     using DiffEqCallbacks: AutoAbstol
-    using SteadyStateDiffEq 
+    using SteadyStateDiffEq
     using ForwardDiff
     using LinearAlgebra
     using NumericalIntegration: integrate
@@ -18,7 +18,7 @@ module AnnABase
     using Setfield: setproperties
     using Interpolations
 
-    import DiffEqCallbacks.SavingCallback
+    import DiffEqCallbacks: SavingCallback, TerminateSteadyState
     import DiffEqBase.dualcache # dos not work if using
     import DiffEqBase.solve
     import Base.length
@@ -37,4 +37,6 @@ module AnnABase
     include("./Common/saving_callback.jl")
     include("./Common/redimensionalize.jl")
     include("./Common/calculate_currents.jl")
+
+    include("./Problems/IVProblem.jl")
 end # module

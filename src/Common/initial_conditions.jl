@@ -39,17 +39,21 @@ function initial_conditions(c::Cell)
         colorvec = matrix_colors(c_init.Jac),
     )
     τᵢ = c_init.parameters.τᵢ
-    prob = ODEProblem(odefun,u0,(0,50*ustrip(τᵢ |> u"s")),c_init)
+    prob = ODEProblem(odefun,u0,(0,5000*ustrip(τᵢ |> u"s")),c_init)
 
-    sol = solve(prob,c_init.alg_ctl.alg;
+    ss_cb = TerminateSteadyState(1e-6, c_init.alg_ctl.ss_tol)
+
+    abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
+    cb = CallbackSet(ss_cb, )
+    sol = solve(prob,Rodas5();
         progress_steps = 50,
         progress = true,
-        callback = AutoAbstol(false;init_curmax=u0 .+ 0.1),
+        callback = cb,
         dt =1e-15*ustrip(τᵢ  |> u"s"),
         dtmin = ustrip(1e-20*τᵢ |> u"s"), #1e-20,
         force_dtmin = true,
         reltol = c_init.alg_ctl.reltol,
-        abstol = u0 .* 0, #1e-12,#c.u0 .* 0,
+        abstol = c_init.alg_ctl.abstol,#u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,
     )
 
