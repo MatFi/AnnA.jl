@@ -1,8 +1,5 @@
-using AnnABase,AnnAPlot, Plots, Unitful
+using AnnABase , Unitful #,AnnAPlot, Plots
 
-parameters = AnnABase.Parameters(light = t->0,Rₛₕ =Inf*1u"V/A*m^2" )
-prob = AnnABase.IVProblem(parameters,[-0.2,1.4]u"V",0.005u"V/s")
-AnnABase.solve!(prob)
-typeof(prob.sol[1])
-
-AnnABase.calculate_currents(prob.sol[1])
+parameters = AnnABase.Parameters(N=300,light = t->0,Rₛₕ =Inf*1u"V/A*m^2" )
+prob = AnnABase.IVProblem(parameters,[1.2,0.3]u"V",0.005u"V/s",double_sweep=false)
+sol = AnnABase.solve(prob)

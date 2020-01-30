@@ -4,7 +4,6 @@ mutable struct IVProblem{B<:Bool,V<:AbstractArray,VR<:Number,P<:Parameters,C<:Al
     sweep_rate::VR
     double_sweep::B
     alg_control::C
-    sol
 end
 
 """
@@ -48,17 +47,12 @@ function IVProblem(
         )
     end
 
-    Vt = t -> ustrip(uconvert(u"V", first(range))) + ustrip(uconvert(u"V/s", rate)) * t
+    Vt = t -> ustrip(uconvert(u"V", first(range))) +
+              sign(-ustrip(first(range) + last(range))) *
+              abs(ustrip(uconvert(u"V/s", rate))) * ustrip(t)
 
     parm = setproperties(parm, V = Vt)
-    prob = IVProblem(
-        parm,
-        range,
-        rate,
-        double_sweep,
-        alg_control,
-        double_sweep ? [] : nothing,
-    )
+    prob = IVProblem(parm, range, rate, double_sweep, alg_control)
 
 end
 
@@ -66,9 +60,28 @@ struct IVSolution <: AbstractProblemSolution
     sol_fwd::Union{DiffEqBase.ODESolution,Nothing}
     sol_rwd::Union{DiffEqBase.ODESolution,Nothing}
     prob::IVProblem
-    I::CurrentDensity
-    V::Unitful.Voltage
+    I_fwd::Union{AbstractArray,Nothing}
+    I_rwd::Union{AbstractArray,Nothing}
+    V_fwd::Union{AbstractArray,Nothing}
+    V_rwd::Union{AbstractArray,Nothing}
 end
+
+IVSolution(fwd, rwd, p::IVProblem) = IVSolution(
+    fwd,
+    rwd,
+    p,
+    calculate_currents(fwd),
+    calculate_currents(rwd),
+    get_V(fwd),
+    get_V(rwd),
+)
+
+IVSolution(fwd, rwd::Nothing, p::IVProblem) =
+    IVSolution(fwd, nothing, p, calculate_currents(fwd), nothing, get_V(fwd), nothing)
+
+IVSolution(fwd::Nothing, rwd, p::IVProblem) =
+    IVSolution(nothing, rwd, p, nothing, calculate_currents(rwd), nothing, get_V(rwd))
+
 
 function solve(p::IVProblem, args...)
     tend = (maximum(p.voltage_range) - minimum(p.voltage_range)) / abs(p.sweep_rate)
@@ -84,9 +97,13 @@ function solve(p::IVProblem, args...)
             tend = tend,
         ),
     )
-    s1 = solve(init_c)#.u[end]
+    s1 = solve(init_c)
+
     if p.double_sweep == true
-        p2 = setproperties(p.parameters, V = t -> p.parameters.V(ustrip(tend |> u"s") - t))
+        p2 = setproperties(
+            p.parameters,
+            V = t -> p.parameters.V(ustrip(tend |> u"s") - ustrip(t)),
+        )
         init_c = Cell(
             p2;
             u0 = s1.u[end],
@@ -99,14 +116,12 @@ function solve(p::IVProblem, args...)
                 tend = tend,
             ),
         )
-        s2 = solve(init_c)
-        s1 = (s1, s2)
-    end
-    #TODO: return as IVSolution
-    return s1
-end
+        s2 = solve(init_c)#.u[end]
+        (fwd, rwd) = p.parameters.V(0) < p2.V(0) ? (s1, s2) : (s2, s1)
 
-function solve!(p::IVProblem, args...)
-    p.sol = solve(p, args...)
-    return nothing
+        return IVSolution(fwd, rwd, p)
+    end
+
+    (fwd, rwd) = p.parameters.V(0) < p.parameters.V(tend) ? (s1, nothing) : (nothing, s1)
+    return IVSolution(fwd, rwd, p)
 end

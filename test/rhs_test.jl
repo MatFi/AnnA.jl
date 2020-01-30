@@ -7,9 +7,6 @@
 
     @test_throws ErrorException AnnABase.Cell(prm, mode=:err)
 
-    cell_err = setproperties(cell,mode=:err)
-    @test_throws ErrorException cell.rhs(du,u,cell_err,0)
-
     #alls = @benchmark AnnABase.rhs!(du,u,cell,1.0)
     #@test allocs(alls) == 0
 end

@@ -54,7 +54,7 @@ with empty storage vectors.
 function DDTransientSolution(c::Cell)
     t = 1.0*c.parameters.τᵢ
     u = c.g(c.u0)
-    J = calculate_currents(c, u, 0.1, u) * c.parameters.jay
+    J = calculate_currents(c.g,c.ndim, u, 0.1, u) * c.parameters.jay
     V = u[2][3][end]*c.ndim.Vbi*c.parameters.VT
     u = rdim_sol(c,u)
     P = DDSpacialVariable.(u[1])
@@ -82,9 +82,9 @@ function (affect!::SavingAffect)(integrator)
     u = affect!.saved_values.cell.g(integrator.u) #dcompose the soultion vecto
     u_prev = affect!.saved_values.cell.g(integrator.uprev)
     if !iszero(affect!.saveiter)
-        J= calculate_currents(integrator.p, u, integrator.t - integrator.tprev, u_prev) * integrator.p.parameters.jay
+        J= calculate_currents(integrator.f.f.g,integrator.f.f.ndim, u, integrator.t - integrator.tprev, u_prev) * integrator.p.parameters.jay
     else
-        J= calculate_currents(integrator.p, u, 0, u) * integrator.p.parameters.jay
+        J= calculate_currents(integrator.f.f.g,integrator.f.f.ndim, u, 0, u) * integrator.p.parameters.jay
     end
 
     affect!.saveiter += 1

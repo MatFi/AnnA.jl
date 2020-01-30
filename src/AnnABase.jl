@@ -23,6 +23,7 @@ module AnnABase
     import DiffEqBase.solve
     import Base.length
 
+    abstract type AbstractProblem end
     abstract type AbstractSolution end
     abstract type AbstractProblemSolution <: AbstractSolution end
 
@@ -41,7 +42,7 @@ module AnnABase
     include("./Common/solve.jl")
     include("./Common/saving_callback.jl")
     include("./Common/redimensionalize.jl")
-    include("./Common/calculate_currents.jl")
+    include("./Common/calculate_externals.jl")
 
     include("./Problems/IVProblem.jl")
 end # module
