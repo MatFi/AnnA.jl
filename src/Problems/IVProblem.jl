@@ -24,7 +24,7 @@ Creates an `IVProblem`. The voltage parameter `V` defined in `parm` gets overwri
     `p = Setfield.setproperties(p::IVProblem, alg_control=AlgControl(...))`
 """
 function IVProblem(
-    parm::Parameters,
+    parm::AbstractParameters,
     range::AbstractArray,
     rate::Unitful.AbstractQuantity;
     double_sweep = true,

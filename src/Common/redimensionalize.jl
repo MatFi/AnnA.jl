@@ -9,8 +9,8 @@ function rdim_sol(sol,p::AbstractParameters)
     return  [P, ϕ ,n, p]
 end
 
-rdim_sol(c::Cell,sol) = rdim_sol(sol, c.parameters) # legacy wrapper
-rdim_sol(sol::Vector{Float64},p::AbstractParameters) = rdim_sol(decompose(sol,c.g),p)
+rdim_sol(c::Cell,sol::Array{T,1} where T<:Real) = rdim_sol(decompose(sol,c.g), c.parameters) # legacy wrapper
+#rdim_sol(sol::Vector{Float64},p::AbstractParameters) = rdim_sol(sol,p)
 function rdim_sol(sol::DiffEqBase.ODESolution)
     p = sol.prob.f.f
     u = decompose.(sol.u,p.g)
