@@ -14,5 +14,5 @@ using Unitful
     include("cell_test.jl")
     include("rhs_test.jl")
     include("solve_test.jl")
-    include("iv_problems_test.jl")
+    include("problems_test.jl")
 end
