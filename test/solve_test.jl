@@ -21,7 +21,7 @@
 
 
     @test isapprox(
-        ustrip(AnnABase.rdim_sol(sol)[2][3][end]),
+        ustrip(AnnABase.rdim_sol(sol)[end][2][3][end]),
         ustrip(-cell.ndim.Vbi * cell.parameters.VT),atol = 1e-4
     )
 
