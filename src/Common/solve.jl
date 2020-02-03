@@ -11,7 +11,7 @@ function solve(c::Cell;tend=c.alg_ctl.tend)
     tol_callback = AutoAbstol(false;init_curmax=c.u0 .+ 000.00001)
 #    (sav_callback, sav_sol) = SavingCallback(c)
 #    callbacks = CallbackSet(sav_callback, )
-    @info "Solve"
+    @debug "Solve"
 
     sol = solve(prob,c.alg_ctl.alg; c.alg_ctl.kwargs... )
     c.sol = sol

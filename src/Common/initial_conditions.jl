@@ -31,7 +31,7 @@ function initial_conditions(c::Cell)
     end
     c_init=deepcopy(c)
 
-    @info "Init_Solve"
+    @debug "Init_Solve"
 
     odefun = ODEFunction((dx,x,p,t) -> c.rhs(dx, x, p, 0);
         mass_matrix = c_init.M,
