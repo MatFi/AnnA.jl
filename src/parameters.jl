@@ -15,7 +15,8 @@ Base.@kwdef struct Parameters <: AbstractParameters
 
     # Perovskite parameters
     b::Number  = 400e-9u"m"           # Perovskite Layer thickness
-    εₚ::Number = 24.1*ε₀            # Perovskite permitivity
+    ε::Number = 24.1
+    εₚ::Number = ε*ε₀            # Perovskite permitivity
     Ec::Number = -3.7*q*u"V"        # Perovskite Conduction band energy
     Ev::Number = -5.3*q*u"V"        # Perovskite Valence band energy
     Eg::Number = Ec-Ev              # Perovskite Bandgap
