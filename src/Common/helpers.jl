@@ -92,10 +92,10 @@ function unpac_struct(s...)
 
     p=OrderedDict{Symbol,Any}()
     for arg in s
-        prm_names = fieldnames(typeof(arg))
+        prm_names = propertynames(arg,true)
         for n in prm_names
             #@eval $n = $p.$(n)
-            p[n] = getfield(arg,n)
+            p[n] = getproperty(arg,n)
         end
     end
     return p

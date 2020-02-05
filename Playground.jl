@@ -11,3 +11,13 @@ parameters isa AnnABase.AbstractParameters
 1u"s" isa Unitful.AbstractQuantity
 using ProfileView
 @profview AnnABase.solve(prob)
+parameters.Vbi
+parameters.τᵢ
+parameters.G₀
+parameters.n0
+parameters.p0
+parameters.nᵢ = 1u"m^-3"
+
+parameters = AnnABase.Parameters(N=300,light = t->0,Rₛₕ =Inf*1u"V/A*m^2")
+
+AnnABase.propertynames(parameters)

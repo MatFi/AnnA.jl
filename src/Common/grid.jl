@@ -16,9 +16,9 @@ end
 
 function Grid(p::AbstractParameters)
     #Unpack parameters
-    for n in fieldnames(Parameters)
-        @eval $n = $p.$(n)
-    end
+    #for n in propertynames(Parameters,true)
+    #    @eval $n = $p.$(n)
+    #end
 
     #pack filednames to dict
     d=OrderedDict{Symbol,Any}()
@@ -27,10 +27,10 @@ function Grid(p::AbstractParameters)
     end
 
     X = 0.2
-    wₑ=bₑ/b
-    wₕ=bₕ/b
-    LD= sqrt(kB*T*εₚ/(q^2*N₀))
-    λ  = LD/b
+    wₑ=p.bₑ/p.b
+    wₕ=p.bₕ/p.b
+    LD= sqrt(p.kB*p.T*p.εₚ/(p.q^2*p.N₀))
+    λ  = LD/p.b
     #@show λ
     st=1.0
     try
@@ -39,17 +39,17 @@ function Grid(p::AbstractParameters)
     catch e
 
     end
-    A  = b -> (tanh(st*(1-2/N))-(1.0-b)*tanh(st))/b
+    A  = b -> (tanh(st*(1-2/p.N))-(1.0-b)*tanh(st))/b
 
 
-    d[:N]  = N
+    d[:N]  = p.N
     d[:Nₑ] = trunc(Int,round(2/(1-atanh(A(wₑ))/st)))
     d[:Nₕ] = trunc(Int,round(2/(1-atanh(A(wₕ))/st)))
 
 
     #println(d[:Nₕ] ," ",d[:Nₑ] )
     #build the grids
-    d[:x]   = collect(range(0,1;length=N+1))
+    d[:x]   = collect(range(0,1;length=d[:N]+1))
     d[:xₑ]  = collect(range(-wₑ,0;length=d[:Nₑ]+1))
     d[:xₕ]  = collect(range(1,1+wₕ;length=d[:Nₕ]+1))
 

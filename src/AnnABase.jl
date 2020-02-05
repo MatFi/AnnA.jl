@@ -21,7 +21,7 @@ module AnnABase
     import DiffEqCallbacks: SavingCallback, TerminateSteadyState
     import DiffEqBase.dualcache # dos not work if using
     import DiffEqBase.solve
-    import Base.length
+    import Base:length, getproperty, setproperty!, propertynames
 
     abstract type AbstractProblem end
     abstract type AbstractSolution end
