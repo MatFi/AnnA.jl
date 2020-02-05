@@ -1,4 +1,10 @@
-mutable struct IVProblem{B<:Bool,V<:AbstractArray,VR<:Number,P<:Parameters,C<:AlgControl}
+struct IVProblem{
+    B<:Bool,
+    V<:AbstractArray,
+    VR<:Number,
+    P<:Parameters,
+    C<:AlgControl,
+} <: AbstractProblem
     parameters::P
     voltage_range::V
     sweep_rate::VR

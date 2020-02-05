@@ -62,3 +62,5 @@ function get_V(sol::DiffEqBase.ODESolution)
     end
     return V
 end
+
+get_t(sol::DiffEqBase.ODESolution) = upreferred.(sol.t*sol.prob.f.f.parameters.τᵢ )

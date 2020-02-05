@@ -3,8 +3,16 @@
     prob = AnnABase.IVProblem(parameters,[-0.2,1.4]u"V",0.005u"V/s")
     @test prob isa AnnABase.IVProblem
     @test  AnnABase.solve(prob) isa AnnABase.IVSolution
+
+    #forward direction
     prob = AnnABase.IVProblem(parameters,[-0.2,1.4]u"V",0.005u"V/s",double_sweep=false)
     @test  AnnABase.solve(prob) isa AnnABase.IVSolution
+
+    #reverse direction
     prob = AnnABase.IVProblem(parameters,[1.2,0.4]u"V",0.005u"V/s",double_sweep=false)
     @test  AnnABase.solve(prob) isa AnnABase.IVSolution
+
+    #test the ocvd
+    prob_ocvd = AnnABase.OCVDProblem(parameters,10u"s",1e3u"s")
+    @test  AnnABase.solve(prob_ocvd) isa AnnABase.OCVDSolution
 end
