@@ -90,8 +90,8 @@ function solve(p::IVProblem, args...)
         p.parameters,
         mode = :cc,
         alg_ctl = AlgControl(
-            dtmin = 1e-20,
-            dt = 1e-6,
+            dtmin = 1e-22,
+            dt = 1e-8,
             reltol = 1e-4,
             abstol = 1e-12,
             tend = tend,
@@ -109,8 +109,8 @@ function solve(p::IVProblem, args...)
             u0 = s1.u[end],
             mode = :cc,
             alg_ctl = AlgControl(
-                dtmin = 1e-20,
-                dt = 1e6,
+                dtmin = 1e-22,
+                dt = 1e-8,
                 reltol = 1e-6,
                 abstol = 1e-8,
                 tend = tend,
