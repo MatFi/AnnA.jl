@@ -1,24 +1,20 @@
 abstract type AbstractParameters end
-const vPar = Union{Number,Tuple,AbstractArray,Function,Array{Function,1}}
+const vPar = Union{Number,Tuple,AbstractArray,Function,Array{Function,1},T} where T
 Base.@kwdef mutable struct Parameters <: AbstractParameters
     """Model Parameters"""
-
     N::Integer  =   400     # Subintervals in perovskite layer, resulting in N+1 Grid points
-
-
     #Physical parameters
     ε₀::vPar = 8.854187817e-12u"F/m"  # Permitivity of free space
     q::vPar  = 1.6021766209e-19u"C"   # Elemntary charge of a proton
     kB::vPar = 8.61733035e-5u"eV/K"  # Bolzmann konstant
     T::vPar  = 300u"K"                # Temperature
-
     # Perovskite parameters
     b::vPar  = 400e-9u"m"           # Perovskite Layer thickness
     ε::vPar = 24.1
-    #εₚ::vPar = ε*ε₀            # Perovskite permitivity
+        #εₚ::vPar = ε*ε₀            # Perovskite permitivity
     Ec::vPar = -3.7u"eV"        # Perovskite Conduction band energy
     Ev::vPar = -5.3u"eV"        # Perovskite Valence band energy
-    #Eg::vPar = Ec-Ev              # Perovskite Bandgap
+        #Eg::vPar = Ec-Ev              # Perovskite Bandgap
     Dₙ::vPar = 1.7e-4u"m^2/s"     # Perovskite electron diffusion coefficient
     Dₚ::vPar = 1.7e-4u"m^2/s"     # Perovskite hole diffusion coefficient
     gc::vPar = 8.1e24u"m^-3"      # Perovskite conduction band DOS
@@ -27,7 +23,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     N₀::vPar = 1.6e25u"m^-3"      # Typical density of ion vacancys
     Dᵢ₀::vPar= 6.5e-8u"m^2/s"     # Diffusion constant
     Eᵢₐ::vPar= 0.58*q*u"V"        # Ativation energy of vacancy diffusion
-#    Dᵢ::vPar = Dᵢ₀*exp(-Eᵢₐ/(kB*T)) #ext #Diffusion coefficient of ions
+        #Dᵢ::vPar = Dᵢ₀*exp(-Eᵢₐ/(kB*T)) #ext #Diffusion coefficient of ions
 
     # Light Parameters
     α::vPar  = 1.3e7u"1/m"        # Perovskite absorption koefficient
@@ -36,7 +32,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     light::vPar = pulse(tₑ=1.0)
 
     # Recombination Parameters
-    #nᵢ::vPar = sqrt(gc*gv)*exp(-Eg/(2*kB*T)) #ext  #Intrinsic carrier density
+        #nᵢ::vPar = sqrt(gc*gv)*exp(-Eg/(2*kB*T)) #ext  #Intrinsic carrier density
     τₙ::vPar = 3e-9u"s"           #electron pseudo lifetime
     τₚ::vPar = 3e-7u"s"           # hole pseudo lifetime
     k₂::vPar = 0u"m^3/s"          # second order rate constant
@@ -54,18 +50,18 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     Ecₑ::vPar= -4.0*u"eV"          # ETL conduction band energy
     bₑ::vPar = 100e-9u"m"         # ETL width
     εₑᵣ::Real = 3
-    #εₑ::vPar = εₑᵣ*ε₀               # ETL permitivity
+        #εₑ::vPar = εₑᵣ*ε₀               # ETL permitivity
     Dₑ::vPar = 1e-5u"m^2/s"       # ETL electron diffusion coeficcient
-    #Efₑ::vPar = Ecₑ-kB*T*log(gcₑ /dₑ) #ext #HTL Fermi level on edge
+        #Efₑ::vPar = Ecₑ-kB*T*log(gcₑ /dₑ) #ext #HTL Fermi level on edge
     # HTL Parameters
     dₕ::vPar = 1e24u"m^-3"        # HTL effective doping density
     gvₕ::vPar= 5e25u"m^-3"        # HTL valence band DOS
     Evₕ::vPar= -5*u"eV"          # HTL valence band energy
     bₕ::vPar = 100e-9u"m"         # HTL width
     εₕᵣ::Real = 3
-#    εₕ::vPar = εₕᵣ*ε₀               # HTL permitivity
+        #εₕ::vPar = εₕᵣ*ε₀               # HTL permitivity
     Dₕ::vPar = 1e-5u"m^2/s"       # HTL electron diffusion coeficcient
-    #Efₕ::vPar = Evₕ+kB*T*log(gvₕ /dₕ) #ext #HTL Fermi level on edge
+        #Efₕ::vPar = Evₕ+kB*T*log(gvₕ /dₕ) #ext #HTL Fermi level on edge
 
     V::vPar = t-> 0#uconvert(Unitful.NoUnits,(Efₑ-Efₕ)/1u"V")      # Voltage protocoll
     Rₛₕ::vPar = 1e3u"V/A*m^2"     # shunt resistance
