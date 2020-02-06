@@ -27,10 +27,11 @@ function Grid(p::AbstractParameters)
     end
 
     X = 0.2
-    wₑ=p.bₑ/p.b
-    wₕ=p.bₕ/p.b
+    wₑ=convert(Float64,p.bₑ/p.b)
+    wₕ=convert(Float64,p.bₕ/p.b)
+
     LD= sqrt(p.kB*p.T*p.εₚ/(p.q^2*p.N₀))
-    λ  = LD/p.b
+    λ  = convert(Float64,LD/p.b)
     #@show λ
     st=1.0
     try
