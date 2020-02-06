@@ -66,17 +66,18 @@ function solve(p::OCVDProblem, args...)
 
 
     s1 = solve(init_c)
+    t0=ustrip(upreferred(copy(p.on_time)))
     p2 = setproperties(
         p.parameters,
-        light  = t -> p.parameters.light(t)+ustrip(p.on_time),
+        light  = t -> p.parameters.light(t+t0),
     )
     alg_ctl =  setproperties(
             p.alg_control,
             tend= p.decay_time,
         )
-    init_c = Cell(p2;u0 = s1.u[end],mode = :oc,alg_ctl =alg_ctl)
+    c = Cell(p2;u0 = s1.u[end],mode = :oc,alg_ctl =alg_ctl)
 
-    s2 = solve(init_c)#.u[end]
+    s2 = solve(c)#.u[end]
 
 
     return OCVDSolution(s1, s2, p)
