@@ -103,7 +103,7 @@ getproperty(p::AbstractParameters,::Val{:n0}) = p.dₑ* p.gc/p.gcₑ*exp((p.Ec�
 getproperty(p::AbstractParameters,::Val{:p0}) = p.dₕ* p.gv/p.gvₕ*exp((p.Ev-p.Evₕ)/(p.kB*p.T)) |> u"m^-3"
 
 
-Base.@kwdef struct AlgControl
+Base.@kwdef mutable struct AlgControl
 
     #Logging::LogLevel   = Warn    # Sets the log level:  Debug ⊂ Info ⊂ Warn ⊂ Error
 
@@ -130,3 +130,13 @@ Base.@kwdef struct AlgControl
         :maxiters => maxiters)
 
 end
+getproperty(p::AlgControl,n::Symbol) = getproperty(p::AlgControl,Val{n}())
+getproperty(p::AlgControl,::Val{S}) where {S} = getfield(p,S)
+getproperty(p::AlgControl,::Val{:kwargs}) = (; :reltol => p.reltol,
+    :abstol => p.abstol,
+    :dtmin => p.dtmin,
+    :dt => p.dt,
+    :force_dtmin => p.force_dtmin,
+    :progress_steps => p.progress_steps,
+    :progress => p.progress,
+    :maxiters => p.maxiters)
