@@ -8,7 +8,8 @@ function solve(c::Cell;tend=c.alg_ctl.tend)
 
     prob = get_problem(c,tend=tend)
 
-    tol_callback = AutoAbstol(false;init_curmax=c.u0 .+ 000.00001)
+    #tol_callback = AutoAbstol(false;init_curmax=c.u0 .+ 000.01)
+    #c.alg_ctl.abstol = ones(length(c.u0))*c.alg_ctl.abstol
 #    (sav_callback, sav_sol) = SavingCallback(c)
 #    callbacks = CallbackSet(sav_callback, )
     @debug "Solve"
