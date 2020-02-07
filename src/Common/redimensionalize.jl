@@ -27,6 +27,12 @@ function rdim_sol(sol::DiffEqBase.ODESolution)
     u_ret = rdim_sol.(u,(p.parameters,))
     return u_ret
 end
+function rdim_sol(c::Cell,sol::DiffEqBase.ODESolution)
+    p = c.rhs
+    u = decompose.(sol.u,p.g)
+    u_ret = rdim_sol.(u,(p.parameters,))
+    return u_ret
+end
 
 """
     rdim_sol(sol::DiffEqBase.ODESolution,t)
