@@ -14,15 +14,17 @@ function OCVDProblem(
     on_time = (on_time |> u"s")
     if alg_control isa Missing
         alg_control = AlgControl(
-            dtmin = ustrip(1e-20 * parm.τᵢ),
-            dt = ustrip(1e-12 * parm.τᵢ),
-            reltol = 1e-4,
-            abstol = 1e-12,
+            dtmin = ustrip((1e-30 * parm.τᵢ )|>u"s"),
+            dt = ustrip((1e-10 * parm.τᵢ)|>u"s"),
+            reltol = 1e-6,
+            abstol = 1e-8,
+            force_dtmin=false,
+            ss_tol=1e-6,
             tend = on_time ,
         )
     else
         #enforce correct tend
-        alc_control = setproperty!(alg_control, tend = ustrip(on_time / parm.τᵢ))
+        alc_control = setproperty!(alg_control, :tend,  on_time )
     end
 
     lght = pulse(
@@ -31,7 +33,8 @@ function OCVDProblem(
         Δh = 1.0,
         Δt = 1e-15,
     )
-    parm = setproperties(parm; light =lght, V= t->0)
+
+    parm = setproperties(parm; light =lght, V= (t)->t*0)
 
     prob = OCVDProblem(parm, promote(on_time, decay_time)..., alg_control)
 
@@ -66,6 +69,9 @@ function solve(p::OCVDProblem, args...)
 
 
     s1 = solve(init_c)
+
+    @debug (get_V(s1))[1] (get_V(s1))[end]
+
     t0=ustrip(upreferred(copy(p.on_time)))
     p2 = setproperties(
         p.parameters,
