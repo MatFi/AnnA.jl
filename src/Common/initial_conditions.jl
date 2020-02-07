@@ -39,24 +39,25 @@ function initial_conditions(c::Cell)
         colorvec = matrix_colors(c_init.Jac),
     )
     τᵢ = c_init.parameters.τᵢ
-    prob = ODEProblem(odefun,u0,(0,5000*ustrip(τᵢ |> u"s")),c_init)
+    prob = ODEProblem(odefun,u0,(0,1e6*ustrip(τᵢ |> u"s")),c_init)
 
-    ss_cb = TerminateSteadyState(1e-6, c_init.alg_ctl.ss_tol)
+    ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
 
-    abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
-    cb = CallbackSet(ss_cb, )
+    #abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
+    cb = CallbackSet(ss_cb,)#abstol_cb )
     sol = solve(prob,Rodas5();
         progress_steps = 50,
         progress = true,
         callback = cb,
-        dt =1e-15*ustrip(τᵢ  |> u"s"),
-        dtmin = ustrip(1e-20*τᵢ |> u"s"), #1e-20,
-        force_dtmin = true,
+        dt =1e-9*ustrip(τᵢ  |> u"s"),
+        dtmin = ustrip(1e-30*τᵢ |> u"s"), #1e-20,
+        force_dtmin = false,
         reltol = c_init.alg_ctl.reltol,
-        abstol = c_init.alg_ctl.abstol,#u0 .* 0, #1e-12,#c.u0 .* 0,
+        abstol = c_init.alg_ctl.abstol*ones(length(u0)),#u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,
     )
 
+    @debug "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
     return sol
 
 #=
