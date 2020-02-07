@@ -1,6 +1,6 @@
 struct IVProblem{
     B<:Bool,
-    V<:AbstractArray,
+    V<:Union{AbstractArray,Tuple},
     VR<:Number,
     P<:Parameters,
     C<:AlgControl,
@@ -31,7 +31,7 @@ Creates an `IVProblem`. The voltage parameter `V` defined in `parm` gets overwri
 """
 function IVProblem(
     parm::AbstractParameters,
-    range::AbstractArray,
+    range::Union{AbstractArray,Tuple},
     rate::Unitful.AbstractQuantity;
     double_sweep = true,
     alg_control = missing,
@@ -49,7 +49,7 @@ function IVProblem(
         #enforce correct tend
         alc_control = setproperty!(
             alg_control,
-            tend = (maximum(range) - minimum(range)) / abs(rate),
+            :tend, (maximum(range) - minimum(range)) / abs(rate)
         )
     end
 
@@ -92,14 +92,16 @@ IVSolution(fwd::Nothing, rwd, p::IVProblem) =
 function solve(p::IVProblem, args...)
     tend = (maximum(p.voltage_range) - minimum(p.voltage_range)) / abs(p.sweep_rate)
     #init
+    τᵢ = p.parameters.τᵢ
     init_c = Cell(
         p.parameters,
         mode = :cc,
         alg_ctl = AlgControl(
-            dtmin = 1e-22,
-            dt = 1e-8,
-            reltol = 1e-4,
+            dtmin = 1e-22*ustrip(τᵢ  |> u"s"),
+            dt = 1e-8*ustrip(τᵢ  |> u"s"),
+            reltol = 1e-6,
             abstol = 1e-12,
+            force_dtmin=false,
             tend = tend,
         ),
     )
@@ -118,7 +120,7 @@ function solve(p::IVProblem, args...)
                 dtmin = 1e-22,
                 dt = 1e-8,
                 reltol = 1e-6,
-                abstol = 1e-8,
+                abstol = 1e-10,
                 tend = tend,
             ),
         )
