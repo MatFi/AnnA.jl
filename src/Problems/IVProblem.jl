@@ -89,21 +89,25 @@ IVSolution(fwd::Nothing, rwd, p::IVProblem) =
     IVSolution(nothing, rwd, p, nothing, calculate_currents(rwd), nothing, get_V(rwd))
 
 
-function solve(p::IVProblem, args...)
+function solve(p::IVProblem, alg_control = missing, args...)
     tend = (maximum(p.voltage_range) - minimum(p.voltage_range)) / abs(p.sweep_rate)
     #init
     τᵢ = p.parameters.τᵢ
-    init_c = Cell(
-        p.parameters,
-        mode = :cc,
-        alg_ctl = AlgControl(
+    if alg_control isa Missing
+        alg_control = AlgControl(
             dtmin = 1e-22*ustrip(τᵢ  |> u"s"),
             dt = 1e-8*ustrip(τᵢ  |> u"s"),
             reltol = 1e-6,
-            abstol = 1e-12,
+            abstol = 1e-6,
             force_dtmin=false,
             tend = tend,
-        ),
+        )
+    end
+
+    init_c = Cell(
+        p.parameters,
+        mode = :cc,
+        alg_ctl = alg_control
     )
     s1 = solve(init_c)
 
@@ -116,13 +120,7 @@ function solve(p::IVProblem, args...)
             p2;
             u0 = s1.u[end],
             mode = :cc,
-            alg_ctl = AlgControl(
-                dtmin = 1e-22,
-                dt = 1e-8,
-                reltol = 1e-6,
-                abstol = 1e-10,
-                tend = tend,
-            ),
+            alg_ctl = alg_control
         )
         s2 = solve(init_c)#.u[end]
         (fwd, rwd) = p.parameters.V(0) < p2.V(0) ? (s1, s2) : (s2, s1)
