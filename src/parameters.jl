@@ -75,11 +75,11 @@ propertynames(p::AbstractParameters,private=true) = begin
     (pubs...,)
 end
 
-setproperty(p::AbstractParameters,n::Symbol) = setproperty(p::AbstractParameters,Val{n}())
-setproperty(p::AbstractParameters,::Val{S}) where {S} = setfield!(p,S)
-setproperty(p::AbstractParameters, ::Val{:nᵢ}) = begin
+setproperty!(p::AbstractParameters,n::Symbol,x) = setproperty(p::AbstractParameters,Val{n}(),x)
+setproperty!(p::AbstractParameters,::Val{S},x) where {S} = setfield!(p,S,x)
+setproperty!(p::AbstractParameters, ::Val{:nᵢ},x) = begin
     @warn "nᵢ is transformed to gc nd gv via gv= gc =2*kB*T*ln(nᵢ)/Eg"
-    g = 2*log(nᵢ)/p.Eg*p.kB*p.T
+    g = sqrt(x^2*exp(p.Eg/p.kB*p.T))
     setfield!(p,:gc,g)
     setfield!(p,:gv,g)
 end
@@ -91,7 +91,7 @@ getproperty(p::AbstractParameters,::Val{:εₕ}) = p.εₕᵣ*p.ε₀
 getproperty(p::AbstractParameters,::Val{:εₑ}) = p.εₑᵣ*p.ε₀
 getproperty(p::AbstractParameters,::Val{:Eg}) = p.Ec-p.Ev |> u"eV"
 getproperty(p::AbstractParameters,::Val{:Dᵢ}) = p.Dᵢ₀*exp(-p.Eᵢₐ/(p.kB*p.T)) |> u"m^2/s"
-getproperty(p::AbstractParameters,::Val{:nᵢ}) = sqrt(p.gc*p.gv)*exp(-p.Eg/(2*p.kB*p.T))  |> u"m^-3"
+getproperty(p::AbstractParameters,::Val{:nᵢ}) = sqrt(p.gc*p.gv*exp(-p.Eg/(p.kB*p.T)))
 getproperty(p::AbstractParameters,::Val{:Efₑ}) = p.Ecₑ-p.kB*p.T*log(p.gcₑ /p.dₑ) |> u"eV"
 getproperty(p::AbstractParameters,::Val{:Efₕ}) = p.Evₕ+p.kB*p.T*log(p.gvₕ /p.dₕ) |> u"eV"
 getproperty(p::AbstractParameters,::Val{:Vbi}) = (p.Efₑ-p.Efₕ) |> u"eV"

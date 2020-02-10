@@ -149,7 +149,7 @@ function (rhs!::Rhs)(du,u,p::Cell,t)
     FP  = DiffEqBase.get_tmp(rhs!.FP,u)
         mul!(FP,rhs!.o.𝕴,P); FP .= FP.*mE;
         mul!(Buff_N ,rhs!.o.𝔇,P)
-        FP .= λ .* (Buff_N .+ FP)
+        FP .= λ .* (Buff_N .+ FP) 
 
     fn  = DiffEqBase.get_tmp(rhs!.fn,u)
         mul!(fn,rhs!.o.𝕴,n); fn .= fn.*mE;
