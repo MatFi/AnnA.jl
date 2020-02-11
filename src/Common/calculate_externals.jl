@@ -59,9 +59,9 @@ function calculate_currents(sol::DiffEqBase.ODESolution)
     return J
 end
 
-function get_V(sol::DiffEqBase.ODESolution)
+function get_V(sol::DiffEqBase.ODESolution)#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
     p = sol.prob.f.f
-    V = Array{Unitful.Voltage}(undef,length(sol.t))
+    V =Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(sol.t))
 #    u = decompose.(sol.u,p.g)
     u = rdim_sol(sol)
     for (uu,i) in zip(u,eachindex(sol.t))
@@ -69,9 +69,10 @@ function get_V(sol::DiffEqBase.ODESolution)
     end
     return V
 end
-function get_V(c::Cell,sol::DiffEqBase.ODESolution)
+function get_V(c::Cell,sol::DiffEqBase.ODESolution)#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
+    p = sol.prob.f.f
     p = c.rhs
-    V = Array{Unitful.Voltage}(undef,length(sol.t))
+    V = Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(sol.t))
 #    u = decompose.(sol.u,p.g)
     u = rdim_sol(c,sol)
     for (uu,i) in zip(u,eachindex(sol.t))
