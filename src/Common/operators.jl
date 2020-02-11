@@ -19,9 +19,16 @@ end
 Compute the operators based on a given `Grid`. Use the `dense` keyword to switch between sparse ord dens representation
 """
 function Operators(g::Grid;flavor::Symbol=:dense)
-    for n in fieldnames(Grid)
-        @eval $n = $g.$(n)
-    end
+    #for n in fieldnames(Grid)
+    #    @eval $n = $g.$(n)
+    #end
+    p = unpac_struct(g)
+    N=p[:N]
+    Nₑ=p[:Nₑ]
+    Nₕ=p[:Nₕ]
+    dx=p[:dx]
+    dxₑ=p[:dxₑ]
+    dxₕ=p[:dxₕ]
 
     #pack filednames to dict
     d=OrderedDict{Symbol,Any}()
