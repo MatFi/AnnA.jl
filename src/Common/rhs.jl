@@ -146,10 +146,14 @@ function (rhs!::Rhs)(du,u,p::Cell,t)
     Buff_Nₑ=DiffEqBase.get_tmp(rhs!.Buff_Nₑ,u)
     Buff_Nₕ=DiffEqBase.get_tmp(rhs!.Buff_Nₕ,u)
 
-    FP  = DiffEqBase.get_tmp(rhs!.FP,u)
-        mul!(FP,rhs!.o.𝕴,P); FP .= FP.*mE;
-        mul!(Buff_N ,rhs!.o.𝔇,P)
-        FP .= λ .* (Buff_N .+ FP) 
+    if rhs!.parameters.freeze_ions
+        FP = DiffEqBase.get_tmp(rhs!.FP,u).*0
+    else
+        FP  = DiffEqBase.get_tmp(rhs!.FP,u)
+            mul!(FP,rhs!.o.𝕴,P); FP .= FP.*mE;
+            mul!(Buff_N ,rhs!.o.𝔇,P)
+            FP .= λ .* (Buff_N .+ FP)
+    end
 
     fn  = DiffEqBase.get_tmp(rhs!.fn,u)
         mul!(fn,rhs!.o.𝕴,n); fn .= fn.*mE;
@@ -222,7 +226,12 @@ function (rhs!::Rhs)(du,u,p::Cell,t)
     du[3*N+4] = fp[1]+rhs!.g.dx[1]*GR[1]/2 -rhs!.ndim.Rₗ(nₑ[end],p[1])
     du[4*N+4] = fpₕ[1]-fp[end]+(rhs!.g.dx[end]*GR[end])/2 -rhs!.ndim.Rᵣ(n[N+1],pₕ[1]); # continuity
     @inbounds @simd for i in 1:N-1
-        du[i+1] = FP[i+1] - FP[i];
+        if !rhs!.parameters.freeze_ions
+            du[i+1] = FP[i+1] - FP[i];
+        else
+            du[i+1]=0
+        end
+
         du[N+2+i] = mE[i+1]-mE[i]-cd[i]/λ²;
         du[2*N+3+i] = fn[i+1]-fn[i]+(rhs!.g.dx[i+1]*GR[i+1]+rhs!.g.dx[i]*GR[i])/2;
         du[3*N+4+i] = fp[i+1]-fp[i]+(rhs!.g.dx[i+1]*GR[i+1]+rhs!.g.dx[i]*GR[i])/2;

@@ -23,6 +23,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     N₀::vPar = 1.6e25u"m^-3"      # Typical density of ion vacancys
     Dᵢ₀::vPar= 6.5e-8u"m^2/s"     # Diffusion constant
     Eᵢₐ::vPar= 0.58*q*u"V"        # Ativation energy of vacancy diffusion
+    freeze_ions = false
         #Dᵢ::vPar = Dᵢ₀*exp(-Eᵢₐ/(kB*T)) #ext #Diffusion coefficient of ions
 
     # Light Parameters
@@ -43,7 +44,6 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     vₚₑ::vPar = 10u"m/s"          # hole recombination velocity for SHR/ETL
     vₙₕ::vPar = 0.1u"m/s"         # electron recombination velocity for SHR/HTL
     vₚₕ::vPar = 1e5u"m/s"         # hole recombination velocity for SHR/HTL
-
     # ELT Parameters
     dₑ::vPar = 1e24u"m^-3"        # ETL effective doping density
     gcₑ::vPar= 5e25u"m^-3"        # ETL conduction band DOS
@@ -75,11 +75,11 @@ propertynames(p::AbstractParameters,private=true) = begin
     (pubs...,)
 end
 
-setproperty!(p::AbstractParameters,n::Symbol,x) = setproperty(p::AbstractParameters,Val{n}(),x)
+setproperty!(p::AbstractParameters,n::Symbol,x) = setproperty!(p::AbstractParameters,Val{n}(),x)
 setproperty!(p::AbstractParameters,::Val{S},x) where {S} = setfield!(p,S,x)
 setproperty!(p::AbstractParameters, ::Val{:nᵢ},x) = begin
-    @warn "nᵢ is transformed to gc nd gv via gv= gc =2*kB*T*ln(nᵢ)/Eg"
-    g = sqrt(x^2*exp(p.Eg/p.kB*p.T))
+    @warn "nᵢ is transformed to gc and gv via gv=gc = sqrt(nᵢ²exp(Eg/kT))"
+    g = sqrt(x^2*exp(uconvert(Unitful.NoUnits,p.Eg/(p.kB*p.T))))
     setfield!(p,:gc,g)
     setfield!(p,:gv,g)
 end
