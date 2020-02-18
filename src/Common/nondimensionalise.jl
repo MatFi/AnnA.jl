@@ -142,10 +142,14 @@ function NonDimensionalize(prm::AbstractParameters)
         τᵣ  = uconvert(Unitful.NoUnits,p[:τₙ]*p[:dₕ]/(p[:τₚ]*p[:dₑ]))
         rtrap = uconvert(Unitful.NoUnits,(p[:τₙ]+p[:τₚ])*p[:nᵢ]/(p[:τₚ]*p[:dₑ]))
 
-        d[:R]= Rec_function(nᵢ²,kk,γ,τᵣ,rtrap)
+        d[:R]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     #    d[:R]= R!(R,n,p) -> @. R = (n*p-nᵢ²)*(kk+γ/(n+τᵣ*p+rtrap))
     else
-        d[:R]= (R,n,p)-> @. R = 0 * n
+        kk  = uconvert(Unitful.NoUnits,p[:k₂]*p[:dₑ]*p[:dₕ]/(p[:G₀]))
+        γ   = 0
+        τᵣ  = 1
+        rtrap = 1
+        d[:R]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     end
 
     """Interface ETM recombination"""
@@ -154,9 +158,13 @@ function NonDimensionalize(prm::AbstractParameters)
         γ   = uconvert(Unitful.NoUnits,p[:dₕ]*p[:vₚₑ]/(p[:b]*p[:G₀]))
         τᵣ  = uconvert(Unitful.NoUnits,p[:dₕ]*p[:vₚₑ]/(p[:vₙₑ]*p[:dₑ]))
         rtrap = uconvert(Unitful.NoUnits,(1/d[:kₑ]+p[:vₚₑ]/p[:vₙₑ])*p[:nᵢ]/p[:dₑ])
-        d[:Rₗ]= Rec_function(nᵢ²,kk,γ,τᵣ,rtrap)
+        d[:Rₗ]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     else
-        d[:Rₗ]= (n,p)-> @. 0*n
+        kk  = uconvert(Unitful.NoUnits,p[:k₂ₑ]*p[:dₑ]*p[:dₕ]/(p[:b]*p[:G₀]))
+        γ   = 0
+        τᵣ  = 1
+        rtrap = 1
+        d[:Rₗ]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     end
 
     """Interface HTM recombination"""
@@ -165,9 +173,13 @@ function NonDimensionalize(prm::AbstractParameters)
         γ   = uconvert(Unitful.NoUnits,p[:dₑ]*p[:vₙₕ]/(p[:b]*p[:G₀]))
         τᵣ  = uconvert(Unitful.NoUnits,p[:dₑ]*p[:vₙₕ]/(p[:vₚₕ]*p[:dₕ]))
         rtrap = uconvert(Unitful.NoUnits,(1/d[:kₕ]+p[:vₙₕ]/p[:vₚₕ])*p[:nᵢ]/p[:dₕ])
-        d[:Rᵣ]= Rec_function(nᵢ²,kk,γ,τᵣ,rtrap)
+        d[:Rᵣ]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     else
-        d[:Rᵣ]= (n,p)-> @. 0*n
+        kk  = uconvert(Unitful.NoUnits,p[:k₂ₕ]*p[:dₑ]*p[:dₕ]/(p[:b]*p[:G₀]))
+        γ   = 0
+        τᵣ  = 1
+        rtrap = 1
+        d[:Rᵣ]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     end
 
     d[:G] = Gen_function(uconvert(Unitful.NoUnits,p[:α]*p[:b]), Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ]|> u"s")), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
