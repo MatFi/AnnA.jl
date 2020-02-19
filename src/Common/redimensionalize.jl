@@ -42,7 +42,7 @@ seconds if no unit is given.
 """
 function rdim_sol(sol::DiffEqBase.ODESolution,t)
     p = sol.prob.f.f
-    u = decompose(sol(ustrip(upreferred(t/p.parameters.τᵢ))),p.g)
+    u = decompose(sol(ustrip(upreferred(t/p.parameters.τᵢ)|>ustrip)),p.g)
     u_ret = rdim_sol(u,p.parameters)
     return u_ret
 end
