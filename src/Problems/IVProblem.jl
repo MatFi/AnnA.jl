@@ -37,7 +37,9 @@ function IVProblem(
     alg_control = missing,
 )
 
+
     if alg_control isa Missing
+
         alg_control = AlgControl(
             dtmin = 1e-20,
             dt = 1e-8,
@@ -89,7 +91,7 @@ IVSolution(fwd::Nothing, rwd, p::IVProblem) =
     IVSolution(nothing, rwd, p, nothing, calculate_currents(rwd), nothing, get_V(rwd))
 
 
-function solve(p::IVProblem, alg_control = missing, args...)
+function solve(p::IVProblem, alg_control = p.alg_control, args...)
     tend = (maximum(p.voltage_range) - minimum(p.voltage_range)) / abs(p.sweep_rate)
     #init
     τᵢ = p.parameters.τᵢ
