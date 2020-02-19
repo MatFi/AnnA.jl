@@ -9,9 +9,9 @@ function calculate_currents(g,ndim, sol, dt, sol_prev)
         dt = Inf
     end
     N = g.Nₑ
-    #N = g.N
+    N = g.N
     κₙ = ndim.κₑ
-    #κₙ = ndim.κₙ
+#    κₙ = ndim.κₙ
     κₚ = ndim.κₚ
     dpt = ndim.dpt
     dpf = ndim.dpf
@@ -24,28 +24,29 @@ function calculate_currents(g,ndim, sol, dt, sol_prev)
     p = sol[4][1]
 
 
-    P = sol[1][1]
-    #ϕ = sol[2][2]
+#    P = sol[1][1]
+#    ϕ = sol[2][2]
 #    ϕ_prev = sol_prev[2][2]
-    #n = sol[3][2]
+#    n = sol[3][2]
 #    p = sol[4][1]
 
     dx = g.dxₑ
-    #dx = g.dx
-    pos = ceil(Int, (N + 1) / 2) + 0# *0+100  # mid of grid
+#    dx = g.dx
+#    pos = ceil(Int, (N + 1) / 2) + 0# *0+100  # mid of grid
 
-    pos =1
+    pos =2
     jn = κₙ ./ dx[pos] .*
          ((n[pos+1] - n[pos]) - (n[pos+1] + n[pos]) .* (ϕ[pos+1] - ϕ[pos]) ./ 2)
-    #jp = -κₚ ./ dx[pos] .*
+#    jp = -κₚ ./ dx[pos] .*
 #         (p[pos+1] - p[pos] + (p[pos+1] + p[pos]) .* (ϕ[pos+1] - ϕ[pos]) ./ 2)
+
     jd = dpt ./ dx[pos] .* (ϕ[pos+1] - ϕ[pos] - ϕ_prev[pos+1] + ϕ_prev[pos]) ./ dt
-    #jf = -dpf ./ dx[pos] .*
-    #     (P[pos+1] - P[pos] + (P[pos+1] + P[pos]) .* (ϕ[pos+1] - ϕ[pos]) ./ 2)
+#    jf = -dpf ./ dx[pos] .*
+#         (P[pos+1] - P[pos] + (P[pos+1] + P[pos]) .* (ϕ[pos+1] - ϕ[pos]) ./ 2)
 
     jₛₕ = -(sol[2][3][end] +ndim.Vbi) *ndim.σₛₕ
     return jn+ - jd + jₛₕ
-    return jn+ jp -jf - jd + jₛₕ
+    return jn + jp - jd -jf + jₛₕ
 end
 calculate_currents(p::Rhs, sol, dt, sol_prev) = calculate_currents(p.g,p.ndim, sol, dt, sol_prev)
 function calculate_currents(sol::DiffEqBase.ODESolution)
@@ -82,3 +83,21 @@ function get_V(c::Cell,sol::DiffEqBase.ODESolution)#::Array{Quantity{Float64,�
 end
 
 get_t(sol::DiffEqBase.ODESolution) = upreferred.(sol.t*sol.prob.f.f.parameters.τᵢ )
+
+function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
+    p = f.prob.f.f
+    sol_vec = rdim_sol(f,t)
+    r=Dict{Symbol,Any}()
+    r[:x]=p.g.x.*p.parameters.b
+    r[:xₑ]=p.g.xₑ.*p.parameters.b
+    r[:xₕ]=p.g.xₕ.*p.parameters.b
+    r[:P]=sol_vec[1][1]
+    r[:ϕ]=sol_vec[2][2]
+    r[:ϕₑ]=sol_vec[2][1]
+    r[:ϕₕ]=sol_vec[2][3]
+    r[:n]=sol_vec[3][2]
+    r[:nₑ]=sol_vec[3][1]
+    r[:p]=sol_vec[4][1]
+    r[:pₕ]=sol_vec[4][2]
+    return r
+end

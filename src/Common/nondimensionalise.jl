@@ -185,6 +185,8 @@ function NonDimensionalize(prm::AbstractParameters)
     d[:G] = Gen_function(uconvert(Unitful.NoUnits,p[:α]*p[:b]), Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ]|> u"s")), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
     d[:V] = Pot_function(uconvert(Unitful.NoUnits,p[:VT]/1u"V"),p[:V],uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
 
+    #when the ions are frozen no corrent is calculated afterwards
+    d[:dpf] = prm.freeze_ions ? Float64(0) : d[:dpf]
     NodimParameters(collect(values(d))...)
 end
 
