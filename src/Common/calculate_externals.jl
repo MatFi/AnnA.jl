@@ -70,7 +70,7 @@ function get_V(sol::DiffEqBase.ODESolution)#::Array{Quantity{Float64,𝐋^2*𝐌
     end
     return V
 end
-function get_V(c::Cell,sol::DiffEqBase.ODESolution)#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
+function get_V(c::Cell,sol::DiffEqBase.ODESolution)
     p = sol.prob.f.f
     p = c.rhs
     V = Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(sol.t))
