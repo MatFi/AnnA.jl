@@ -84,7 +84,7 @@ function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol
     Rhs(collect(values(d))...)
 end
 
-function (rhs!::Rhs)(du,u,p::Cell,t)
+function (rhs!::Rhs)(du,u,pr,t)
 
     δ   = rhs!.ndim.δ
     χ   = rhs!.ndim.χ
@@ -116,14 +116,13 @@ function (rhs!::Rhs)(du,u,p::Cell,t)
 
     ϕₑ  = DiffEqBase.get_tmp(rhs!.ϕₑ,u)
     nₑ  = DiffEqBase.get_tmp(rhs!.nₑ,u)
-    ϕₑ[Nₑ+1] = ϕ[1]
-    nₑ[Nₑ+1] = n[1]/rhs!.ndim.kₑ
+
     @inbounds @simd for i in 1:rhs!.g.Nₑ
         ϕₑ[i]   = u[4*N+4+i]
         nₑ[i]   = u[4*N+Nₑ+4+i]
     end
-#    ϕₑ[Nₑ] = ϕ[1]  #nasty fix probably wrong Nₑ ind nodim
-#    nₑ[Nₑ+1] = n[1]/rhs!.ndim.kₑ
+    ϕₑ[Nₑ+1] = ϕ[1]
+    nₑ[Nₑ+1] = n[1]/rhs!.ndim.kₑ
 
     ϕₕ  = DiffEqBase.get_tmp(rhs!.ϕₕ,u)
     pₕ  = DiffEqBase.get_tmp(rhs!.pₕ,u)
