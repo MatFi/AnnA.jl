@@ -100,6 +100,7 @@ function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
     r[:p]=sol_vec[4][1]
     r[:pₕ]=sol_vec[4][2]
     getQFL!(r,p.parameters)
+    r[:V]=sol_vec[2][3][end]+p.ndim.Vbi*p.parameters.VT
     return r
 end
 
