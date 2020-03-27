@@ -101,6 +101,13 @@ function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
     r[:pₕ]=sol_vec[4][2]
     getQFL!(r,p.parameters)
     r[:V]=sol_vec[2][3][end]+p.ndim.Vbi*p.parameters.VT
+    #calculate current wo dispacement
+    t_ndim =Float64(t/p.parameters.τᵢ)
+    ndim_sol=decompose(f(t_ndim), p.g)
+    dt = minimum(abs.(f.t .- t_ndim))
+    ndim_sol_prev=(f(t_ndim-abs(dt)), p.g)
+    ndim_sol_pre=decompose(f(Float64(t/p.parameters.τᵢ)), p.g)
+    r[:j]= -calculate_currents(p.g,p.ndim, ndim_sol, dt, ndim_sol)* p.parameters.jay
     return r
 end
 

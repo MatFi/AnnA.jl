@@ -36,8 +36,6 @@ function IVProblem(
     double_sweep = true,
     alg_control = missing,
 )
-
-
     if alg_control isa Missing
 
         alg_control = AlgControl(
@@ -205,3 +203,31 @@ function calc_ideality(s::IVSolution;at_V=:all)
     end
     id
 end
+
+#= Have to do this with interpolations
+"""
+    (j::IVSolution)(v::Unitful.Voltage,dir=:reverse)
+
+returns the current at a particular voltage, evaluated from the sweep direction dir (:reverse or :forward). Uses linear interpolation of datapoints
+
+"""
+function (j::IVSolution)(v::Unitful.Voltage,dir=:reverse)
+    i=j.I_rwd
+    u=j.V_rwd
+    if dir == :forward
+        i=j.I_fwd
+        u=j.V_fwd
+    end
+    idx_low = argmin(abs.(u.-v))
+    #we clip the endpoints for now,
+    #TODO: implement extraposation / not clipping ends
+    ((idx_low == 1 )||( idx_low == length(i))) && return i[idx_low]
+    idx_high = abs(u[idx_low-1] - v) < abs(u[idx_low+1]-v) ? idx_low+1 :  idx_low - 1
+
+    r = (v-u[idx_low])/(u[idx_high]-u[idx_low])
+    j_low=i[idx_low]
+    j_high = i[idx_high]
+
+    return -r*(j_high-j_low)+j_low
+end
+=#
