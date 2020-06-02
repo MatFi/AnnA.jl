@@ -18,12 +18,13 @@ module AnnABase
     using RecursiveArrayTools: copyat_or_push!
     using Setfield: setproperties
     using Interpolations
+    using DelimitedFiles: readdlm
 
     import DiffEqCallbacks: SavingCallback, TerminateSteadyState
     import DiffEqBase.dualcache # dos not work if using
     import DiffEqBase.solve
     import Base:length, getproperty, setproperty!, propertynames
-
+    
     abstract type AbstractProblem end
     abstract type AbstractSolution end
     abstract type AbstractProblemSolution <: AbstractSolution end
@@ -31,6 +32,7 @@ module AnnABase
     const CurrentDensity = Union{Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}, Level{L,S,Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}} where S where L} where U where T
 
     include("./Common/helpers.jl")
+    include("./helpers/dataloader.jl")
     include("parameters.jl")
     include("./Common/nondimensionalise.jl")
     include("./Common/grid.jl")
