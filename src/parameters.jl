@@ -119,6 +119,7 @@ Base.@kwdef mutable struct AlgControl
     progress_steps = 50
     maxiters = 5000
     tend = 1e5u"s"
+    initializealg = OrdinaryDiffEq.NoInit()
 
     kwargs = (; :reltol => reltol,
         :abstol => abstol,
@@ -127,7 +128,8 @@ Base.@kwdef mutable struct AlgControl
         :force_dtmin => force_dtmin,
         :progress_steps => progress_steps,
         :progress => progress,
-        :maxiters => maxiters)
+        :maxiters => maxiters,
+        :initializealg => initializealg,)
 
 end
 getproperty(p::AlgControl,n::Symbol) = getproperty(p::AlgControl,Val{n}())
@@ -139,4 +141,5 @@ getproperty(p::AlgControl,::Val{:kwargs}) = (; :reltol => p.reltol,
     :force_dtmin => p.force_dtmin,
     :progress_steps => p.progress_steps,
     :progress => p.progress,
-    :maxiters => p.maxiters)
+    :maxiters => p.maxiters,
+    :initializealg => initializealg,)
