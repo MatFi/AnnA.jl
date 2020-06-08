@@ -43,6 +43,7 @@ function initial_conditions(c::Cell)
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
 
+
     #abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
     cb = CallbackSet(ss_cb,)#abstol_cb )
     sol = solve(prob,Rodas5();
@@ -55,6 +56,7 @@ function initial_conditions(c::Cell)
         reltol = c_init.alg_ctl.reltol,
         abstol = c_init.alg_ctl.abstol*ones(length(u0)),#u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,
+        initializealg=OrdinaryDiffEq.NoInit(),
     )
 
     @debug "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
