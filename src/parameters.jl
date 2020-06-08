@@ -142,4 +142,4 @@ getproperty(p::AlgControl,::Val{:kwargs}) = (; :reltol => p.reltol,
     :progress_steps => p.progress_steps,
     :progress => p.progress,
     :maxiters => p.maxiters,
-    :initializealg => initializealg,)
+    :initializealg => p.initializealg,)
