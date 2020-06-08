@@ -104,7 +104,7 @@ getproperty(p::AbstractParameters,::Val{:p0}) = p.dₕ* p.gv/p.gvₕ*exp((p.Ev-p
 
 
 Base.@kwdef mutable struct AlgControl
-
+#TODO: make this just a Dict
     #Logging::LogLevel   = Warn    # Sets the log level:  Debug ⊂ Info ⊂ Warn ⊂ Error
 
     ss_tol::Float64     = 1e-6      # ftol for steady state detection
