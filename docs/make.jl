@@ -7,7 +7,7 @@ using Documenter
 using AnnABase
 
 makedocs(
-         sitename = "JulianMonger Documentation",
+         sitename = "AnnABase Documentation",
          modules = [AnnABase],
          doctest = true,
          strict = true,
