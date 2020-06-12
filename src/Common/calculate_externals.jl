@@ -112,11 +112,11 @@ function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
 end
 
 function getQFL!(d::Dict, p::AbstractParameters)
-     d[:nₑf] = @.p.Ecₑ - p.kB * p.T * log(p.gcₑ / d[:nₑ])
-     d[:nf] = @. p.Ec - p.kB * p.T * log(p.gc / d[:n])
+     d[:nₑf] = @.p.Ecₑ - p.kB * p.T * log(p.gcₑ / abs.(d[:nₑ]))
+     d[:nf] = @. p.Ec - p.kB * p.T * log(p.gc / abs.(d[:n]))
 
-     d[:pf] =@. p.Ev + p.kB * p.T * log(p.gv / d[:p])
-     d[:pₕf] = @.p.Evₕ + p.kB * p.T * log(p.gvₕ / d[:pₕ])
+     d[:pf] =@. p.Ev + p.kB * p.T * log(p.gv / abs.(d[:p]))
+     d[:pₕf] = @.p.Evₕ + p.kB * p.T * log(p.gvₕ / abs.(d[:pₕ]))
      d[:QFLS] = @.d[:nf] - d[:pf]
      d[:V] = d[:ϕₕ][end]+p.Vbi/u"eV"*u"V"
     nothing
