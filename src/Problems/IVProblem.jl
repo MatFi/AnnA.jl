@@ -41,8 +41,8 @@ function IVProblem(
         alg_control = AlgControl(
             dtmin = 1e-20,
             dt = 1e-8,
-            reltol = 1e-4,
-            abstol = 1e-12,
+            reltol = 1e-5,
+            abstol = 1e-8,
             tend = (maximum(range) - minimum(range)) / abs(rate),
         )
     else
