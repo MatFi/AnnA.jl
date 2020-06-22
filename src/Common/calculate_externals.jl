@@ -51,7 +51,7 @@ end
 calculate_currents(p::Rhs, sol, dt, sol_prev) = calculate_currents(p.g,p.ndim, sol, dt, sol_prev)
 function calculate_currents(sol::DiffEqBase.ODESolution)
     p = sol.prob.f.f
-    J = Array{typeof(p.parameters.jay |> u"mA/cm^2")}(undef,length(sol.t))
+    J = Array{typeof(p.parameters.jay |> u"A/m^2")}(undef,length(sol.t))
     u = decompose.(sol.u,p.g)
     J[1] =calculate_currents(p, u[1], Inf, u[1]) * p.parameters.jay
     for (u,dt,u_prev,i) in zip(u[2:end],diff(sol.t),u[1:end-1],1:length(sol.t)-1)
