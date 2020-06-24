@@ -115,7 +115,7 @@ Base.@kwdef mutable struct AlgControl
     dtmin   = 1e-15
     dt      = 1e-14
     force_dtmin = true
-    progress = true
+    progress = false
     progress_steps = 50
     maxiters = 1000
     tend = 1e5u"s"
