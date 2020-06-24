@@ -30,7 +30,7 @@ function get_problem(c::Cell;tend = 20.0u"s")
     )
     tspan = (0.0, convert(Float64,(tend/c.parameters.τᵢ)))
 
-    tol_callback = AutoAbstol(false;init_curmax=u0 .+ 0.1)
+    #tol_callback = AutoAbstol(false;init_curmax=u0 .+ 0.1)
 
     prob = ODEProblem(odefun,u0,tspan,c)
 end
