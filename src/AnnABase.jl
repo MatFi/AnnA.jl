@@ -5,7 +5,7 @@ module AnnABase
     using DiffEqBase: ODEFunction, ODEProblem, solve
     using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using DiffEqBase: get_tmp
-    using DiffEqCallbacks: AutoAbstol
+    #using DiffEqCallbacks: AutoAbstol
     using SteadyStateDiffEq
     using ForwardDiff
     using LinearAlgebra
@@ -21,11 +21,11 @@ module AnnABase
     using Interpolations
     using DelimitedFiles: readdlm
 
-    import DiffEqCallbacks: SavingCallback, TerminateSteadyState
+    import DiffEqCallbacks: TerminateSteadyState
     import DiffEqBase.dualcache # dos not work if using
     import DiffEqBase.solve
     import Base:length, getproperty, setproperty!, propertynames
-    
+
     abstract type AbstractProblem end
     abstract type AbstractSolution end
     abstract type AbstractProblemSolution <: AbstractSolution end
@@ -44,7 +44,7 @@ module AnnABase
     include("./Common/initial_conditions.jl")
     include("./Common/jacobian.jl")
     include("./Common/solve.jl")
-    include("./Common/saving_callback.jl")
+#    include("./Common/saving_callback.jl")
     include("./Common/redimensionalize.jl")
     include("./Common/calculate_externals.jl")
 
