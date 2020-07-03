@@ -79,9 +79,9 @@ setproperty!(p::AbstractParameters,n::Symbol,x) = setproperty!(p::AbstractParame
 setproperty!(p::AbstractParameters,::Val{S},x) where {S} = setfield!(p,S,x)
 setproperty!(p::AbstractParameters, ::Val{:nᵢ},x) = begin
     @warn "nᵢ is transformed to gc and gv via gv=gc = sqrt(nᵢ²exp(Eg/kT))"
-    g = sqrt(x^2*exp(uconvert(Unitful.NoUnits,p.Eg/(p.kB*p.T))))
-    setfield!(p,:gc,g)
-    setfield!(p,:gv,g)
+    g = sqrt(x^2*exp(uconvert(Unitful.NoUnits,p.Eg/(p.kB*p.T))));
+    setfield!(p,:gc,g);
+    setfield!(p,:gv,g);
 end
 
 getproperty(p::AbstractParameters,n::Symbol) = getproperty(p::AbstractParameters,Val{n}())
