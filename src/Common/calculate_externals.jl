@@ -60,12 +60,15 @@ function calculate_currents(sol::DiffEqBase.ODESolution)
     return J
 end
 
-function get_V(sol::DiffEqBase.ODESolution)#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
+
+function get_V(sol::DiffEqBase.ODESolution;t=[])#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
     p = sol.prob.f.f
-    V =Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(sol.t))
+
 #    u = decompose.(sol.u,p.g)
-    u = rdim_sol(sol)
-    for (uu,i) in zip(u,eachindex(sol.t))
+
+    u = isempty(t) ? rdim_sol(sol) : rdim_sol(sol,t)
+    V =Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(u))
+    for (i,uu) in enumerate(u)
         V[i]= uu[2][3][end]+p.ndim.Vbi*p.parameters.VT
     end
     return V
@@ -79,6 +82,7 @@ function get_V(c::Cell,sol::DiffEqBase.ODESolution)
     for (uu,i) in zip(u,eachindex(sol.t))
         V[i]= uu[2][3][end]+p.ndim.Vbi*p.parameters.VT
     end
+
     return V
 end
 

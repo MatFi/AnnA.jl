@@ -121,7 +121,7 @@ function NonDimensionalize(prm::AbstractParameters)
     d[:kₑ]  = p[:gc]/p[:gcₑ]*exp((p[:Ecₑ]-p[:Ec])/(p[:kB]*p[:T]))
     d[:kₕ]  = p[:gv]/p[:gvₕ]*exp((p[:Ev]-p[:Evₕ])/(p[:kB]*p[:T]))
 
-    d[:σₛₕ] = p[:VT]/p[:Rₛₕ]/p[:jay]
+    d[:σₛₕ] = 1/p[:Rₛₕ]/p[:jay]*p[:VT]
     #Test for nodimensionalty
     for i in eachindex(d)
         if typeof(d[i]) <: Unitful.Quantity
