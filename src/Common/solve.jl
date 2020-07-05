@@ -1,4 +1,4 @@
-function solve(c::Cell;tend=c.alg_ctl.tend)
+function solve(c::Cell;tend=c.alg_ctl.tend,kwargs...)
     if (c.initialized==:false)
         initial_conditions!(c)
     #    if c.initialized != :Sucess
@@ -14,7 +14,7 @@ function solve(c::Cell;tend=c.alg_ctl.tend)
 #    callbacks = CallbackSet(sav_callback, )
     @debug "Solve"
 
-    sol = solve(prob,c.alg_ctl.alg; c.alg_ctl.kwargs... )
+    sol = solve(prob,c.alg_ctl.alg; c.alg_ctl.kwargs...,kwargs... )
     c.sol = sol
     return sol
 end
