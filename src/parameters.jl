@@ -75,7 +75,7 @@ end
 
 propertynames(p::AbstractParameters,private=true) = begin
     pubs = fieldnames(typeof(p))
-    privs =(:εₚ,:εₕ,:εₑ,:Eg,:Dᵢ,:nᵢ,:Efₑ,:Efₕ,:Vbi,:VT,:τᵢ,:G₀,:jay,:n0,:p0)
+    privs =(:gc,:gv,:gcₑ,:gvₕ,:εₚ,:εₕ,:εₑ,:Eg,:Dᵢ,:nᵢ,:Efₑ,:Efₕ,:Vbi,:VT,:τᵢ,:G₀,:jay,:n0,:p0)
     private && return (pubs...,privs...)
     (pubs...,)
 end
