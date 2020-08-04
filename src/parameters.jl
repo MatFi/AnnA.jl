@@ -1,5 +1,6 @@
 abstract type AbstractParameters end
 const vPar = Union{Number,Tuple,AbstractArray,Function,Array{Function,1},T} where T
+
 Base.@kwdef mutable struct Parameters <: AbstractParameters
     """Model Parameters"""
     N::Integer  =   400     # Subintervals in perovskite layer, resulting in N+1 Grid points
@@ -17,8 +18,10 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
         #Eg::vPar = Ec-Ev              # Perovskite Bandgap
     Dₙ::vPar = 1.7e-4u"m^2/s"     # Perovskite electron diffusion coefficient
     Dₚ::vPar = 1.7e-4u"m^2/s"     # Perovskite hole diffusion coefficient
-    gc::vPar = 8.1e24u"m^-3"      # Perovskite conduction band DOS
-    gv::vPar = 5.8e24u"m^-3"      # Perovskite valence band DOS
+  #  gc::vPar = 8.1e24u"m^-3"      # Perovskite conduction band DOS
+  #  gv::vPar = 5.8e24u"m^-3"      # Perovskite valence band DOS
+    mₑ::vPar = 0.2                  #Perovskite electron mass
+    mₕ::vPar = 0.2                  #Perovskite hole mass
     # Ion Parameters
     N₀::vPar = 1.6e25u"m^-3"      # Typical density of ion vacancys
     Dᵢ₀::vPar= 6.5e-8u"m^2/s"     # Diffusion constant
@@ -46,7 +49,8 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     vₚₕ::vPar = 1e5u"m/s"         # hole recombination velocity for SHR/HTL
     # ELT Parameters
     dₑ::vPar = 1e24u"m^-3"        # ETL effective doping density
-    gcₑ::vPar= 5e25u"m^-3"        # ETL conduction band DOS
+#    gcₑ::vPar= 5e25u"m^-3"        # ETL conduction band DOS
+    mcₑ::vPar= 1.5                  # ETL electron mass
     Ecₑ::vPar= -4.0*u"eV"          # ETL conduction band energy
     bₑ::vPar = 100e-9u"m"         # ETL width
     εₑᵣ::Real = 3
@@ -55,7 +59,8 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
         #Efₑ::vPar = Ecₑ-kB*T*log(gcₑ /dₑ) #ext #HTL Fermi level on edge
     # HTL Parameters
     dₕ::vPar = 1e24u"m^-3"        # HTL effective doping density
-    gvₕ::vPar= 5e25u"m^-3"        # HTL valence band DOS
+  #  gvₕ::vPar= 5e25u"m^-3"        # HTL valence band DOS
+    mvₕ::vPar= 12                 # HTL hole mass
     Evₕ::vPar= -5*u"eV"          # HTL valence band energy
     bₕ::vPar = 100e-9u"m"         # HTL width
     εₕᵣ::Real = 3
@@ -83,6 +88,11 @@ setproperty!(p::AbstractParameters, ::Val{:nᵢ},x) = begin
     setfield!(p,:gc,g);
     setfield!(p,:gv,g);
 end
+setproperty!(p::AbstractParameters, ::Val{:gc},x) = setfield!(p,:mₑ,(x/2)^(2/3)*(4.13566769692e-15u"eV*s")^2/(2π*9.10938356e-31u"kg"*p.kB*p.T)|>upreferred)
+setproperty!(p::AbstractParameters, ::Val{:gv},x) = setfield!(p,:mₕ,(x/2)^(2/3)*(4.13566769692e-15u"eV*s")^2/(2π*9.10938356e-31u"kg"*p.kB*p.T)|>upreferred)
+setproperty!(p::AbstractParameters, ::Val{:gcₑ},x) = setfield!(p,:mcₑ,(x/2)^(2/3)*(4.13566769692e-15u"eV*s")^2/(2π*9.10938356e-31u"kg"*p.kB*p.T)|>upreferred)
+setproperty!(p::AbstractParameters, ::Val{:gvₕ},x) = setfield!(p,:mvₕ,(x/2)^(2/3)*(4.13566769692e-15u"eV*s")^2/(2π*9.10938356e-31u"kg"*p.kB*p.T)|>upreferred)
+
 
 getproperty(p::AbstractParameters,n::Symbol) = getproperty(p::AbstractParameters,Val{n}())
 getproperty(p::AbstractParameters,::Val{S}) where {S} = getfield(p,S)
@@ -101,7 +111,10 @@ getproperty(p::AbstractParameters,::Val{:G₀}) = p.Fₚₕ/p.b*(1-exp(-p.α*p.b
 getproperty(p::AbstractParameters,::Val{:jay}) = p.q*p.G₀*p.b |> u"A/m^2"
 getproperty(p::AbstractParameters,::Val{:n0}) = p.dₑ* p.gc/p.gcₑ*exp((p.Ecₑ-p.Ec)/(p.kB*p.T))  |> u"m^-3"
 getproperty(p::AbstractParameters,::Val{:p0}) = p.dₕ* p.gv/p.gvₕ*exp((p.Ev-p.Evₕ)/(p.kB*p.T)) |> u"m^-3"
-
+getproperty(p::AbstractParameters,::Val{:gc}) = 2*(2π*p.mₑ*9.10938356e-31u"kg"*p.kB*p.T/(4.13566769692e-15u"eV*s")^2)^(3/2)|> u"m^-3"
+getproperty(p::AbstractParameters,::Val{:gv}) = 2*(2π*p.mₕ*9.10938356e-31u"kg"*p.kB*p.T/(4.13566769692e-15u"eV*s")^2)^(3/2)|> u"m^-3"
+getproperty(p::AbstractParameters,::Val{:gcₑ}) = 2*(2π*p.mcₑ*9.10938356e-31u"kg"*p.kB*p.T/(4.13566769692e-15u"eV*s")^2)^(3/2)|> u"m^-3"
+getproperty(p::AbstractParameters,::Val{:gvₕ}) = 2*(2π*p.mvₕ*9.10938356e-31u"kg"*p.kB*p.T/(4.13566769692e-15u"eV*s")^2)^(3/2)|> u"m^-3"
 
 Base.@kwdef mutable struct AlgControl
 #TODO: make this just a Dict
