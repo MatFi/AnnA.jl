@@ -26,7 +26,7 @@ function OCVDProblem(
         #enforce correct tend
         alc_control = setproperty!(alg_control, :tend,  on_time )
     end
-
+   
     lght = pulse(
         tₑ = Float64(ustrip(on_time)) + 2e-15,
         w = Float64(ustrip(on_time)),
@@ -60,15 +60,15 @@ OCVDSolution(on, decay, p::OCVDProblem) = OCVDSolution(
     get_V(decay),
 )
 
-function solve(p::OCVDProblem, args...)
-
+function solve(pp::OCVDProblem, args...)
+    p=deepcopy(pp)
     tend = p.on_time
     parms= p.parameters
 
     init_c = Cell(parms;mode = :oc,alg_ctl = p.alg_control)
 
-
-    s1 = solve(init_c)
+    @debug p.on_time
+    s1 = solve(init_c,tend=p.on_time)
 
     @debug (get_V(s1))[1] (get_V(s1))[end]
 
@@ -77,6 +77,7 @@ function solve(p::OCVDProblem, args...)
         p.parameters,
         light  = t -> p.parameters.light(t+t0),
     )
+    @show t0
     alg_ctl =  setproperties(
             p.alg_control,
             tend= p.decay_time,
