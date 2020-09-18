@@ -25,7 +25,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     # Ion Parameters
     N₀::vPar = 1.6e25u"m^-3"      # Typical density of ion vacancys
     Dᵢ₀::vPar= 6.5e-8u"m^2/s"     # Diffusion constant
-    Eᵢₐ::vPar= 0.58*q*u"V"        # Ativation energy of vacancy diffusion
+    Eᵢₐ::vPar= 0.58*u"eV"        # Ativation energy of vacancy diffusion
     freeze_ions = false
         #Dᵢ::vPar = Dᵢ₀*exp(-Eᵢₐ/(kB*T)) #ext #Diffusion coefficient of ions
 
