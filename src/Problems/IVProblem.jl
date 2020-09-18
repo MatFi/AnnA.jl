@@ -128,7 +128,7 @@ function solve(p::IVProblem, alg_control = p.alg_control, args...)
         return IVSolution(fwd, rwd, p)
     end
 
-    (fwd, rwd) = p.parameters.V(0) < p.parameters.V(tend) ? (s1, nothing) : (nothing, s1)
+    (fwd, rwd) = p.parameters.V(0) < p.parameters.V(tend|>ustrip) ? (s1, nothing) : (nothing, s1)
     return IVSolution(fwd, rwd, p)
 end
 
