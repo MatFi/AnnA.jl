@@ -15,7 +15,8 @@ module AnnABase
     using SparseArrays
     using Unitful
     using Unitful.DefaultSymbols
-
+    using DataFrames: DataFrame
+    using Waveforms: trianglewave
     using RecursiveArrayTools: copyat_or_push!
     using Setfield: setproperties
     using Interpolations
@@ -48,9 +49,9 @@ module AnnABase
     include("./Common/redimensionalize.jl")
     include("./Common/calculate_externals.jl")
 
-    include("./Problems/IVProblem.jl")
-    include("./Problems/JscVocProblem.jl")
-    include("./Problems/OCVDProblem.jl")
-
+    include("./Problems/IVProblem.jl") #deprecate
+    include("./Problems/JscVocProblem.jl")#deprecate
+    include("./Problems/OCVDProblem.jl")#deprecate
+    include("./Problems/ProblemSolution.jl")
 
 end # module

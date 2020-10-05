@@ -36,6 +36,9 @@ function IVProblem(
     double_sweep = true,
     alg_control = missing,
 )
+    range = ustrip.(uconvert.((u"V",),range))
+    rate =ustrip(uconvert(u"V/s", rate))
+    tend = (maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)
     if alg_control isa Missing
 
         alg_control = AlgControl(
@@ -43,19 +46,24 @@ function IVProblem(
             dt = 1e-8,
             reltol = 1e-5,
             abstol = 1e-8,
-            tend = (maximum(range) - minimum(range)) / abs(rate),
+            tend = tend*u"s",
         )
     else
         #enforce correct tend
         alc_control = setproperty!(
             alg_control,
-            :tend, (maximum(range) - minimum(range)) / abs(rate)
+            :tend, tend*u"s"
         )
     end
+    rev = diff(range)[1] <0 
+    amplitude = abs(first(range) - last(range))
+    freq= π/2/tend * (1+double_sweep) *(1-2*rev)
+    Vt= t -> amplitude*trianglewave(freq*ustrip(t)+(rev * π ))+minimum(range)
 
-    Vt = t -> ustrip(uconvert(u"V", first(range))) +
-              sign(ustrip(-first(range) + last(range))) *
-              abs(ustrip(uconvert(u"V/s", rate))) * ustrip(t)
+ 
+   # Vt = t -> ustrip(uconvert(u"V", first(range))) +
+    #          sign(ustrip(-first(range) + last(range))) *
+    #          abs(ustrip(uconvert(u"V/s", rate))) * ustrip(t)
 
     parm = setproperties(parm, V = Vt)
     prob = IVProblem(parm, range, rate, double_sweep, alg_control)
@@ -90,19 +98,10 @@ IVSolution(fwd::Nothing, rwd, p::IVProblem) =
 
 
 function solve(p::IVProblem, alg_control = p.alg_control, args...)
-    tend = (maximum(p.voltage_range) - minimum(p.voltage_range)) / abs(p.sweep_rate)
+
     #init
     τᵢ = p.parameters.τᵢ
-    if alg_control isa Missing
-        alg_control = AlgControl(
-            dtmin = 1e-22*ustrip(τᵢ  |> u"s"),
-            dt = 1e-8*ustrip(τᵢ  |> u"s"),
-            reltol = 1e-6,
-            abstol = 1e-6,
-            force_dtmin=false,
-            tend = tend,
-        )
-    end
+
 
     init_c = Cell(
         p.parameters,
@@ -111,7 +110,7 @@ function solve(p::IVProblem, alg_control = p.alg_control, args...)
     )
     s1 = solve(init_c)
 
-    if p.double_sweep == true
+    if false # p.double_sweep == true
         p2 = setproperties(
             p.parameters,
             V = t -> p.parameters.V(ustrip(tend |> u"s") - ustrip(t)),
@@ -123,13 +122,10 @@ function solve(p::IVProblem, alg_control = p.alg_control, args...)
             alg_ctl = alg_control
         )
         s2 = solve(init_c)#.u[end]
-        (fwd, rwd) = p.parameters.V(0) < p2.V(0) ? (s1, s2) : (s2, s1)
 
-        return IVSolution(fwd, rwd, p)
+        return IVSolution(s1, s2, p)
     end
-
-    (fwd, rwd) = p.parameters.V(0) < p.parameters.V(tend|>ustrip) ? (s1, nothing) : (nothing, s1)
-    return IVSolution(fwd, rwd, p)
+    return ProblemSolution(s1)
 end
 
 function steadyStateI(V::Number,s::IVSolution;ss_tol=1e-6)
