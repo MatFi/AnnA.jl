@@ -1,4 +1,5 @@
 struct ProblemSolution <:AbstractProblemSolution
+    parameters
     df
     xₑ
     x
@@ -7,7 +8,7 @@ end
 function ProblemSolution(sol::ODESolution)
     parm = sol.prob.f.f
     grid=parm.g
-    ProblemSolution(todf(sol),grid.xₑ,grid.x,grid.xₕ)
+    ProblemSolution(parm,todf(sol),grid.xₑ,grid.x,grid.xₕ)
 end
 
 
