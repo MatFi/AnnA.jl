@@ -30,7 +30,7 @@ function todf(sol::ODESolution)
     phi= map(a-> a[2][2], d)
     n =  map(a-> a[3][2], d)
     p=map(a-> a[4][1], d)
-    phi_htm= map(a-> a[3][1], d)
+    phi_htm= map(a-> a[2][3], d)
     p_htm=map(a-> a[4][2], d)
     
     light= parm.parameters.light.(ustrip(sol.t*τᵢ.|> u"s" ))
