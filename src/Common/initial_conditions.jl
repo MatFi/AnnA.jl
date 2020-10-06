@@ -14,7 +14,7 @@ function initial_conditions(c::Cell)
     # the algebraic varibles nowher apper as timederivative in the massmatrix
     cc =deepcopy(c)
     #if c.mode == :oc
-        p_init = setproperties(cc.parameters, V = t -> 0) #ensure that we initialize to
+        p_init = setproperties(cc.parameters, V = t -> convert(Float64,upreferred(c.alg_ctl.tstart/c.parameters.τᵢ))) #ensure that we initialize to
         c_init= setproperties(cc, parameters = p_init,
             mode = :precondition,
             Jac = get_jac_sparse_pattern(cc.g; mode = :cc))

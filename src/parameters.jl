@@ -131,6 +131,7 @@ Base.@kwdef mutable struct AlgControl
     progress = false
     progress_steps = 50
     maxiters = 1000
+    tstart =0.0u"s"
     tend = 1e5u"s"
     initializealg = OrdinaryDiffEq.NoInit()
 

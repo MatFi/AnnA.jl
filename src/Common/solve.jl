@@ -1,4 +1,4 @@
-function solve(c::Cell;tend=c.alg_ctl.tend,kwargs...)
+function solve(c::Cell;tstart=c.alg_ctl.tstart, tend=c.alg_ctl.tend,kwargs...)
     if (c.initialized==:false)
         initial_conditions!(c)
     #    if c.initialized != :Sucess
@@ -6,7 +6,7 @@ function solve(c::Cell;tend=c.alg_ctl.tend,kwargs...)
     #    end
     end
 
-    prob = get_problem(c,tend=tend)
+    prob = get_problem(c,tstart=tstart,tend=tend)
 
     #tol_callback = AutoAbstol(false;init_curmax=c.u0 .+ 000.01)
     #c.alg_ctl.abstol = ones(length(c.u0))*c.alg_ctl.abstol
@@ -18,7 +18,7 @@ function solve(c::Cell;tend=c.alg_ctl.tend,kwargs...)
     c.sol = sol
     return sol
 end
-function get_problem(c::Cell;tend = 20.0u"s")
+function get_problem(c::Cell;tstart=0.0u"s",tend = 20.0u"s")
     u0 = c.u0
 
     colorvec = matrix_colors(c.Jac)
@@ -28,7 +28,7 @@ function get_problem(c::Cell;tend = 20.0u"s")
         jac_prototype = c.Jac,
         colorvec = matrix_colors(c.Jac),
     )
-    tspan = (0.0, convert(Float64,upreferred(tend/c.parameters.τᵢ)))
+    tspan = (convert(Float64,upreferred(tstart/c.parameters.τᵢ)), convert(Float64,upreferred(tend/c.parameters.τᵢ)))
 
     #tol_callback = AutoAbstol(false;init_curmax=u0 .+ 0.1)
 
