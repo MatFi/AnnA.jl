@@ -44,7 +44,7 @@ function todf(sol::ODESolution)
     Ecp = map(x->(-x * u"eV/V") .+ Ec,phi)
     Evp = map(x->(-x * u"eV/V" ) .+ Ev, phi)
     Evh = map(x-> (-x * u"eV/V") .+ Evₕ,phi_htm)
-    @show last(Evh), last(p_htm)
+  
     nₑf =map((e,n)-> (e .- parm.kB .* parm.T .* log.(parm.gcₑ ./ abs.(n))),Ece,n_etm)
     nf = map((e,n)-> (e .- parm.kB .* parm.T .* log.(parm.gc ./ abs.(n))),Ecp,n)
 
