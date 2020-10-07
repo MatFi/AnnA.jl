@@ -14,7 +14,7 @@ function initial_conditions(c::Cell)
     # the algebraic varibles nowher apper as timederivative in the massmatrix
     cc =deepcopy(c)
     #if c.mode == :oc
-        p_init = setproperties(cc.parameters, V = t -> convert(Float64,upreferred(c.alg_ctl.tstart/c.parameters.τᵢ))) #ensure that we initialize to
+        p_init = setproperties(cc.parameters, V = t -> 0) #ensure that we initialize to
         c_init= setproperties(cc, parameters = p_init,
             mode = :precondition,
             Jac = get_jac_sparse_pattern(cc.g; mode = :cc))
@@ -23,7 +23,7 @@ function initial_conditions(c::Cell)
 #    end
     c_init = Cell(p_init;mode = :cc,alg_ctl = c.alg_ctl)
     #u0 = nl_solve_intiter(c_init,u0;ftol=c.alg_ctl.ss_tol,factor=2).zero
-#    return u0
+    #return u0
     # in :oc mode a second init step is needed (in case we have light)
     if c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
@@ -33,7 +33,7 @@ function initial_conditions(c::Cell)
 
     @debug "Init_Solve"
 
-    odefun = ODEFunction((dx,x,p,t) -> c_init.rhs(dx, x, p, 0);
+    odefun = ODEFunction((dx,x,p,t) -> c_init.rhs(dx, x, p, convert(Float64,upreferred(c.alg_ctl.tstart/c.parameters.τᵢ)));
         mass_matrix = c_init.M,
         jac_prototype = c_init.Jac,
         colorvec = matrix_colors(c_init.Jac),
