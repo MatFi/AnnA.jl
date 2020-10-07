@@ -39,18 +39,18 @@ function todf(sol::ODESolution)
     Ec = parm.Ec
     Ev = parm.Ev
     Evₕ = parm.Evₕ
-    @show typeof(phi_etm)
+
     Ece = map(x->(-x * u"eV/V").+Ecₑ ,phi_etm) 
     Ecp = map(x->(-x * u"eV/V") .+ Ec,phi)
     Evp = map(x->(-x * u"eV/V" ) .+ Ev, phi)
     Evh = map(x-> (-x * u"eV/V") .+ Evₕ,phi_htm)
+    @show last(Evh), last(p_htm)
+    nₑf =map((e,n)-> (e .- parm.kB .* parm.T .* log.(parm.gcₑ ./ abs.(n))),Ece,n_etm)
+    nf = map((e,n)-> (e .- parm.kB .* parm.T .* log.(parm.gc ./ abs.(n))),Ecp,n)
+
+    pf = map((e,p)-> (e .+ parm.kB .* parm.T .* log.(parm.gv ./ abs.(p))),Evp,p)
+    pₕf = map((e,p) -> (e .+ parm.kB .* parm.T .* log.(parm.gvₕ ./ abs.(p))),Evh,p_htm)
     
-    nₑf =map((e,n)-> @.(e - parm.kB * parm.T * log(parm.gcₑ / abs.(n))),Ece,n_etm)
-    nf = map((e,n)->@.(e - parm.kB * parm.T * log(parm.gc / abs.(n))),Ecp,n)
-
-    pf = map((e,p)-> @.(e + parm.kB * parm.T * log(parm.gv / abs.(p))),Evp,p)
-    pₕf =map((e,p) -> @. (e + parm.kB * parm.T * log(parm.gvₕ / abs.(p))),Evh,p_htm)
-
 
     light = parm.light.(ustrip(sol.t * τᵢ .|> u"s"))
 
