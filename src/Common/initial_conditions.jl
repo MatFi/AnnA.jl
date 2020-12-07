@@ -10,21 +10,20 @@ function initial_conditions(c::Cell)
 
     #@info "initialisation : nlsolve on first guess in :precondition mode"
     u0 = c.u0
+    #u0 = init_guess(c.g,c.ndim) 
     # NLSolve will do the rest in no time! Actually this onnly works because
     # the algebraic varibles nowher apper as timederivative in the massmatrix
     cc =deepcopy(c)
     #if c.mode == :oc
-        p_init = setproperties(cc.parameters, V = t -> 0) #ensure that we initialize to
-        c_init= setproperties(cc, parameters = p_init,
-            mode = :precondition,
-            Jac = get_jac_sparse_pattern(cc.g; mode = :cc))
-    #else
-#        c_init= deepcopy(c)
-#    end
-    c_init = Cell(p_init;mode = :cc,alg_ctl = c.alg_ctl)
-    #u0 = nl_solve_intiter(c_init,u0;ftol=c.alg_ctl.ss_tol,factor=2).zero
-    #return u0
-    # in :oc mode a second init step is needed (in case we have light)
+    p_init = setproperties(
+        cc.parameters, 
+        V = (t) -> 1/(1/(t^4+eps(1.0))+1)*cc.parameters.V(
+            convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))
+        )
+    ) #ensure that we initialize to
+
+    c_init = Cell(p_init;mode = :cc,alg_ctl = cc.alg_ctl)
+
     if c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
         u0 = nl_solve_intiter(c,u1.zero;ftol=c.alg_ctl.ss_tol,factor=u1.ftol).zero
@@ -32,8 +31,8 @@ function initial_conditions(c::Cell)
 #    c_init=deepcopy(c)
 
     @debug "Init_Solve"
-
-    odefun = ODEFunction((dx,x,p,t) -> c_init.rhs(dx, x, p, convert(Float64,upreferred(c.alg_ctl.tstart/c.parameters.τᵢ)));
+ 
+    odefun = ODEFunction(c_init.rhs;
         mass_matrix = c_init.M,
         jac_prototype = c_init.Jac,
         colorvec = matrix_colors(c_init.Jac),
@@ -43,7 +42,7 @@ function initial_conditions(c::Cell)
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
 
-
+   
     #abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
     cb = CallbackSet(ss_cb,)#abstol_cb )
     sol = solve(prob,Rodas5();
