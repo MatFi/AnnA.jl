@@ -49,9 +49,10 @@ module AnnABase
     include("./Common/redimensionalize.jl")
     include("./Common/calculate_externals.jl")
 
-    include("./Problems/IVProblem.jl") #deprecate
-    include("./Problems/JscVocProblem.jl")#deprecate
-    include("./Problems/OCVDProblem.jl")#deprecate
+    include("./Problems/IVProblem.jl") 
+    include("./Problems/JscVocProblem.jl")
+    include("./Problems/OCVDProblem.jl")
+    include("./Problems/TPVProblem.jl")
     include("./Problems/ProblemSolution.jl")
 
 end # module
