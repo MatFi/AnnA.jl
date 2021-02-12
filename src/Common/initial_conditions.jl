@@ -22,7 +22,7 @@ function initial_conditions(c::Cell)
         )
     ) #ensure that we initialize to
 
-    c_init = Cell(p_init;mode = :cc,alg_ctl = cc.alg_ctl)
+    c_init = Cell(p_init;mode = p_init.light(0) >0 ? :oc : :cc,alg_ctl = cc.alg_ctl)
 
     if c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
