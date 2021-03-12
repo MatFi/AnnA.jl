@@ -88,6 +88,7 @@ function (rhs!::Rhs)(du,u,pr,t)
 
     δ   = rhs!.ndim.δ
     χ   = rhs!.ndim.χ
+    ϰ   = rhs!.ndim.ϰ
     λ   = rhs!.ndim.λ
     λ²  = rhs!.ndim.λ²
     λₑ² = rhs!.ndim.λₑ²
@@ -177,7 +178,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     cd  = DiffEqBase.get_tmp(rhs!.cd,u)
     cd_buff = DiffEqBase.get_tmp(rhs!.Buff_N₋₁,u)
         mul!(cd_buff,rhs!.o.𝔏,P)
-        cd .= rhs!.g.NN .- cd_buff
+        cd .= rhs!.g.NN .- cd_buff .- ϰ
         mul!(cd_buff,rhs!.o.𝔏,n)
         cd .= cd .+ δ.*cd_buff
         mul!(cd_buff,rhs!.o.𝔏,p)

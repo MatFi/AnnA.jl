@@ -31,6 +31,6 @@ function Cell(
     rhs = Rhs(p,grid,ndim,operators,mode)
     massMatrix   = mass_matrix(grid, ndim;mode=mode)
     Jac = get_jac_sparse_pattern(grid;mode=mode)
-    u_ini = u0 isa Missing ? init_guess(grid,ndim) : u0
+    u_ini = u0 isa Missing ? init_guess(grid,ndim,p.Vbi/p.q/p.VT) : u0
     Cell(massMatrix,Jac,grid,operators,p,ndim,rhs,mode,alg_ctl,u_ini,!(u0 isa Missing),nothing)
 end

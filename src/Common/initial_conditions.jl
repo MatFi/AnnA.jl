@@ -24,9 +24,9 @@ function initial_conditions(c::Cell)
 
     c_init = Cell(p_init;mode = p_init.light(0) >0 ? :oc : :cc,alg_ctl = cc.alg_ctl)
 
-    if c.mode == :occ  #legacy
+    if  true#:occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
-        u0 = nl_solve_intiter(c,u1.zero;ftol=c.alg_ctl.ss_tol,factor=u1.ftol).zero
+        u0 = nl_solve_intiter(c,u0;ftol=c.alg_ctl.ss_tol).zero
     end
 #    c_init=deepcopy(c)
 
@@ -41,8 +41,10 @@ function initial_conditions(c::Cell)
     prob = ODEProblem(odefun,u0,(0,1e6*ustrip(τᵢ |> u"s")),c_init)
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
+    
+    #sol = solve(prob,SSRootfind())
+   # prob = ODEProblem(odefun,sol.u,(0,1e6*ustrip(τᵢ |> u"s")),c_init)
 
-   
     #abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
     cb = CallbackSet(ss_cb,)#abstol_cb )
     sol = solve(prob,Rodas5();
@@ -55,11 +57,21 @@ function initial_conditions(c::Cell)
         reltol = c_init.alg_ctl.reltol,
         abstol = c_init.alg_ctl.abstol,#*ones(length(u0)),#u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,
-            #initializealg=ShampineCollocationInit(),
+        #initializealg=ShampineCollocationInit(),
         initializealg=OrdinaryDiffEq.NoInit(),
+       # initializealg=BrownFullBasicInit(),
     )
 
-    @debug "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
+   
+    if sol.retcode  ==:Unstable
+        @show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
+        sol_ini=AnnABase.ProblemSolution(sol)
+        n=sol_ini.df.n[end][ floor(Int,p_init.N/2)]
+        p=sol_ini.df.p[end][ floor(Int,p_init.N/2)]
+        ϕ=diff(sol_ini.df.ϕ[end])[ floor(Int,p_init.N/2)]
+        @show n p  n*p  p_init.nᵢ^2 ϕ
+        throw(sol.retcode)
+    end
     return sol
 
 #=
@@ -103,11 +115,11 @@ function nl_solve_intiter(c_init::Cell,u0;ftol=1e-6,factor=1)
     u1 = nlsolve(
         df,
         u0;
-        iterations = 100,
+        iterations = 10000,
         ftol = ftol,
         factor = factor,
         show_trace = haskey(ENV, "JULIA_DEBUG"),
-        method = :newton,
+       # method = :newton,
     )
     @debug "NLsolve: " u1.f_converged u1.iterations u1.residual_norm
     return u1
@@ -128,15 +140,31 @@ end
 Returns an initial guess for NLsolve root finding. The `NodimParameter` value
 is needed to guarantee consitancy of the guess.
 """
-function init_guess(g::Grid, ndim::NodimParameters)
+function init_guess(g::Grid, ndim::NodimParameters,Vbikt)
     P_init = ones(size(g.x))
     phi_init = zeros(size(g.x))
-    p_init = ones(size(g.x)) * ndim.kₕ .* range(0, 1, length = g.N + 1) #* 1e-1
-    n_init = ones(size(g.x)) * ndim.kₑ .* range(1, 0, length = g.N + 1) #* 1e-1
+    dn,dp = (0.0,0.0)
+   
+    if ndim.ϰ >0
+        dn =  abs(ndim.ϰ )/ ndim.δ
+        dp = ndim.nᵢ²*exp(Vbikt)/dn
+    else
+        dp = abs(ndim.ϰ)/(ndim.δ*ndim.χ)
+        dn = ndim.nᵢ²*exp(Vbikt)/dp
+    end
+    @show dn dp ndim.kₑ ndim.kₕ
+    dnend =   ndim.nᵢ²*exp(Vbikt)/ndim.kₕ
+    n_init = ones(size(g.x)) .*range( ndim.kₑ,dnend, length = g.N + 1) #* 
+    p_init = ndim.nᵢ²*exp(Vbikt)./n_init
+
+  #  n_init = ones(size(g.x)) .*range( ndim.kₑ,dn, length = g.N + 1) #* 1
+
+  #  p_init = ones(size(g.x)) .*range(dp , ndim.kₕ, length = g.N + 1) #* 1e-1
+  # n_init = ones(size(g.x)) .*range( ndim.kₑ,dn, length = g.N + 1) #* 1e-1
     phiE_init = zeros(size(g.xₑ))
-    nE_init = ones(size(g.xₑ)) .* range(1, n_init[1] / ndim.kₑ, length = g.Nₑ)
+    nE_init = ones(size(g.xₑ))# .* range(1, n_init[1] / ndim.kₑ, length = g.Nₑ)
     phiH_init = zeros(size(g.xₕ))
-    pH_init = ones(size(g.xₕ)) .* range(p_init[end] / ndim.kₕ, 1, length = g.Nₕ)
+    pH_init = ones(size(g.xₕ)) #.* range(p_init[end] / ndim.kₕ, 1, length = g.Nₕ)
     return [
         P_init
         phi_init

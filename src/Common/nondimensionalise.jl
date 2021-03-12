@@ -40,6 +40,7 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     λ²::T     #Debye length square
     δ::T      #ratio of typical electron/ion densities
     χ::T      #ratio of typical hole/electron densities
+    ϰ::T  # ratio of perovskite doping and ionic concentration
     σ::T      #ratio of carrier and ionic timescales
     κₚ::T     #hole current Parameter
     κₙ::T     #electron current parameter
@@ -59,7 +60,7 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     λₑ²::T    # relative ETL Debye length square
     λₕ²::T    # relaitve HTL Debye length square
     λₕ::T     # relaitve HTL Debye Length
-
+    nᵢ²::T     #nodim intrinsc conc
     σₛₕ::T # nundim Shunt conductivity
 
     """Interface parameters"""
@@ -100,6 +101,7 @@ function NonDimensionalize(prm::AbstractParameters)
     #d[:nᵢ²] = nᵢ^2/(dₑ*dₕ)
     d[:δ]   = p[:dₑ]/p[:N₀]
     d[:χ]   = p[:dₕ]/p[:dₑ]
+    d[:ϰ]   = p[:dₚ]/p[:N₀] 
     d[:σ]   = p[:dₑ]/(p[:G₀]*p[:τᵢ])
     d[:κₚ]  = p[:Dₚ]*p[:dₕ]/(p[:G₀]*p[:b]^2)
     d[:κₙ]  = p[:Dₙ]*p[:dₑ]/(p[:G₀]*p[:b]^2)
@@ -122,6 +124,7 @@ function NonDimensionalize(prm::AbstractParameters)
     d[:kₕ]  = p[:gv]/p[:gvₕ]*exp((p[:Ev]-p[:Evₕ])/(p[:kB]*p[:T]))
 
     d[:σₛₕ] = 1/p[:Rₛₕ]/p[:jay]*p[:VT]
+    d[:nᵢ²] = uconvert(Unitful.NoUnits,p[:nᵢ]^2/(p[:dₑ]*p[:dₕ]))
     #Test for nodimensionalty
     for i in eachindex(d)
         if typeof(d[i]) <: Unitful.Quantity
@@ -133,7 +136,7 @@ function NonDimensionalize(prm::AbstractParameters)
         end
     end
 
-    nᵢ² = uconvert(Unitful.NoUnits,p[:nᵢ]^2/(p[:dₑ]*p[:dₕ]))
+    nᵢ² = d[:nᵢ²] 
     """Bulk Recombination"""
     if !iszero(p[:τₚ])# && τₙ>0u"s"
 

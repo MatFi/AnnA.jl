@@ -15,6 +15,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
         #εₚ::vPar = ε*ε₀            # Perovskite permitivity
     Ec::vPar = -3.7u"eV"        # Perovskite Conduction band energy
     Ev::vPar = -5.3u"eV"        # Perovskite Valence band energy
+    dₚ   = 0u"m^-3" # Peroviskite doping concentration
         #Eg::vPar = Ec-Ev              # Perovskite Bandgap
     Dₙ::vPar = 1.7e-4u"m^2/s"     # Perovskite electron diffusion coefficient
     Dₚ::vPar = 1.7e-4u"m^2/s"     # Perovskite hole diffusion coefficient
