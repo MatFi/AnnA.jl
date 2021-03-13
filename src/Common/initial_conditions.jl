@@ -18,13 +18,14 @@ function initial_conditions(c::Cell)
     p_init = setproperties(
         cc.parameters, 
         V = (t) -> 1/(1/(t^4+eps(1.0))+1)*cc.parameters.V(
-            convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))
-        )
+            convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))+ustrip(cc.parameters.Vbi)*(1/(t^6+1))
+        ),
+        light=t->c.parameters.light(0),
     ) #ensure that we initialize to
 
     c_init = Cell(p_init;mode = p_init.light(0) >0 ? :oc : :cc,alg_ctl = cc.alg_ctl)
 
-    if  true#:occ  #legacy
+    if  c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
         u0 = nl_solve_intiter(c,u0;ftol=c.alg_ctl.ss_tol).zero
     end
@@ -52,7 +53,7 @@ function initial_conditions(c::Cell)
         progress = c_init.alg_ctl.progress,
         callback = cb,
         dt =1e-9*ustrip(τᵢ  |> u"s"),
-        dtmin = ustrip(1e-30*τᵢ |> u"s"), #1e-20,
+        dtmin = ustrip(1e-40*τᵢ |> u"s"), #1e-20,
         force_dtmin = false,
         reltol = c_init.alg_ctl.reltol,
         abstol = c_init.alg_ctl.abstol,#*ones(length(u0)),#u0 .* 0, #1e-12,#c.u0 .* 0,
@@ -152,13 +153,13 @@ function init_guess(g::Grid, ndim::NodimParameters,Vbikt)
         dp = abs(ndim.ϰ)/(ndim.δ*ndim.χ)
         dn = ndim.nᵢ²*exp(Vbikt)/dp
     end
-    @show dn dp ndim.kₑ ndim.kₕ
+
     dnend =   ndim.nᵢ²*exp(Vbikt)/ndim.kₕ
     n_init = ones(size(g.x)) .*range( ndim.kₑ,dnend, length = g.N + 1) #* 
     p_init = ndim.nᵢ²*exp(Vbikt)./n_init
 
-  #  n_init = ones(size(g.x)) .*range( ndim.kₑ,dn, length = g.N + 1) #* 1
-
+  #  n_init = ones(size(g.x)) .*dn #* 1
+   # p_init = ones(size(g.x)) .*dp#* 1e-1
   #  p_init = ones(size(g.x)) .*range(dp , ndim.kₕ, length = g.N + 1) #* 1e-1
   # n_init = ones(size(g.x)) .*range( ndim.kₑ,dn, length = g.N + 1) #* 1e-1
     phiE_init = zeros(size(g.xₑ))
