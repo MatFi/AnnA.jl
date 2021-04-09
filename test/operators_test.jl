@@ -1,7 +1,7 @@
 @testset "Operators" begin
-    cell_a  = AnnABase.Cell(AnnABase.Parameters();op_flavor=:matrix_free)
-    cell_b  = AnnABase.Cell(AnnABase.Parameters();op_flavor=:dense)
-    cell_c  = AnnABase.Cell(AnnABase.Parameters();op_flavor=:sparse)
+    cell_a  = AnnA.Cell(AnnA.Parameters();op_flavor=:matrix_free)
+    cell_b  = AnnA.Cell(AnnA.Parameters();op_flavor=:dense)
+    cell_c  = AnnA.Cell(AnnA.Parameters();op_flavor=:sparse)
 
 
     ϕ   = rand(cell_a.g.N+1)
@@ -31,8 +31,8 @@
     @test cd_dense ≈ cd_free
     @test cd_dense ≈ cd_sparse
 
-    Test.@test_throws ErrorException AnnABase.Cell(
-                                            AnnABase.Parameters();op_flavor=:err)
+    Test.@test_throws ErrorException AnnA.Cell(
+                                            AnnA.Parameters();op_flavor=:err)
     Test.@test_throws ErrorException mul!(mE_free,cell_a.o.𝕴, ϕ[2:end] )
     Test.@test_throws ErrorException mul!(mE_free,cell_a.o.𝔇, ϕ[2:end] )
     Test.@test_throws ErrorException mul!(cd_free,cell_a.o.𝔏, ϕ[2:end] )
