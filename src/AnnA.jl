@@ -5,11 +5,11 @@ module AnnA
     using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using DiffEqBase: get_tmp
     #using DiffEqCallbacks: AutoAbstol
-    using SteadyStateDiffEq
+   # using SteadyStateDiffEq
     using ForwardDiff
     using LinearAlgebra
     using NumericalIntegration: integrate
-    using NLsolve: nlsolve, OnceDifferentiable
+  #  using NLsolve: nlsolve, OnceDifferentiable
     using Roots
     using SparseArrays
     using Unitful
@@ -18,7 +18,7 @@ module AnnA
     using Waveforms: trianglewave
     using RecursiveArrayTools: copyat_or_push!
     using Setfield: setproperties
-    using Interpolations
+   # using Interpolations
     using DelimitedFiles: readdlm
 
     import DiffEqCallbacks: TerminateSteadyState
