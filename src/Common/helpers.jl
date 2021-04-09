@@ -11,7 +11,7 @@ A simple wrapper for creating tridiagonal matrices a bit more convineantly
 
 # Example
 ```jldoctest
-julia> AnnABase.Tridiagonal(4,1,-2,-1)
+julia> AnnA.Tridiagonal(4,1,-2,-1)
 4×4 LinearAlgebra.Tridiagonal{Int64,Array{Int64,1}}:
  -2  -1   ⋅   ⋅
   1  -2  -1   ⋅
