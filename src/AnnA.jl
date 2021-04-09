@@ -18,7 +18,7 @@ module AnnA
     using Waveforms: trianglewave
     using RecursiveArrayTools: copyat_or_push!
     using Setfield: setproperties
-   # using Interpolations
+    using Interpolations: interpolate, SteffenMonotonicInterpolation
     using DelimitedFiles: readdlm
 
     import DiffEqCallbacks: TerminateSteadyState
