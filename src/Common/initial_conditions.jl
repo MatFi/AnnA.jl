@@ -3,8 +3,7 @@
     initial_conditions(c::Cell)
 
 Calculates the initial condition of a given `Cell` using NLsolve.
-Returns the steady state solution vector to the conditions of
-time `t = 0`.
+Returns the steady state solution vector.
 """
 function initial_conditions(c::Cell)
 
