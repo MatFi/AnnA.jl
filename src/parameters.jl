@@ -74,7 +74,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
 
 end
 
-propertynames(p::AbstractParameters,private=true) = begin
+propertynames(p::AbstractParameters,private::Bool=true) = begin
     pubs = fieldnames(typeof(p))
     privs =(:gc,:gv,:gcₑ,:gvₕ,:εₚ,:εₕ,:εₑ,:Eg,:Dᵢ,:nᵢ,:Efₑ,:Efₕ,:Vbi,:VT,:τᵢ,:G₀,:jay,:n0,:p0)
     private && return (pubs...,privs...)

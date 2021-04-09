@@ -32,9 +32,9 @@ module AnnA
 
     const CurrentDensity = Union{Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}, Level{L,S,Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}} where S where L} where U where T
 
+    include("parameters.jl")
     include("./Common/helpers.jl")
     include("./helpers/dataloader.jl")
-    include("parameters.jl")
     include("./Common/nondimensionalise.jl")
     include("./Common/grid.jl")
     include("./Common/operators.jl")
