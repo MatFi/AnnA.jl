@@ -1,10 +1,10 @@
 ```@meta
 DocTestSetup = quote
-    using AnnABase
+    using AnnA
 end
 ```
 
 ```@autodocs
-Modules = [AnnABase]
+Modules = [AnnA]
 Order   = [:function, :type]
 ```
