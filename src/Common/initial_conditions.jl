@@ -91,39 +91,39 @@ function initial_conditions(c::Cell)
 end
 
 
-function nl_solve_intiter(c_init::Cell,u0;ftol=1e-6,factor=1)
-    # get the sparse colored jacobian for fast NLsolve
-    function j!(jac, x, c_init)
-        colors = matrix_colors(c_init.Jac)
-        forwarddiff_color_jacobian!(
-            jac,
-            (dx, x) -> c_init.rhs(dx, x, c_init, 0.0),
-            x;
-            colorvec = colors,
-            sparsity = c_init.Jac,
-        )
-        return nothing
-    end
+# function nl_solve_intiter(c_init::Cell,u0;ftol=1e-6,factor=1)
+#     # get the sparse colored jacobian for fast NLsolve
+#     function j!(jac, x, c_init)
+#         colors = matrix_colors(c_init.Jac)
+#         forwarddiff_color_jacobian!(
+#             jac,
+#             (dx, x) -> c_init.rhs(dx, x, c_init, 0.0),
+#             x;
+#             colorvec = colors,
+#             sparsity = c_init.Jac,
+#         )
+#         return nothing
+#     end
 
-    df = OnceDifferentiable(
-        (dx, x) -> c_init.rhs(dx, x, c_init, 0.0),
-        (jac, x) -> j!(jac, x, c_init),
-        u0,
-        copy(u0),
-        c_init.Jac,
-    )
-    u1 = nlsolve(
-        df,
-        u0;
-        iterations = 10000,
-        ftol = ftol,
-        factor = factor,
-        show_trace = haskey(ENV, "JULIA_DEBUG"),
-       # method = :newton,
-    )
-    @debug "NLsolve: " u1.f_converged u1.iterations u1.residual_norm
-    return u1
-end
+#     df = OnceDifferentiable(
+#         (dx, x) -> c_init.rhs(dx, x, c_init, 0.0),
+#         (jac, x) -> j!(jac, x, c_init),
+#         u0,
+#         copy(u0),
+#         c_init.Jac,
+#     )
+#     u1 = nlsolve(
+#         df,
+#         u0;
+#         iterations = 10000,
+#         ftol = ftol,
+#         factor = factor,
+#         show_trace = haskey(ENV, "JULIA_DEBUG"),
+#        # method = :newton,
+#     )
+#     @debug "NLsolve: " u1.f_converged u1.iterations u1.residual_norm
+#     return u1
+# end
 """
     initial_conditions!(c::Cell)
 
