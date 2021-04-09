@@ -1,5 +1,5 @@
 using Documenter
-using AnnABase
+using AnnA
 
 makedocs(
     sitename = "AnnA.jl",
