@@ -1,7 +1,7 @@
 module AnnA
     using DataStructures: OrderedDict
     using OrdinaryDiffEq: Rodas4P, Rodas5
-    using DiffEqBase: ODEFunction, ODEProblem,ODESolution, ODEProblem, solve
+    using DiffEqBase: ODEFunction, ODEProblem,ODESolution, solve
     import DiffEqBase, OrdinaryDiffEq
     using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using DiffEqBase: get_tmp
