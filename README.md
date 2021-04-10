@@ -3,7 +3,7 @@
 ___
 
 ## Heavy development
-we trying to fill the docs: [documentation (placeholder)](https://matfi.gitlab.io/AnnABase.jl)
+we trying to fill the docs: [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://matfi.github.io/AnnA.jl/dev/)]
 
 ## Purpose and Aim of this package
 This package implements all the basic functionality to conduct time resolved drift-diffusion simulations of perovksite solar cells and related systems in one spacial dimension. It applies Courtier's finite element scheme and solves the resulting equations using the awesome [DifferentialEquations.jl](https://github.com/JuliaDiffEq/DifferentialEquations.jl) package by [Chris Rackauckas](https://github.com/JuliaDiffEq/DifferentialEquations.jl/commits?author=ChrisRackauckas).
