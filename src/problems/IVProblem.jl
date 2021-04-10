@@ -110,10 +110,11 @@ function solve(p::IVProblem, alg_control = p.alg_control, args...)
     )
     s1 = solve(init_c)
 
-  #  s=ProblemSolution(s1)
-  #  s.df.V[1]=u"V"
-  #  d = diff(s.df.V)    
-    return ProblemSolution(s1)
+    s=ProblemSolution(s1)
+   
+    d = diff(s.df.V).>=0u"V"    
+    s.df.fwd=vcat(d[1],d)
+    return s
 end
 
 function steadyStateI(V::Number,s::IVSolution;ss_tol=1e-6)
