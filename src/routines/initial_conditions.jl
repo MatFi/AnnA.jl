@@ -9,16 +9,18 @@ function initial_conditions(c::Cell)
 
     #@info "initialisation : nlsolve on first guess in :precondition mode"
     u0 = c.u0
-    #u0 = init_guess(c.g,c.ndim) 
-    # NLSolve will do the rest in no time! Actually this onnly works because
-    # the algebraic varibles nowher apper as timederivative in the massmatrix
     cc =deepcopy(c)
     #if c.mode == :oc
+    ts=[0.0,1e-6,1e28] 
+    vs=[ustrip(cc.parameters.Vbi),
+        cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
+        cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
+    ]
+    v_itp = interpolate(ts, vs ,SteffenMonotonicInterpolation())
+    @show v_itp(3)
     p_init = setproperties(
         cc.parameters, 
-        V = (t) -> 1/(1/(t^4+eps(1.0))+1)*cc.parameters.V(
-            convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))+ustrip(cc.parameters.Vbi)*(1/(t^6+1))
-        ),
+        V = (t) -> v_itp(t),
         light=t->c.parameters.light(0),
     ) #ensure that we initialize to
 

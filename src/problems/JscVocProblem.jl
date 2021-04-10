@@ -5,10 +5,18 @@ struct JscVocProblem{V<:Number,VR<:Number,P<:Parameters,C<:AlgControl} <: Abstra
     alg_control::C
 end
 
-"""
 
 """
-function JscVocProblem(
+    function JscVocProblem(
+        parm::AbstractParameters,
+        max_intensity::Number,
+        max_t::Number;
+        alg_control = missing,
+    )
+
+Creates an `JscVocProblem`. Where the backgrond illumination is increased to `max_intensity*Fₚₕ` logerythmical within the time `max_t`.
+"""
+function JscVocProblem( 
     parm::AbstractParameters,
     max_intensity::Number,
     max_t::Number;

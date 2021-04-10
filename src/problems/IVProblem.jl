@@ -110,21 +110,9 @@ function solve(p::IVProblem, alg_control = p.alg_control, args...)
     )
     s1 = solve(init_c)
 
-    if false # p.double_sweep == true
-        p2 = setproperties(
-            p.parameters,
-            V = t -> p.parameters.V(ustrip(tend |> u"s") - ustrip(t)),
-        )
-        init_c = Cell(
-            p2;
-            u0 = s1.u[end],
-            mode = :cc,
-            alg_ctl = alg_control
-        )
-        s2 = solve(init_c)#.u[end]
-
-        return IVSolution(s1, s2, p)
-    end
+  #  s=ProblemSolution(s1)
+  #  s.df.V[1]=u"V"
+  #  d = diff(s.df.V)    
     return ProblemSolution(s1)
 end
 

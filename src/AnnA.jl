@@ -7,7 +7,7 @@ module AnnA
     using DiffEqBase: get_tmp
     #using DiffEqCallbacks: AutoAbstol
    # using SteadyStateDiffEq
-    using ForwardDiff
+    import ForwardDiff
     using LinearAlgebra
     using NumericalIntegration: integrate
   #  using NLsolve: nlsolve, OnceDifferentiable
@@ -23,8 +23,8 @@ module AnnA
     using DelimitedFiles: readdlm
 
     import DiffEqCallbacks: TerminateSteadyState, CallbackSet
-    import DiffEqBase.dualcache # dos not work if using
-    import DiffEqBase.solve
+    import DiffEqBase: solve, dualcache # dos not work if using
+  #  import DiffEqBase: solve
     import Base:length, getproperty, setproperty!, propertynames
 
     abstract type AbstractProblem end
@@ -34,26 +34,26 @@ module AnnA
     const CurrentDensity = Union{Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}, Level{L,S,Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}} where S where L} where U where T
 
     include("parameters.jl")
-    include("./Common/helpers.jl")
+    include("./routines/helpers.jl")
     include("./helpers/dataloader.jl")
-    include("./Common/nondimensionalise.jl")
-    include("./Common/grid.jl")
-    include("./Common/operators.jl")
-    include("./Common/mass_matrix.jl")
-    include("./Common/make_cell.jl")
-    include("./Common/rhs.jl")
-    include("./Common/initial_conditions.jl")
-    include("./Common/jacobian.jl")
-    include("./Common/solve.jl")
-#   include("./Common/saving_callback.jl")
-    include("./Common/redimensionalize.jl")
-    include("./Common/calculate_externals.jl")
+    include("./routines/nondimensionalise.jl")
+    include("./routines/grid.jl")
+    include("./routines/operators.jl")
+    include("./routines/mass_matrix.jl")
+    include("./routines/make_cell.jl")
+    include("./routines/rhs.jl")
+    include("./routines/initial_conditions.jl")
+    include("./routines/jacobian.jl")
+    include("./routines/solve.jl")
+    include("./routines/redimensionalize.jl")
+    include("./routines/calculate_externals.jl")
 
-    include("./Problems/IVProblem.jl") 
-    include("./Problems/JscVocProblem.jl")
-    include("./Problems/OCVDProblem.jl")
-    include("./Problems/TPVProblem.jl")
-    include("./Problems/ProblemSolution.jl")
+    include("./problems/IVProblem.jl") 
+    include("./problems/JscVocProblem.jl")
+    include("./problems/OCVDProblem.jl")
+    include("./problems/TPVProblem.jl")
+    include("./problems/ProblemSolution.jl")
+
+    export solve, IVProblem, JscVocProblem, OCVDProblem, TPVProblem, Parameters
 
 end # module
-    
