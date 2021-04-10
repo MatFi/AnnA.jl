@@ -8,7 +8,7 @@ using AnnA
 makedocs(
     sitename = "AnnA.jl",
     modules = [AnnA],
-    doctest = :fix,
+    doctest = true,
   #  strict = true,
     checkdocs = :exports,
 #    repo = "https://gitlab.com/MatFi/AnnABase.jl/blob/{commit}{path}#{line}",
