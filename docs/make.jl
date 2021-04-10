@@ -17,7 +17,7 @@ makedocs(
         "Usage"=>Any[
             "usage.md"
             ],
-        "Examples"=>Any[],
+        "Examples"=>Any["examples/iv_sim.jl"],
         "API"=>"api.md"
     ],
     
