@@ -3,27 +3,32 @@
 using Documenter
 using AnnA
 
-#DocMeta.setdocmeta!(AnnA, :DocTestSetup, :(using AnnA); recursive=true)
-
+DocMeta.setdocmeta!(AnnA, :DocTestSetup, :(using AnnA, Unitful); recursive=true)
 makedocs(
     sitename = "AnnA.jl",
     modules = [AnnA],
     doctest = true,
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true",
+    ),
   #  strict = true,
     checkdocs = :exports,
 #    repo = "https://gitlab.com/MatFi/AnnABase.jl/blob/{commit}{path}#{line}",
     pages = Any[
         "Home"=>"index.md",
         "Usage"=>Any[
-            "usage.md"
+            "Interface" => "interface.md"
             ],
-        "Examples"=>Any["examples/iv_sim.md"],
+        "Examples"=>Any[
+            "IV-Problems" =>"examples/iv_sim.md"
+            ],
         "API"=>"api.md"
     ],
     
 )
 
-
-deploydocs(
-   repo = "https://github.com/MatFi/AnnA.jl"
-)
+if get(ENV, "CI", nothing) == "true"
+    deploydocs(
+        repo = "https://github.com/MatFi/AnnA.jl"
+    )
+end

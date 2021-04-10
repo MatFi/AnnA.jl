@@ -3,8 +3,8 @@ DocTestSetup = quote
     using AnnA
 end
 ```
-#IV Simulations
-Simulating IV curves can be simply done by an high level dispatch
+# IV Simulations
+The simulation of an IV curve can be done via the provided interface:
 
 ```@example iv
 using AnnA
@@ -28,6 +28,4 @@ sol= sol  .|>ustrip             # strip the units, so we can plot the result wit
 
 plot(sol.V[sol.fwd], sol.j[sol.fwd] , ylabel="j (mA/cm²)",xlabel="Voltage (V)",label="Forward", ylims=(-25,40),xlims=(-0.5,1.3),legend=:topleft)
 plot!(sol.V[.!sol.fwd], sol.j[.!sol.fwd],label="Backward" )
-savefig("iv-ill-plot.svg"); nothing # hide
 ```
-![](iv-ill-plot.svg)

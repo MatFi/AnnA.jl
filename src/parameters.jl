@@ -1,70 +1,154 @@
 abstract type AbstractParameters end
-const vPar = Union{Number,Tuple,AbstractArray,Function,Array{Function,1},T} where T
 
+"""
+    Parameters(;       
+        N  =   400,                 # Subintervals in perovskite layer, 
+                                    # resulting in N+1 Grid points
+
+        # Physical parameters
+        ε₀ = 8.854187817e-12u"F/m" , # Permitivity of free space
+        q  = 1.6021766209e-19u"C",   # Elemntary charge of a proton
+        kB = 8.61733035e-5u"eV/K",   # Bolzmann konstant
+    
+        # Perovskite parameters
+        b  = 400e-9u"m",             # Perovskite layer thickness
+        ε = 24.1,                    # Perovskite permitivity
+        Ec = -3.7u"eV",              # Perovskite conduction band energy
+        Ev = -5.3u"eV",              # Perovskite valence band energy
+        dₚ = 0u"m^-3",               # Perovskite doping concentration
+        Dₙ = 1.7e-4u"m^2/s",         # Perovskite electron diffusion coefficient
+        Dₚ = 1.7e-4u"m^2/s",         # Perovskite hole diffusion coefficient
+        mₑ = 0.2,                    # Perovskite effective electron mass
+        mₕ = 0.2,                    # Perovskite effective hole mass
+        
+        # Ion Parameters
+        N₀ = 1.6e24u"m^-3",          # Typical density of ion vacancys
+        Dᵢ₀ = 6.5e-8u"m^2/s",        # Diffusion constant
+        Eᵢₐ = 0.58 * u"eV",          # Ativation energy of vacancy diffusion
+        freeze_ions = false,
+        
+        # Environment Parameters
+        T  = 300u"K",                # Temperature
+        α  = 1.3e7u"1/m",            # Perovskite absorption koefficient
+        Fₚₕ = 1.4e21u"m^-2*s^-1",    # 1 Sun absorbed photonflux 
+        dir = 1,                     # Light trough  1 -> ETL, -1 -> HTL
+        light = pulse(tₑ=1.0),       # Light(t) function 
+        V = t -> 0,                  # Voltage(t) function
+        Rₛₕ = 1e3u"V/A*m^2",         # Shunt resistance
+
+        # Recombination Parameters
+        τₙ = 3e-7u"s",             # electron pseudo lifetime
+        τₚ = 3e-7u"s",             # hole pseudo lifetime
+        k₂ = 3.22e-17u"m^3/s",     # second order rate constant
+    
+        # Interface Recombination
+        k₂ₑ = 0u"m^4/s",           # ETL/perovskite bimolecular recombination rate
+        k₂ₕ = 0u"m^4/s",           # perovskite/HTL bimolecular recombination rate
+        vₙₑ = 0u"m/s",             # electron recombination velocity for SHR/ETL
+        vₚₑ = 0u"m/s",             # hole recombination velocity for SHR/ETL
+        vₙₕ = 0u"m/s",             # electron recombination velocity for SHR/HTL
+        vₚₕ = 0u"m/s",             # hole recombination velocity for SHR/HTL
+    
+        # ELT Parameters
+        dₑ = 1e18u"cm^-3",         # ETL effective doping density
+        mcₑ = 1.5,                 # ETL effective electron mass
+        Ecₑ = -4.0 * u"eV",        # ETL conduction band energy
+        bₑ = 100e-9u"m",           # ETL width
+        εₑᵣ = 3,                   # ETL permitivity
+        Dₑ = 1e-7u"m^2/s",         # ETL electron diffusion coeficcient
+    
+        # HTL Parameters
+        dₕ = 1e18u"cm^-3",         # HTL effective doping density
+        mvₕ = 12,                  # HTL hole mass
+        Evₕ = -5 * u"eV",          # HTL valence band energy
+        bₕ = 100e-9u"m",           # HTL width
+        εₕᵣ = 3,                   # HTL permitivity
+        Dₕ = 1e-7u"m^2/s",         # HTL electron diffusion coeficcient
+    )
+
+Construct the parameters object from the defaults.
+
+# Examples
+```jldoctest; output = false
+def_parm = Parameters()         # Use the default parameters
+mod_parm = Parameters(          # Use modified default parameters 
+    b  = 432u"nm",              # Perovskite Layer thickness
+    ε = 42,                     # Perovskite permitivity
+)
+
+# output
+Parameters(400, 8.854187817e-12 F m^-1, 1.6021766209e-19 C, 8.61733035e-5 eV K^-1, 432 nm, 42, -3.7 eV, -5.3 eV, 0 m^-3, 0.00017 m^2 s^-1, 0.00017 m^2 s^-1, 0.2, 0.2, 1.6e24 m^-3, 6.5e-8 m^2 s^-1, 0.58 eV, false, 300 K, 1.3e7 m^-1, 1.4e21 m^-2 s^-1, 1, AnnA.Pulse{Float64, Vector{Float64}, Float64, Vector{Float64}, Interpolations.MonotonicInterpolation{Float64, Float64, Float64, Float64, Float64, Interpolations.SteffenMonotonicInterpolation, Vector{Float64}, Vector{Float64}}}(1.0, 0.0, 0.999999999998, 1.0e-12, 1.0, [-1.7976931348623157e308, 9.999778782798785e-13, 1.9999778782798783e-12, 1.0, 1.000000000001, 1.7976931348623157e308], [0.0, 0.0, 1.0, 1.0, 0.0, 0.0], 6-element interpolate(::Vector{Float64}, ::Vector{Float64}, Interpolations.SteffenMonotonicInterpolation()) with element type Float64:
+  0.0
+  0.0
+  1.0000000000000007
+  1.0
+ -2.220446049250313e-16
+  0.0), AnnA.var"#3#5"(), 1000.0 m^2 V A^-1, 3.0e-7 s, 3.0e-7 s, 3.22e-17 m^3 s^-1, 0 m^4 s^-1, 0 m^4 s^-1, 0 m s^-1, 0 m s^-1, 0 m s^-1, 0 m s^-1, 1.0e18 cm^-3, 1.5, -4.0 eV, 1.0e-7 m, 3, 1.0e-7 m^2 s^-1, 1.0e18 cm^-3, 12, -5 eV, 1.0e-7 m, 3, 1.0e-7 m^2 s^-1)
+```
+"""
 Base.@kwdef mutable struct Parameters <: AbstractParameters
-    """Model Parameters"""
-    N::Integer  =   400     # Subintervals in perovskite layer, resulting in N+1 Grid points
+    N::Integer  =   400       # Subintervals in perovskite layer, resulting in N+1 Grid points
     
     # Physical parameters
-    ε₀::vPar = 8.854187817e-12u"F/m"# Permitivity of free space
-    q::vPar  = 1.6021766209e-19u"C" # Elemntary charge of a proton
-    kB::vPar = 8.61733035e-5u"eV/K" # Bolzmann konstant
+    ε₀ = 8.854187817e-12u"F/m"# Permitivity of free space
+    q  = 1.6021766209e-19u"C" # Elemntary charge of a proton
+    kB = 8.61733035e-5u"eV/K" # Bolzmann konstant
    
     
     # Perovskite parameters
-    b::vPar  = 400e-9u"m"           # Perovskite Layer thickness
-    ε::vPar = 24.1                  # Perovskite permitivity
-    Ec::vPar = -3.7u"eV"            # Perovskite Conduction band energy
-    Ev::vPar = -5.3u"eV"            # Perovskite Valence band energy
-    dₚ   = 0u"m^-3"                 # Peroviskite doping concentration
-    Dₙ::vPar = 1.7e-4u"m^2/s"       # Perovskite electron diffusion coefficient
-    Dₚ::vPar = 1.7e-4u"m^2/s"       # Perovskite hole diffusion coefficient
-    mₑ::vPar = 0.2                  # Perovskite electron mass
-    mₕ::vPar = 0.2                  # Perovskite hole mass
+    b  = 400e-9u"m"           # Perovskite Layer thickness
+    ε = 24.1                  # Perovskite permitivity
+    Ec = -3.7u"eV"            # Perovskite Conduction band energy
+    Ev = -5.3u"eV"            # Perovskite Valence band energy
+    dₚ   = 0u"m^-3"           # Peroviskite doping concentration
+    Dₙ = 1.7e-4u"m^2/s"       # Perovskite electron diffusion coefficient
+    Dₚ = 1.7e-4u"m^2/s"       # Perovskite hole diffusion coefficient
+    mₑ = 0.2                  # Perovskite electron mass
+    mₕ = 0.2                  # Perovskite hole mass
     
     # Ion Parameters
-    N₀::vPar = 1.6e24u"m^-3"        # Typical density of ion vacancys
-    Dᵢ₀::vPar = 6.5e-8u"m^2/s"      # Diffusion constant
-    Eᵢₐ::vPar = 0.58 * u"eV"        # Ativation energy of vacancy diffusion
+    N₀ = 1.6e24u"m^-3"        # Typical density of ion vacancys
+    Dᵢ₀ = 6.5e-8u"m^2/s"      # Diffusion constant
+    Eᵢₐ = 0.58 * u"eV"        # Ativation energy of vacancy diffusion
     freeze_ions = false
     
     # Environment Parameters
-    T::vPar  = 300u"K"              # Temperature
-    α::vPar  = 1.3e7u"1/m"          # Perovskite absorption koefficient
-    Fₚₕ::vPar = 1.4e21u"m^-2*s^-1"  # Photonflux (bandgap dependent)
-    dir::Integer =   1              # Shine light trough  1 -> ETL, -1 -> HTL
-    light::vPar = pulse(tₑ=1.0)
-    V::vPar = t -> 0                 # Voltage protocoll
-    Rₛₕ::vPar = 1e3u"V/A*m^2"       # Shunt resistance
+    T  = 300u"K"              # Temperature
+    α  = 1.3e7u"1/m"          # Perovskite absorption coefficient
+    Fₚₕ = 1.4e21u"m^-2*s^-1"  # 1 Sun photonflux  
+    dir::Integer =   1        # Light trough  1 -> ETL, -1 -> HTL
+    light::Function = pulse(tₑ=1.0)     # Light(t) function  [Sun]
+    V::Function = t -> 0               # Voltage(t) function [V]
+    Rₛₕ = 1e3u"V/A*m^2"       # Shunt resistance
 
     # Recombination Parameters
-    τₙ::vPar = 3e-7u"s"             # electron pseudo lifetime
-    τₚ::vPar = 3e-7u"s"             # hole pseudo lifetime
-    k₂::vPar = 3.22e-17u"m^3/s"     # second order rate constant
+    τₙ = 3e-7u"s"             # electron pseudo lifetime
+    τₚ = 3e-7u"s"             # hole pseudo lifetime
+    k₂ = 3.22e-17u"m^3/s"     # second order rate constant
    
     # Interface Recombination
-    k₂ₑ::vPar = 0u"m^4/s"           # ETL/perovskite bimolecular recombination rate
-    k₂ₕ::vPar = 0u"m^4/s"           # perovskite/HTL bimolecular recombination rate
-    vₙₑ::vPar = 0u"m/s"             # electron recombination velocity for SHR/ETL
-    vₚₑ::vPar = 0u"m/s"             # hole recombination velocity for SHR/ETL
-    vₙₕ::vPar = 0u"m/s"             # electron recombination velocity for SHR/HTL
-    vₚₕ::vPar = 0u"m/s"             # hole recombination velocity for SHR/HTL
+    k₂ₑ = 0u"m^4/s"           # ETL/perovskite bimolecular recombination rate
+    k₂ₕ = 0u"m^4/s"           # perovskite/HTL bimolecular recombination rate
+    vₙₑ = 0u"m/s"             # electron recombination velocity for SHR/ETL
+    vₚₑ = 0u"m/s"             # hole recombination velocity for SHR/ETL
+    vₙₕ = 0u"m/s"             # electron recombination velocity for SHR/HTL
+    vₚₕ = 0u"m/s"             # hole recombination velocity for SHR/HTL
    
     # ELT Parameters
-    dₑ::vPar = 1e18u"cm^-3"          # ETL effective doping density
-    mcₑ::vPar = 1.5                  # ETL electron mass
-    Ecₑ::vPar = -4.0 * u"eV"           # ETL conduction band energy
-    bₑ::vPar = 100e-9u"m"           # ETL width
-    εₑᵣ::Real = 3                   # ETL permitivity
-    Dₑ::vPar = 1e-7u"m^2/s"         # ETL electron diffusion coeficcient
+    dₑ = 1e18u"cm^-3"         # ETL effective doping density
+    mcₑ = 1.5                 # ETL electron mass
+    Ecₑ = -4.0 * u"eV"        # ETL conduction band energy
+    bₑ = 100e-9u"m"           # ETL width
+    εₑᵣ::Real = 3             # ETL permitivity
+    Dₑ = 1e-7u"m^2/s"         # ETL electron diffusion coefficient
    
     # HTL Parameters
-    dₕ::vPar = 1e18u"cm^-3"          # HTL effective doping density
-    mvₕ::vPar = 12                   # HTL hole mass
-    Evₕ::vPar = -5 * u"eV"             # HTL valence band energy
-    bₕ::vPar = 100e-9u"m"           # HTL width
-    εₕᵣ::Real = 3                   # HTL permitivity
-    Dₕ::vPar = 1e-7u"m^2/s"         # HTL electron diffusion coeficcient
+    dₕ = 1e18u"cm^-3"         # HTL effective doping density
+    mvₕ = 12                  # HTL hole mass
+    Evₕ = -5 * u"eV"          # HTL valence band energy
+    bₕ = 100e-9u"m"           # HTL width
+    εₕᵣ::Real = 3             # HTL permitivity
+    Dₕ = 1e-7u"m^2/s"         # HTL electron diffusion coefficient
 end
 
 propertynames(p::AbstractParameters,private::Bool=true) = begin
