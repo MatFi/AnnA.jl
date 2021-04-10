@@ -4,7 +4,7 @@ ___
 
 | **Documentation**          | **Build Status**        |
 |:--------------------------:|:-----------------------:|
-| [![][docs-dev-img]][docs-dev-url] | [![][ci-img]][i-url] [![][codecov-img]][codecov-url]|
+| [![][docs-dev-img]][docs-dev-url] | [![][ci-img]][ci-url] [![][codecov-img]][codecov-url]|
 
 ## Purpose and Aim of this package
 This package implements basic functionality to conduct time resolved drift-diffusion simulations of ionic solar cells like perovskites and related systems in one spacial dimension. It applies Courtier's finite element scheme and solves the resulting equations using the awesome [DifferentialEquations.jl](https://github.com/JuliaDiffEq/DifferentialEquations.jl) package by [Chris Rackauckas](https://github.com/JuliaDiffEq/DifferentialEquations.jl/commits?author=ChrisRackauckas).
