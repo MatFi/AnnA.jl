@@ -1,7 +1,8 @@
 module AnnA
     using DataStructures: OrderedDict
-    using OrdinaryDiffEq
-    using DiffEqBase: ODEFunction, ODEProblem, solve
+    using OrdinaryDiffEq: Rodas4P, Rodas5
+    using DiffEqBase: ODEFunction, ODEProblem,ODESolution, ODEProblem, solve
+    import DiffEqBase, OrdinaryDiffEq
     using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using DiffEqBase: get_tmp
     #using DiffEqCallbacks: AutoAbstol
@@ -21,7 +22,7 @@ module AnnA
     using Interpolations: interpolate, SteffenMonotonicInterpolation
     using DelimitedFiles: readdlm
 
-    import DiffEqCallbacks: TerminateSteadyState
+    import DiffEqCallbacks: TerminateSteadyState, CallbackSet
     import DiffEqBase.dualcache # dos not work if using
     import DiffEqBase.solve
     import Base:length, getproperty, setproperty!, propertynames
@@ -44,7 +45,7 @@ module AnnA
     include("./Common/initial_conditions.jl")
     include("./Common/jacobian.jl")
     include("./Common/solve.jl")
-#    include("./Common/saving_callback.jl")
+#   include("./Common/saving_callback.jl")
     include("./Common/redimensionalize.jl")
     include("./Common/calculate_externals.jl")
 
@@ -55,3 +56,4 @@ module AnnA
     include("./Problems/ProblemSolution.jl")
 
 end # module
+    
