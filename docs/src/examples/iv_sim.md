@@ -1,14 +1,9 @@
-```@meta
-DocTestSetup = quote
-    using AnnA
-end
-```
 # IV Simulations
 The simulation of an IV curve can be done via the provided interface:
 
 ```@example iv
 using AnnA
-using Plots
+using Plots; gr()
 using Unitful
 parm = Parameters(light = t -> 1.0,   
     vₙₕ= 10u"m/s" ,                 # electron surface recombination vel. at HTM
