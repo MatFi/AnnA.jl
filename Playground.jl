@@ -1,8 +1,30 @@
-using  Unitful #,AnnAPlot, Plots
+using AnnA
+using Plots
+using Unitful
+parm = Parameters(light = t -> 1.0,
+    vₙₕ= 10u"m/s" ,        
+    vₚₕ= 0.01u"m/s" ,
+    N=500,
+    N₀=1e18u"cm^-3"
+)
+prob = IVProblem(parm, [-0.5,1.7]u"V", 0.2u"V/s")
+sol  = solve(prob)
+
+sol=sol.df
+sol.j =sol.j .|> u"mA/cm^2"
+sol= sol  .|>ustrip
+
+plot(sol.V[sol.fwd], sol.j[sol.fwd] .|>abs, yscale=:log10, ylabel="j (A/m²)",xlabel="Voltage (V)",legend=false)
+plot!(sol.V[.!sol.fwd], sol.j[.!sol.fwd] .|>abs )
+plot(sol.V[sol.fwd], sol.j[sol.fwd] , ylabel="j (mA/cm²)",xlabel="Voltage (V)",label="Forward", ylims=(-25,40),xlims=(-0.5,1.3),legend=:topleft)
+plot!(sol.V[.!sol.fwd], sol.j[.!sol.fwd],label="Backward" )
+
+
+    using  Unitful #,AnnAPlot, Plots
 include("./src/AnnABase.jl")
 parameters = AnnABase.Parameters(
     N=300,mₑ =0.2 ,mₕ =0.2, light = t->0,Rₛₕ =Inf*1u"V/A*m^2",
-    dₚ=5e19u"m^-3",
+    dₚ=5e19u"m^-3", 
     dₕ=1e23u"m^-3",
     dₑ=1e23u"m^-3",
     vₙₑ= 0*1e-4u"m/s" ,        # electron recombination velocity for SHR/ETL

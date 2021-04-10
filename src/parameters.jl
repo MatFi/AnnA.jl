@@ -38,9 +38,9 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     Rₛₕ::vPar = 1e3u"V/A*m^2"       # Shunt resistance
 
     # Recombination Parameters
-    τₙ::vPar = 3e-9u"s"             # electron pseudo lifetime
+    τₙ::vPar = 3e-7u"s"             # electron pseudo lifetime
     τₚ::vPar = 3e-7u"s"             # hole pseudo lifetime
-    k₂::vPar = 0u"m^3/s"            # second order rate constant
+    k₂::vPar = 3.22e-17u"m^3/s"     # second order rate constant
    
     # Interface Recombination
     k₂ₑ::vPar = 0u"m^4/s"           # ETL/perovskite bimolecular recombination rate
@@ -51,20 +51,20 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     vₚₕ::vPar = 0u"m/s"             # hole recombination velocity for SHR/HTL
    
     # ELT Parameters
-    dₑ::vPar = 1e23u"m^-3"          # ETL effective doping density
+    dₑ::vPar = 1e18u"cm^-3"          # ETL effective doping density
     mcₑ::vPar = 1.5                  # ETL electron mass
     Ecₑ::vPar = -4.0 * u"eV"           # ETL conduction band energy
     bₑ::vPar = 100e-9u"m"           # ETL width
     εₑᵣ::Real = 3                   # ETL permitivity
-    Dₑ::vPar = 1e-5u"m^2/s"         # ETL electron diffusion coeficcient
+    Dₑ::vPar = 1e-7u"m^2/s"         # ETL electron diffusion coeficcient
    
     # HTL Parameters
-    dₕ::vPar = 1e23u"m^-3"          # HTL effective doping density
+    dₕ::vPar = 1e18u"cm^-3"          # HTL effective doping density
     mvₕ::vPar = 12                   # HTL hole mass
     Evₕ::vPar = -5 * u"eV"             # HTL valence band energy
     bₕ::vPar = 100e-9u"m"           # HTL width
     εₕᵣ::Real = 3                   # HTL permitivity
-    Dₕ::vPar = 1e-5u"m^2/s"         # HTL electron diffusion coeficcient
+    Dₕ::vPar = 1e-7u"m^2/s"         # HTL electron diffusion coeficcient
 end
 
 propertynames(p::AbstractParameters,private::Bool=true) = begin
