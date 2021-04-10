@@ -11,13 +11,12 @@ function initial_conditions(c::Cell)
     u0 = c.u0
     cc =deepcopy(c)
     #if c.mode == :oc
-    ts=[0.0,1e-6,1e28] 
+    ts=[0.0,1e-2,1e28] 
     vs=[ustrip(cc.parameters.Vbi),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
     ]
     v_itp = interpolate(ts, vs ,SteffenMonotonicInterpolation())
-    @show v_itp(3)
     p_init = setproperties(
         cc.parameters, 
         V = (t) -> v_itp(t),
