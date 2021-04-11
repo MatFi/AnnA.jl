@@ -13,14 +13,17 @@ makedocs(
     ),
   #  strict = true,
     checkdocs = :exports,
-#    repo = "https://gitlab.com/MatFi/AnnABase.jl/blob/{commit}{path}#{line}",
     pages = Any[
         "Home"=>"index.md",
-        "Usage"=>Any[
-            "Interface" => "interface.md"
+        "Interface"=>Any[
+            "Simulation parameters" => "interface/parameters.md",
+            "Problem definition" => "interface/problems.md",
             ],
         "Examples"=>Any[
-            "IV-Problems" =>"examples/iv_sim.md"
+            "IV" => "examples/iv_sim.md",
+            "JscVoc" => "examples/jscvoc_sim.md",
+            "OCVD"  =>   "examples/ocvd_sim.md",
+            "TPV"  =>   "examples/tpv_sim.md",
             ],
         "API"=>"api.md"
     ],

@@ -22,5 +22,5 @@ sol.j =sol.j .|> u"mA/cm^2"     # scale j to conveniant units
 sol= sol  .|>ustrip             # strip the units, so we can plot the result with Plots
 
 plot(sol.V[sol.fwd], sol.j[sol.fwd] , ylabel="j (mA/cm²)",xlabel="Voltage (V)",label="Forward", ylims=(-25,40),xlims=(-0.5,1.3),legend=:topleft)
-plot!(sol.V[.!sol.fwd], sol.j[.!sol.fwd],label="Backward" )
+plot!(sol.V[.!sol.fwd], sol.j[.!sol.fwd],label="Backward")
 ```
