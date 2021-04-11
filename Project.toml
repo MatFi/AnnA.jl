@@ -34,4 +34,5 @@ Waveforms = "cb13b1c6-351e-5134-b3ad-d6a530956a82"
 [compat]
 DataFrames = "0.22"
 Interpolations = "0.13"
+NumericalIntegration = "0.3"
 Unitful = "1.7"
