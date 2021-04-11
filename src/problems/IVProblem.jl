@@ -22,12 +22,13 @@ end
             dt = 1e-6,
             reltol = 1e-4,
             abstol = 1e-12,
-            tend = (maximum(range) - minimum(range)) / abs(rate)
+            tend = (maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)
         ),
     )
 
-Creates an `IVProblem`. The voltage parameter `V` defined in `parm` gets overwritten by the linear voltage sweep defined as `V = t-> first(range) + rate*t`. `AlgControl.tend` is forced to be `(maximum(range) - minimum(range)) / abs(rate)`, an overwrite can be done on the finalized object using Setfield:
-    `p = Setfield.setproperties(p::IVProblem, alg_control=AlgControl(...))`
+Creates an `IVProblem`. The voltage parameter `V` defined in `parm` will be overwritten by the linear voltage sweep defined as `V = t-> first(range) + rate*t`.
+`AlgControl.tend` is forced to be `(maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)`, an overwrite can be done on the finalized object using Setfield:
+`p = Setfield.setproperties(p::IVProblem, alg_control=AlgControl(...))`
 """
 function IVProblem(
     parm::AbstractParameters,
@@ -36,8 +37,8 @@ function IVProblem(
     double_sweep = true,
     alg_control = missing,
 )
-    range = ustrip.(uconvert.((u"V",),range))
-    rate =ustrip(uconvert(u"V/s", rate))
+    range = ustrip.(upreferred.(range))
+    rate = ustrip(upreferred(rate))
     tend = (maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)
     if alg_control isa Missing
 

@@ -1,4 +1,5 @@
 ```@autodocs
 Modules = [AnnA]
-Order   = [:function, :type]
+Pages   = ["routines/helpers.jl"]
+Order   = [:functi, :type]
 ```

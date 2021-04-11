@@ -192,6 +192,10 @@ getproperty(p::AbstractParameters,::Val{:gc}) = 2 * (2π * p.mₑ * 9.10938356e-
 getproperty(p::AbstractParameters,::Val{:gv}) = 2 * (2π * p.mₕ * 9.10938356e-31u"kg" * p.kB * p.T / (4.13566769692e-15u"eV*s")^2)^(3 / 2) |> u"m^-3"
 getproperty(p::AbstractParameters,::Val{:gcₑ}) = 2 * (2π * p.mcₑ * 9.10938356e-31u"kg" * p.kB * p.T / (4.13566769692e-15u"eV*s")^2)^(3 / 2) |> u"m^-3"
 getproperty(p::AbstractParameters,::Val{:gvₕ}) = 2 * (2π * p.mvₕ * 9.10938356e-31u"kg" * p.kB * p.T / (4.13566769692e-15u"eV*s")^2)^(3 / 2) |> u"m^-3"
+getproperty(p::AbstractParameters,::Val{:Nc}) = p.gc
+getproperty(p::AbstractParameters,::Val{:Nv}) = p.gv
+getproperty(p::AbstractParameters,::Val{:Ncₑ}) = p.gcₑ
+getproperty(p::AbstractParameters,::Val{:Nvₕ}) = p.gvₕ
 
 Base.@kwdef mutable struct AlgControl
 # TODO: make this just a Dict
