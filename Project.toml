@@ -32,6 +32,6 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 Waveforms = "cb13b1c6-351e-5134-b3ad-d6a530956a82"
 
 [compat]
-Unitful = "1.7"
 DataFrames = "0.22"
-
+DiffEqDiffTools = "1.7"
+Unitful = "1.7"
