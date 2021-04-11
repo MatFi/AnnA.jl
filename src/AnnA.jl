@@ -1,16 +1,17 @@
 module AnnA
-    using DataFrames:DataFrame
-    using DataStructures:OrderedDict
-    using DelimitedFiles:readdlm
-    using DiffEqBase: get_tmp, ODEFunction, ODEProblem,ODESolution, solve
+    using DataFrames: DataFrame
+    using DataStructures: OrderedDict
+    using DelimitedFiles: readdlm
+    import DiffEqBase: get_tmp, ODEFunction, ODEProblem, ODESolution, solve
     using DiffEqCallbacks: TerminateSteadyState, CallbackSet
     import ForwardDiff
     using Interpolations: interpolate, SteffenMonotonicInterpolation
     using LinearAlgebra
-    using NumericalIntegration:integrat
+    using NumericalIntegration: integrate
     using OrdinaryDiffEq: Rodas4P, Rodas5
-    import DiffEqBase, OrdinaryDiffEq
-    using RecursiveArrayTools:copyat_or_push!
+    import DiffEqBase 
+	import OrdinaryDiffEq
+    using RecursiveArrayTools: copyat_or_push!
     using Roots
     using Setfield:setproperties
     using SparseArrays
