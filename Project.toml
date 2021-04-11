@@ -30,3 +30,6 @@ SteadyStateDiffEq = "9672c7b4-1e72-59bd-8a11-6ac3964bc41f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 Waveforms = "cb13b1c6-351e-5134-b3ad-d6a530956a82"
+
+[compat]
+NLsolve = "4.5"
