@@ -1,37 +1,30 @@
 module AnnA
-    using DataStructures: OrderedDict
-    using OrdinaryDiffEq: Rodas4P, Rodas5
-    using DiffEqBase: ODEFunction, ODEProblem,ODESolution, solve
-    import DiffEqBase, OrdinaryDiffEq
-    using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
-    using DiffEqBase: get_tmp
-    #using DiffEqCallbacks: AutoAbstol
-   # using SteadyStateDiffEq
+    using DataFrames:DataFrame
+    using DataStructures:OrderedDict
+    using DelimitedFiles:readdlm
+    using DiffEqBase: get_tmp, ODEFunction, ODEProblem,ODESolution, solve
+    using DiffEqCallbacks: TerminateSteadyState, CallbackSet
     import ForwardDiff
+    using Interpolations: interpolate, SteffenMonotonicInterpolation
     using LinearAlgebra
-    using NumericalIntegration: integrate
-  #  using NLsolve: nlsolve, OnceDifferentiable
+    using NumericalIntegration:integrat
+    using OrdinaryDiffEq: Rodas4P, Rodas5
+    import DiffEqBase, OrdinaryDiffEq
+    using RecursiveArrayTools:copyat_or_push!
     using Roots
+    using Setfield:setproperties
     using SparseArrays
+    using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using Unitful
     using Unitful.DefaultSymbols
-    using DataFrames: DataFrame
-    using Waveforms: trianglewave
-    using RecursiveArrayTools: copyat_or_push!
-    using Setfield: setproperties
-    using Interpolations: interpolate, SteffenMonotonicInterpolation
-    using DelimitedFiles: readdlm
-
-    import DiffEqCallbacks: TerminateSteadyState, CallbackSet
-    import DiffEqBase: solve, dualcache # dos not work if using
-  #  import DiffEqBase: solve
-    import Base:length, getproperty, setproperty!, propertynames
+    
+  	import Base:length, getproperty, setproperty!, propertynames
 
     abstract type AbstractProblem end
     abstract type AbstractSolution end
     abstract type AbstractProblemSolution <: AbstractSolution end
 
-    const CurrentDensity = Union{Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}, Level{L,S,Quantity{T,Unitful.𝐈*Unitful.𝐋^-2,U}} where S where L} where U where T
+    const CurrentDensity = Union{Quantity{T,Unitful.𝐈 * Unitful.𝐋^-2,U},Level{L,S,Quantity{T,Unitful.𝐈 * Unitful.𝐋^-2,U}} where S where L} where U where T
 
     include("parameters.jl")
     include("./routines/helpers.jl")

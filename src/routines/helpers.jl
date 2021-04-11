@@ -100,3 +100,13 @@ function unpac_struct(s...)
     end
     return p
 end
+
+"""
+    trianglewave(φ)
+
+2π-periodic triangle wave of φ with amplitude 1.
+"""
+function trianglewave(x)
+    xm = mod2pi(x + π/2)
+    xm < π ? 2xm/π - 1 : -2xm/π + 3
+end
