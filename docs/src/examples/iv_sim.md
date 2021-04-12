@@ -8,7 +8,6 @@ IVProblem
 
 ```jldoctest iv; output = false
 using AnnA
-using Plots; gr()
 using Unitful
 parm = Parameters(light = t -> 1.0,   
     vₙₕ= 10u"m/s" ,                 # electron surface recombination vel. at HTM
@@ -19,17 +18,19 @@ parm = Parameters(light = t -> 1.0,
 prob = IVProblem(parm, [-0.5,1.7]u"V", 0.2u"V/s")
 sol  = solve(prob)
 
-isapprox(sol.df.V[1] - sol.df.V[end], 0; atol=1e-4) # hide
+isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4) # hide
 
 # output
 
-false
+true
 
 
 ```
 The `ProblemSolution` object contains also grid and spatial information. All timesteps are stored in a `DataFrame` an can be acessed via the `df` field of `sol`.
 If we just want to plot the IV characteristics we can do:   
 ```@example iv
+using Plots; gr()
+
 sol=sol.df
 sol.j =sol.j .|> u"mA/cm^2"     # scale j to conveniant units
 sol= sol  .|>ustrip             # strip the units, so we can plot the result with Plots

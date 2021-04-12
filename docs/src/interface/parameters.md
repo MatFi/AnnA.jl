@@ -41,7 +41,7 @@ The mobile ions are controlled by the concentration `N₀`, diffusion constant `
 
 Values for other important device parameters are implicitly provided from the input in [`Parameters()`](@ref). 
 ### Effective Density Of States
-This conduction / valence band DOS ``~	N_{c/v} `` is calculated from the Bolzamnn approximation, electron/hole effective mass ``m_{e/h}``, the Bolzmann constant ``k_B``, temperature ``T``, Electron rest mass ``m_0`` and Planck constant ``h`` via:
+This conduction / valence band DOS ``~	N_{c/v} `` is calculated from the *free electron gas* approximation, electron/hole effective mass ``m_{e/h}``, the Bolzmann constant ``k_B``, temperature ``T``, Electron rest mass ``m_0`` and Planck constant ``h`` via:
 ```math
 N_{c/v} = 2\left(\frac{2\pi m_{e/h}  m_0  k_B T}{h^2}   \right)^{3/2}
 ```	
@@ -62,9 +62,26 @@ n_i^2 = N_{c}N_{v} \cdot e^\frac{- E_g }{k_B T}
 parm.nᵢ
 ```
 ### Fermi Level
+The Fermilevel ``Ef_{e/h}`` in the electron / hole trasportlayer can be expressed by thair doping density  ``d_{e/h}``, effective DOS and bandenergy ``E_{ce} / E_{vh} ``,  
+
+```math
+\begin{aligned}
+Ef_{e} &= E_{ce} - k_BT \log(N_{ce}/d_e) \\
+Ef_h &= E_{vh} + k_BT \log(N_{vh}/d_h)
+\begin{aligned}
+```
+
+```@repl interface	
+parm.Efₑ
+parm.Efₕ
+```
 
 ### Built In Potential
+The difference in fermi levels between ETM and HTM define the built in potential ``V_{Bi}``
 
-### Ionic Timescale
+```@repl interface	
+parm.Efₑ - parm.Efₕ
+parm.Vbi
+```
 
 

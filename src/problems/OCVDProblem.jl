@@ -77,7 +77,7 @@ function solve(pp::OCVDProblem, args...)
         p.parameters,
         light  = t -> p.parameters.light(t+t0),
     )
-    @show t0
+
     alg_ctl =  setproperties(
             p.alg_control,
             tend= p.decay_time,

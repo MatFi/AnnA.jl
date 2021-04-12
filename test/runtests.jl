@@ -7,6 +7,7 @@ using LinearAlgebra
 using BenchmarkTools
 using Logging
 using Unitful
+using Documenter
 
 include("jacobian_test.jl")
 include("operators_test.jl")
@@ -15,3 +16,7 @@ include("rhs_test.jl")
 include("solve_test.jl")
 include("problems_test.jl")
 
+DocMeta.setdocmeta!(AnnA, :DocTestSetup, :(using AnnA, Unitful); recursive=true)
+@testset "Doctests" begin
+    doctest(AnnA)
+end
