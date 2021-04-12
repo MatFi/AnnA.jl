@@ -176,6 +176,7 @@ function (rhs!::Rhs)(du,u,pr,t)
         fpₕ .= κₕ.*(Buff_Nₕ .+ fpₕ)
 
     cd  = DiffEqBase.get_tmp(rhs!.cd,u)
+    
     cd_buff = DiffEqBase.get_tmp(rhs!.Buff_N₋₁,u)
         mul!(cd_buff,rhs!.o.𝔏,P)
         cd .= rhs!.g.NN .- cd_buff .- ϰ
@@ -183,16 +184,15 @@ function (rhs!::Rhs)(du,u,pr,t)
         cd .= cd .+ δ.*cd_buff
         mul!(cd_buff,rhs!.o.𝔏,p)
         cd .= cd .- δ.*χ.*cd_buff
-        #mlab cd = NN-Lo*P+delta*(Lo*n-chi*Lo*p); # charge density
 
     cdₑ  = DiffEqBase.get_tmp(rhs!.cdₑ,u)
         mul!(cdₑ,rhs!.o.𝔏ₑ,nₑ)
         cdₑ .= cdₑ .- rhs!.g.ddE
-        #mlab   cdₑ = LoE*nE-ddE; # charge density in ETL
+
     cdₕ  = DiffEqBase.get_tmp(rhs!.cdₕ,u)
         mul!(cdₕ,rhs!.o.𝔏ₕ,pₕ)
         cdₕ .= rhs!.g.ddH .- cdₕ
-        #mlab cdₕ = ddH-LoH*pH; # charge density in HTL
+
 
     GR  = DiffEqBase.get_tmp(rhs!.GR, u)
         mul!(Buff_N, rhs!.o.𝕴, n)   # Buff_N now contains the interpolatet n
