@@ -3,7 +3,6 @@
 
 Calculates the total current in the center of the device see: DOI: 0.1007/s10825-019-01396-2
 """
-
 function calculate_currents(g,ndim, sol, dt, sol_prev)
     if dt == 0
         dt = Inf

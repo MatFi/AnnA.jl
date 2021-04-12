@@ -12,34 +12,41 @@ struct IVProblem{
     alg_control::C
 end
 
+
+
 """
     IVProblem(
         parm::Parameters,
-        range::AbstractArray,
-        rate::Unitful.AbstractQuantity;
+        range::Union{AbstractArray,Tuple},
+        rate;
         double_sweep = true,
         alg_control = AlgControl(dtmin = 1e-20,
             dt = 1e-6,
             reltol = 1e-4,
             abstol = 1e-12,
-            tend = (maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)
-        ),
+            tend = abs(sum(diff(range))) / abs(rate) * (1+double_sweep)
+        ),  
     )
 
 Creates an `IVProblem`. The voltage parameter `V` defined in `parm` will be overwritten by the linear voltage sweep defined as `V = t-> first(range) + rate*t`.
-`AlgControl.tend` is forced to be `(maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)`, an overwrite can be done on the finalized object using Setfield:
-`p = Setfield.setproperties(p::IVProblem, alg_control=AlgControl(...))`
+`AlgControl.tend` is forced to be `abs(sum(diff(range))) / abs(rate) * (1+double_sweep)`, an overwrite can be done on the finalized object using Setfield:
+`p = Setfield.setproperties(p::IVProblem, alg_control=AlgControl(...))`. 
+
+!!! note "Units"
+	
+    If no units provided for `range` and `rate`, `V` and `V/s` is assumed. 
+        
 """
 function IVProblem(
     parm::AbstractParameters,
     range::Union{AbstractArray,Tuple},
-    rate::Unitful.AbstractQuantity;
+    rate;
     double_sweep = true,
     alg_control = missing,
-)
+) where {T,U}
     range = ustrip.(upreferred.(range))
     rate = ustrip(upreferred(rate))
-    tend = (maximum(range) - minimum(range)) / abs(rate) * (1+double_sweep)
+    tend = abs(sum(diff(range))) / abs(rate) * (1+double_sweep)
     if alg_control isa Missing
 
         alg_control = AlgControl(
@@ -70,6 +77,7 @@ function IVProblem(
     prob = IVProblem(parm, range, rate, double_sweep, alg_control)
 
 end
+
 
 struct IVSolution <: AbstractProblemSolution
     sol_fwd::Union{DiffEqBase.ODESolution,Nothing}

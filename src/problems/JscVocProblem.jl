@@ -14,7 +14,7 @@ end
         alg_control = missing,
     )
 
-Creates an `JscVocProblem`. Where the backgrond illumination is increased to `max_intensity*Fₚₕ` logerythmical within the time `max_t`.
+Creates an `JscVocProblem`. Where the backgrond illumination is increased to `max_intensity*Fₚₕ` exponentially within the time `max_t`.
 """
 function JscVocProblem( 
     parm::AbstractParameters,
