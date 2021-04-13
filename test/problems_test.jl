@@ -10,11 +10,13 @@
     
     #forward direction
     prob = AnnA.IVProblem(parameters,[-0.2,1.4]u"V",0.005u"V/s",double_sweep=false)
-    @test sol =  AnnA.solve(prob) isa AnnA.ProblemSolution
+    sol =  AnnA.solve(prob) isa AnnA.ProblemSolution
+    @test sol isa AnnA.ProblemSolution
     @test !isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4)
     #reverse direction
     prob = AnnA.IVProblem(parameters,[1.2,0.4]u"V",0.005u"V/s",double_sweep=false)
-    @test  AnnA.solve(prob) isa AnnA.ProblemSolution
+    sol = AnnA.solve(prob) isa AnnA.ProblemSolution
+    @test sol isa AnnA.ProblemSolution
     @test !isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4)
 
     #test the ocvd  
