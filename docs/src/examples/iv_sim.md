@@ -5,8 +5,8 @@ The simulation of an IV curve can be done by the `IVProblem` constructor
 ```@docs
 IVProblem
 ```
-
-```jldoctest iv; output = false
+Here is a simple example on how to us
+```@example iv
 using AnnA
 using Unitful
 parm = Parameters(light = t -> 1.0,   
@@ -17,17 +17,10 @@ parm = Parameters(light = t -> 1.0,
 )
 prob = IVProblem(parm, [-0.5,1.7]u"V", 0.2u"V/s")
 sol  = solve(prob)
-
-isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4) # hide
-
-# output
-
-true
-
-
 ```
 The `ProblemSolution` object contains also grid and spatial information. All timesteps are stored in a `DataFrame` an can be acessed via the `df` field of `sol`.
-If we just want to plot the IV characteristics we can do:   
+If we just want to plot the IV characteristics we can do: 
+
 ```@example iv
 using Plots
 
