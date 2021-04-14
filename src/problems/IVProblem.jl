@@ -41,7 +41,7 @@ function IVProblem(
     rate;
     double_sweep = true,
     alg_control = missing,
-) where {T,U}
+)
     range = ustrip.(upreferred.(range))
     rate = ustrip(upreferred(rate))
     tend = abs(sum(diff(range))) / abs(rate) * (1+double_sweep)
