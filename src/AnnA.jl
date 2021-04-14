@@ -29,7 +29,6 @@ module AnnA
 
     include("parameters.jl")
     include("./routines/helpers.jl")
-    include("./helpers/dataloader.jl")
     include("./routines/nondimensionalise.jl")
     include("./routines/grid.jl")
     include("./routines/operators.jl")
