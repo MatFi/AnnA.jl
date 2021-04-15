@@ -34,7 +34,7 @@ abstract type AbstractParameters end
         dir = 1,                     # Light trough  1 -> ETL, -1 -> HTL
         light = pulse(tₑ=1.0),       # Light(t) function 
         V = t -> 0,                  # Voltage(t) function
-        Rₛₕ = 1e3u"V/A*m^2",         # Shunt resistance
+        Rₛₕ = 1e6u"V/A*m^2",         # Shunt resistance
 
         # Recombination Parameters
         τₙ = 3e-7u"s",             # electron pseudo lifetime
@@ -119,7 +119,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     dir::Integer =   1        # Light trough  1 -> ETL, -1 -> HTL
     light::Function = pulse(tₑ=1.0)     # Light(t) function  [Sun]
     V::Function = t -> 0               # Voltage(t) function [V]
-    Rₛₕ = 1e3u"V/A*m^2"       # Shunt resistance
+    Rₛₕ = 1e6u"V/A*m^2"       # Shunt resistance
 
     # Recombination Parameters
     τₙ = 3e-7u"s"             # electron pseudo lifetime

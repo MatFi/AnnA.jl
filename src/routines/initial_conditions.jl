@@ -20,10 +20,9 @@ function initial_conditions(c::Cell)
     p_init = setproperties(
         cc.parameters, 
         V = (t) -> v_itp(t),
-        light=t->c.parameters.light(0),
+        light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     ) #ensure that we initialize to
-
-    c_init = Cell(p_init;mode = c.mode, alg_ctl = cc.alg_ctl)
+    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl)
 
     if  c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
@@ -63,10 +62,9 @@ function initial_conditions(c::Cell)
        # initializealg=BrownFullBasicInit(),
     )
 
-   
-    if sol.retcode  ==:Unstable
+    if sol.retcode  !=:Terminated
         @show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
-        sol_ini=AnnABase.ProblemSolution(sol)
+        sol_ini=ProblemSolution(sol)
         n=sol_ini.df.n[end][ floor(Int,p_init.N/2)]
         p=sol_ini.df.p[end][ floor(Int,p_init.N/2)]
         ϕ=diff(sol_ini.df.ϕ[end])[ floor(Int,p_init.N/2)]
@@ -145,7 +143,7 @@ function init_guess(g::Grid, ndim::NodimParameters,Vbikt)
     P_init = ones(size(g.x))
     phi_init = zeros(size(g.x))
     dn,dp = (0.0,0.0)
-   
+
     if ndim.ϰ >0
         dn =  abs(ndim.ϰ )/ ndim.δ
         dp = ndim.nᵢ²*exp(Vbikt)/dn
@@ -158,10 +156,10 @@ function init_guess(g::Grid, ndim::NodimParameters,Vbikt)
     n_init = ones(size(g.x)) .*range( ndim.kₑ,dnend, length = g.N + 1) #* 
     p_init = ndim.nᵢ²*exp(Vbikt)./n_init
 
-  #  n_init = ones(size(g.x)) .*dn #* 1
-   # p_init = ones(size(g.x)) .*dp#* 1e-1
-  #  p_init = ones(size(g.x)) .*range(dp , ndim.kₕ, length = g.N + 1) #* 1e-1
-  # n_init = ones(size(g.x)) .*range( ndim.kₑ,dn, length = g.N + 1) #* 1e-1
+    #  n_init = ones(size(g.x)) .*dn #* 1
+    # p_init = ones(size(g.x)) .*dp#* 1e-1
+    #  p_init = ones(size(g.x)) .*range(dp , ndim.kₕ, length = g.N + 1) #* 1e-1
+    # n_init = ones(size(g.x)) .*range( ndim.kₑ,dn, length = g.N + 1) #* 1e-1
     phiE_init = zeros(size(g.xₑ))
     nE_init = ones(size(g.xₑ))# .* range(1, n_init[1] / ndim.kₑ, length = g.Nₑ)
     phiH_init = zeros(size(g.xₕ))

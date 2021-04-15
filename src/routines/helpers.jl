@@ -76,7 +76,7 @@ differentiable, allowing for autodiff.
 - `tₑ`: end time (end of fall)
 """
 function pulse(;Δh = 1.0, h₀ = 0.0, w = (1.0-2e-12), Δt = 1.0e-12, tₑ = 1.0)
-    lim=1.7976931348623157e+308
+    lim=1.e+308
     ts=[-lim,0, Δt,Δt+w,2*Δt+w,lim].-(1*Δt+w-tₑ)
     hs=[h₀ ,h₀,h₀+Δh,h₀+Δh,h₀,h₀]
     itp = interpolate(ts, hs ,SteffenMonotonicInterpolation())
