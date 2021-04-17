@@ -2,7 +2,7 @@
 """
     initial_conditions(c::Cell)
 
-Calculates the initial condition of a given `Cell` using NLsolve.
+Calculates the initial condition of a given `Cell` at `t=tstart`.
 Returns the steady state solution vector.
 """
 function initial_conditions(c::Cell)
@@ -11,7 +11,7 @@ function initial_conditions(c::Cell)
     u0 = c.u0
     cc =deepcopy(c)
     #if c.mode == :oc
-    ts=[0.0,1e-2,1e28] 
+    ts=[0.0,1e-2,1e256] 
     vs=[ustrip(cc.parameters.Vbi),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
@@ -38,7 +38,7 @@ function initial_conditions(c::Cell)
         colorvec = matrix_colors(c_init.Jac),
     )
     τᵢ = c_init.parameters.τᵢ
-    prob = ODEProblem(odefun,u0,(0,1e6*ustrip(τᵢ |> u"s")),c_init)
+    prob = ODEProblem(odefun,u0,(0,1e60*ustrip(τᵢ |> u"s")),c_init)
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
     
@@ -62,15 +62,18 @@ function initial_conditions(c::Cell)
        # initializealg=BrownFullBasicInit(),
     )
 
-    if sol.retcode  !=:Terminated
-        @show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
-        sol_ini=ProblemSolution(sol)
-        n=sol_ini.df.n[end][ floor(Int,p_init.N/2)]
-        p=sol_ini.df.p[end][ floor(Int,p_init.N/2)]
-        ϕ=diff(sol_ini.df.ϕ[end])[ floor(Int,p_init.N/2)]
-        @show n p  n*p  p_init.nᵢ^2 ϕ
-        throw(sol.retcode)
-    end
+        if sol.retcode ==:Success
+            @warn "Initialisation did not reach ss_tol"
+        # elseif sol.retcode  !=:Terminated
+        #     @show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
+        #     sol_ini=ProblemSolution(sol)
+        #     n=sol_ini.df.n[end][ floor(Int,p_init.N/2)]
+        #     p=sol_ini.df.p[end][ floor(Int,p_init.N/2)]
+        #     ϕ=diff(sol_ini.df.ϕ[end])[ floor(Int,p_init.N/2)]
+        #     @show n p  n*p  p_init.nᵢ^2 ϕ
+        #     throw(sol.retcode)
+        # end
+        end
     return sol
 
 #=

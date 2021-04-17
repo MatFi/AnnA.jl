@@ -32,7 +32,7 @@ abstract type AbstractParameters end
         α  = 1.3e7u"1/m",            # Perovskite absorption koefficient
         Fₚₕ = 1.4e21u"m^-2*s^-1",    # 1 Sun absorbed photonflux 
         dir = 1,                     # Light trough  1 -> ETL, -1 -> HTL
-        light = pulse(tₑ=1.0),       # Light(t) function 
+        light = pulse(tₑ=1.0,w=2.),       # Light(t) function 
         V = t -> 0,                  # Voltage(t) function
         Rₛₕ = 1e6u"V/A*m^2",         # Shunt resistance
 
@@ -66,24 +66,15 @@ abstract type AbstractParameters end
         Dₕ = 1e-7u"m^2/s",         # HTL electron diffusion coeficcient
     )
 
-Construct the parameters object from the defaults.
+Constructs the parameters object from the defaults.
 
 # Examples
-```jldoctest; output = false
+```@example; output = false
 def_parm = Parameters()         # Use the default parameters
 mod_parm = Parameters(          # Use modified default parameters 
     b  = 432u"nm",              # Perovskite Layer thickness
     ε = 42,                     # Perovskite permitivity
 )
-
-# output
-Parameters(400, 8.854187817e-12 F m^-1, 1.6021766209e-19 C, 8.61733035e-5 eV K^-1, 432 nm, 42, -3.7 eV, -5.3 eV, 0 m^-3, 0.00017 m^2 s^-1, 0.00017 m^2 s^-1, 0.2, 0.2, 1.6e24 m^-3, 6.5e-8 m^2 s^-1, 0.58 eV, false, 300 K, 1.3e7 m^-1, 1.4e21 m^-2 s^-1, 1, AnnA.Pulse{Float64, Vector{Float64}, Float64, Vector{Float64}, Interpolations.MonotonicInterpolation{Float64, Float64, Float64, Float64, Float64, Interpolations.SteffenMonotonicInterpolation, Vector{Float64}, Vector{Float64}}}(1.0, 0.0, 0.999999999998, 1.0e-12, 1.0, [-1.7976931348623157e308, 9.999778782798785e-13, 1.9999778782798783e-12, 1.0, 1.000000000001, 1.7976931348623157e308], [0.0, 0.0, 1.0, 1.0, 0.0, 0.0], 6-element interpolate(::Vector{Float64}, ::Vector{Float64}, Interpolations.SteffenMonotonicInterpolation()) with element type Float64:
-  0.0
-  0.0
-  1.0000000000000007
-  1.0
- -2.220446049250313e-16
-  0.0), AnnA.var"#3#5"(), 1000.0 m^2 V A^-1, 3.0e-7 s, 3.0e-7 s, 3.22e-17 m^3 s^-1, 0 m^4 s^-1, 0 m^4 s^-1, 0 m s^-1, 0 m s^-1, 0 m s^-1, 0 m s^-1, 1.0e18 cm^-3, 1.5, -4.0 eV, 1.0e-7 m, 3, 1.0e-7 m^2 s^-1, 1.0e18 cm^-3, 12, -5 eV, 1.0e-7 m, 3, 1.0e-7 m^2 s^-1)
 ```
 """
 Base.@kwdef mutable struct Parameters <: AbstractParameters
@@ -117,7 +108,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     α  = 1.3e7u"1/m"          # Perovskite absorption coefficient
     Fₚₕ = 1.4e21u"m^-2*s^-1"  # 1 Sun photonflux  
     dir::Integer =   1        # Light trough  1 -> ETL, -1 -> HTL
-    light::Function = pulse(tₑ=1.0)     # Light(t) function  [Sun]
+    light::Function = pulse(tₑ=1.0,w=2.)     # Light(t) function  [Sun]
     V::Function = t -> 0               # Voltage(t) function [V]
     Rₛₕ = 1e6u"V/A*m^2"       # Shunt resistance
 
