@@ -22,7 +22,7 @@ SparseDiffTools = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
-DataFrames = "0.22"
+DataFrames = "0.22, 1.0"
 DataStructures = "0.15, 0.16.1, 0.17, 0.18"
 DiffEqBase = "6"
 DiffEqCallbacks = "2.16.1"
