@@ -6,7 +6,7 @@ using AnnA
 
 doctest = "fix" in ARGS ? :fix : true
 
-DocMeta.setdocmeta!(AnnA, :DocTestSetup, :(using AnnA, Unitful); recursive=true)
+DocMeta.setdocmeta!(AnnA, :DocTestSetup, :(using AnnA, Unitful, UnitfulRecipes); recursive=true)
 makedocs(
     sitename = "AnnA.jl",
     modules = [AnnA],
