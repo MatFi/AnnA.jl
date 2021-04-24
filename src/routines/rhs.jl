@@ -196,7 +196,7 @@ function (rhs!::Rhs)(du,u,pr,t)
 
     GR  = DiffEqBase.get_tmp(rhs!.GR, u)
         mul!(Buff_N, rhs!.o.𝕴, n)   # Buff_N now contains the interpolatet n
-        mul!(GR, rhs!.o.𝕴, p)       # GR contains interploated p
+        mul!(GR, rhs!.o.𝕴, p)       # GR contains interpolated p
         rhs!.ndim.R(GR ,Buff_N, GR) # GR  contains now the recobination rate
 
         mul!(Buff_N, rhs!.o.𝕴, rhs!.g.x) # Buff_N ontains the interpolated x
@@ -244,7 +244,7 @@ function (rhs!::Rhs)(du,u,pr,t)
         du[4*N+Nₑ+5+i] = fnₑ[i+1]-fnₑ[i]
     end
     ### HTM ###
-    du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] + rhs!.ndim.Vbi - rhs!.ndim.V(t);
+    du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] + rhs!.ndim.Vbi - rhs!.ndim.V(t);  
     du[4*N+2*Nₑ+2*Nₕ+4] = pₕ[end]-1;
     @inbounds @simd for i in 1:Nₕ-1
         du[4*N+2*Nₑ+4+i] = mEₕ[i+1]-mEₕ[i]-cdₕ[i]/λₕ²;
@@ -253,7 +253,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     # Perform any additional step requested by the optional input argument rhs!.mode
     if rhs!.mode == :cc  # cosed circuit is default
     elseif rhs!.mode == :oc #oopen circuit
-        du[4*N+5] = (fnₑ[1]-( ϕₕ[end] +rhs!.ndim.Vbi) *rhs!.ndim.σₛₕ) ;  # no flux and shunt
+        du[4*N+5] = (fnₑ[1]-( ϕₕ[end] +rhs!.ndim.Vbi) *rhs!.ndim.σₛₕ) ;  # no flux except shunt
         du[4*N+2*Nₑ+Nₕ+4] =  ϕₑ[1] # Potential reference at etl contact
         #du[N+1] = integrate(rhs!.g.x,P)-1;
         #du[N+1] = integrate(rhs!.g.x,P)-1)^4;
