@@ -8,7 +8,7 @@ IVProblem
 Here is a simple example on how to us
 ```@example iv
 using AnnA
-using Unitful
+using Unitful, UnitfulRecipes
 parm = Parameters(light = t -> 1.0,   
     vₙₕ= 10u"m/s" ,                 # electron surface recombination vel. at HTM
     vₚₕ= 0.01u"m/s" ,               # hole surface recombination vel. at HTM
@@ -26,6 +26,7 @@ using Plots
 using UnitfulRecipes  # To interface Unitful with Plots
 
 sol=sol.df
+sol.j = sol.j |>u"mA/cm^2" # scale to common units
 plt = plot(sol.V[sol.fwd], sol.j[sol.fwd],label="Forward", ylims=(-25,40),xlims=(-0.5,1.3),legend=:topleft);
 plot!(plt,sol.V[.!sol.fwd], sol.j[.!sol.fwd],label="Backward");
 plt
@@ -38,6 +39,7 @@ The wrapper implements ``j_{sc}(V_{oc})`` simulation by two consecutive simulati
 # Open Circuit Voltage Decay (OCVD)
 
 To simulate a open circuit voltage decay a `OCVDProblem` is implemented:
+
 ```@example iv
 prob_ocvd = OCVDProblem(
     parm,       # input parameter set
@@ -47,3 +49,4 @@ prob_ocvd = OCVDProblem(
 
 sol = solve(prob_ocvd)  
 plot(sol.t_decay,sol.V_decay,xscale=:log10)
+```
