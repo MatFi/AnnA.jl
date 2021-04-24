@@ -196,7 +196,7 @@ Base.@kwdef mutable struct AlgControl
     reltol::Float64     = 1e-6      # Relative tolerance for the solvers (auto_abstol =  u*reltol)
     abstol              = 1e-5
     autodiff::Bool      = true      # Enable autodifferentiation (highly suggested)
-    alg     = Rodas4P(autodiff=autodiff) # Integrator Algorithm. Optional suggestions are: Rodas5(), ROS34PW2(), ROS3P(), QBDF(), QNDF()
+    alg     = Rodas4P2(autodiff=autodiff) # Integrator Algorithm. Optional suggestions are: Rodas5(), ROS34PW2(), ROS3P(), QBDF(), QNDF()
     dtmin   = 1e-15
     dt      = 1e-14
     force_dtmin = true

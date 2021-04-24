@@ -9,8 +9,8 @@ module AnnA
     using LinearAlgebra
     using NumericalIntegration: integrate
     using OrdinaryDiffEq: Rodas4P, Rodas5
-    import DiffEqBase 
-	import OrdinaryDiffEq
+    using DiffEqBase 
+	  using OrdinaryDiffEq
     using RecursiveArrayTools: copyat_or_push!
     using Roots
     using Setfield:setproperties
