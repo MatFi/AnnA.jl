@@ -21,7 +21,7 @@ function initial_conditions(c::Cell)
         cc.parameters, 
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
-    ) #ensure that we initialize to
+    )
     c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl)
 
     if  c.mode == :occ  #legacy
@@ -63,16 +63,10 @@ function initial_conditions(c::Cell)
     )
 
         if sol.retcode ==:Success
-            @warn "Initialisation did not reach ss_tol"
-        # elseif sol.retcode  !=:Terminated
-        #     @show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
-        #     sol_ini=ProblemSolution(sol)
-        #     n=sol_ini.df.n[end][ floor(Int,p_init.N/2)]
-        #     p=sol_ini.df.p[end][ floor(Int,p_init.N/2)]
-        #     ϕ=diff(sol_ini.df.ϕ[end])[ floor(Int,p_init.N/2)]
-        #     @show n p  n*p  p_init.nᵢ^2 ϕ
-        #     throw(sol.retcode)
-        # end
+            @warn "Initialisation did not reach steady state within ss_tol"
+        elseif sol.retcode  !=:Terminated
+            @warn "Initialisation failed"
+            #@show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
         end
     return sol
 
