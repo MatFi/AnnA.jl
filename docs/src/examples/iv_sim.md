@@ -26,7 +26,7 @@ using Plots
 using UnitfulRecipes  # To interface Unitful with Plots
 
 sol=sol.df
-sol.j = sol.j |>u"mA/cm^2" # scale to common units
+sol.j = sol.j .|>u"mA/cm^2" # scale to common units
 plt = plot(sol.V[sol.fwd], sol.j[sol.fwd],label="Forward", ylims=(-25,40),xlims=(-0.5,1.3),legend=:topleft);
 plot!(plt,sol.V[.!sol.fwd], sol.j[.!sol.fwd],label="Backward");
 plt
@@ -48,5 +48,5 @@ prob_ocvd = OCVDProblem(
 ) 
 
 sol = solve(prob_ocvd)  
-plot(sol.t_decay,sol.V_decay,xscale=:log10)
+plot(sol.t_decay,sol.V_decay,xscale=:log10,xlims=(1e-8,10))
 ```
