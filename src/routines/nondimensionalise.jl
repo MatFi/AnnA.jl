@@ -82,8 +82,8 @@ end
 
 Performs the nondimensionalisation of the input parameters and returns a `NodimParameters` struct
 """
-function NonDimensionalize(prm::AbstractParameters)
-
+function NonDimensionalize(parm::AbstractParameters)
+    prm = deepcopy(parm)
     #Unpack parameters
     p=unpac_struct(prm)
 
@@ -185,7 +185,10 @@ function NonDimensionalize(prm::AbstractParameters)
         d[:Rᵣ]= Rec_function(promote(copy(nᵢ²),copy(kk),copy(γ),copy(τᵣ),copy(rtrap))...)
     end
 
-    d[:G] = Gen_function(uconvert(Unitful.NoUnits,p[:α]*p[:b]), Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ]|> u"s")), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
+#    d[:G] = Gen_function(uconvert(Unitful.NoUnits,p[:α]*p[:b]), Float64(p[:dir]), t -> p[:light](t*ustrip(p[:τᵢ]|> u"s")), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
+    ti=ustrip(p[:τᵢ]|> u"s")
+    d[:G] = Gen_function(uconvert(Unitful.NoUnits,p[:α]*p[:b]), Float64(p[:dir]), t -> prm.light(t*ti), uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
+    
     d[:V] = Pot_function(uconvert(Unitful.NoUnits,p[:VT]/1u"V"),p[:V],uconvert(Unitful.NoUnits,p[:τᵢ]/1u"s"))
 
     #when the ions are frozen no corrent is calculated afterwards
@@ -273,6 +276,7 @@ function (g!::Gen_function)(G,x,t)
     @.  G   =  g!.αb/(1-exp(-g!.αb))*exp(-g!.αb*(g!.dir*x + (1-g!.dir)/2));
 #    @.  G   =  (g!.light(t*g!.tion))*g!.αb/(1-exp(-g!.αb))*exp(-g!.αb*(g!.dir*x + (1-g!.dir)/2));
 end
+
 
 """
     struct Pot_function{T, F} <: Function

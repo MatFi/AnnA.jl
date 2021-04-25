@@ -1,4 +1,4 @@
-struct Rhs{P,NP,G,OP,M,A,AE,AH,AM,AEM,AHM, AP, AEP, AHP} <: Function
+struct Rhs{P,NP,G,OP,M,A,AE,AH,AM,AEM,AHM, AP, AEP, AHP, GEN} <: Function
     parameters::P
     ndim::NP    # ndim parameters
     g::G        # the grid object
@@ -17,7 +17,8 @@ struct Rhs{P,NP,G,OP,M,A,AE,AH,AM,AEM,AHM, AP, AEP, AHP} <: Function
     fp::A   # hole current
     fpₕ::AH  # hole current in HTL
     GR::A   # generation recombination sum
-
+    G::GEN    # generation rate of 1 sun 
+  
     Buff_N::A
     Buff_Nₕ::AH
     Buff_Nₑ::AE
@@ -64,7 +65,10 @@ function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol
     d[:fnₑ] = DiffEqBase.dualcache(zeros(g.Nₑ),N)
     d[:fpₕ] = DiffEqBase.dualcache(zeros(g.Nₕ),N)
     d[:GR]  = DiffEqBase.dualcache(zeros(g.N),N)
-
+    G = zeros(g.N)
+    mul!(G, op.𝕴, g.x)
+    ndim.G(G, G, missing)
+    d[:G] = G
     d[:Buff_N]  = DiffEqBase.dualcache(zeros(g.N),N)
     d[:Buff_Nₑ]  = DiffEqBase.dualcache(zeros(g.Nₑ),N)
     d[:Buff_Nₕ]  = DiffEqBase.dualcache(zeros(g.Nₕ),N)
@@ -108,7 +112,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     ϕ   = DiffEqBase.get_tmp(rhs!.ϕ,u)
     n   = DiffEqBase.get_tmp(rhs!.n,u)
     p   =  DiffEqBase.get_tmp(rhs!.p,u)
-    @inbounds @simd for i in 1:N+1
+    @inbounds for i in 1:N+1
         P[i]   = u[i]
         ϕ[i]    = u[N+1+i]
         n[i]    = u[2*N+2+i]
@@ -118,7 +122,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     ϕₑ  = DiffEqBase.get_tmp(rhs!.ϕₑ,u)
     nₑ  = DiffEqBase.get_tmp(rhs!.nₑ,u)
 
-    @inbounds @simd for i in 1:rhs!.g.Nₑ
+    @inbounds for i in 1:rhs!.g.Nₑ
         ϕₑ[i]   = u[4*N+4+i]
         nₑ[i]   = u[4*N+Nₑ+4+i]
     end
@@ -130,7 +134,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     ϕₕ[1]=ϕ[N+1]
     pₕ[1]=p[N+1]/rhs!.ndim.kₕ
     #@inbounds @simd
-    @inbounds @simd for i in 1:rhs!.g.Nₕ
+    @inbounds for i in 1:rhs!.g.Nₕ
         ϕₕ[i+1]  = u[4*N+2*Nₑ+4+i]
         pₕ[i+1]  = u[4*N+2*Nₑ+Nₕ+4+i]
     end
@@ -194,21 +198,35 @@ function (rhs!::Rhs)(du,u,pr,t)
         cdₕ .= rhs!.g.ddH .- cdₕ
 
 
-    GR  = DiffEqBase.get_tmp(rhs!.GR, u)
+    R  = DiffEqBase.get_tmp(rhs!.GR, u)
         mul!(Buff_N, rhs!.o.𝕴, n)   # Buff_N now contains the interpolatet n
-        mul!(GR, rhs!.o.𝕴, p)       # GR contains interpolated p
-        rhs!.ndim.R(GR ,Buff_N, GR) # GR  contains now the recobination rate
+        mul!(R, rhs!.o.𝕴, p)       # GR contains interpolated p
+        rhs!.ndim.R(R ,Buff_N, R) # GR  contains now the recobination rate
 
-        mul!(Buff_N, rhs!.o.𝕴, rhs!.g.x) # Buff_N ontains the interpolated x
-        rhs!.ndim.G(Buff_N, Buff_N, t) # Buff_N contains generation rate
+   #     mul!(Buff_N, rhs!.o.𝕴, rhs!.g.x) # Buff_N ontains the interpolated x
+    #    rhs!.ndim.G(Buff_N, Buff_N, t) # Buff_N contains generation rate
 
     #!!! her we have allocs !!!! but alternatives lead to Forward diff erro, or seem to be 25% slower s#####
-    GR  = Buff_N * rhs!.ndim.G.light(t) - GR
-    #@inbounds @simd  for i in eachindex(GR)
-    #    GR[i]  = Buff_N[i] * rhs!.ndim.G.light(t) - GR[i]
-    #end
+    l =  rhs!.ndim.G.light(t)
 
-
+    # This is a dirty hack to buffer the timegradient of genereration function 
+    # temporarely in the return du vector
+    GR = @view du[end-N+1:end]
+    GR   .= muladd(rhs!.G , l ,-R)
+  
+ 
+    
+    @inbounds for i in 1:N-1
+        if !rhs!.parameters.freeze_ions
+            du[i+1] = FP[i+1] - FP[i];
+        else
+            du[i+1]=0
+        end
+        genrec = (rhs!.g.dx[i+1]*GR[i+1]+rhs!.g.dx[i]*GR[i])/2
+        du[N+2+i] = mE[i+1]-mE[i]-cd[i]/λ²;
+        du[2*N+3+i] = fn[i+1]-fn[i]+genrec;
+        du[3*N+4+i] = fp[i+1]-fp[i]+genrec;
+    end
     # P BC
     du[1] = FP[1];      # no Ion flux at bc
     du[N+1] = -FP[N];   # no Ion flux at bc
@@ -225,28 +243,19 @@ function (rhs!::Rhs)(du,u,pr,t)
     # p BC
     du[3*N+4] = fp[1]+rhs!.g.dx[1]*GR[1]/2 -rhs!.ndim.Rₗ(nₑ[end],p[1])
     du[4*N+4] = fpₕ[1]-fp[end]+(rhs!.g.dx[end]*GR[end])/2 -rhs!.ndim.Rᵣ(n[N+1],pₕ[1]); # continuity
-    @inbounds @simd for i in 1:N-1
-        if !rhs!.parameters.freeze_ions
-            du[i+1] = FP[i+1] - FP[i];
-        else
-            du[i+1]=0
-        end
-
-        du[N+2+i] = mE[i+1]-mE[i]-cd[i]/λ²;
-        du[2*N+3+i] = fn[i+1]-fn[i]+(rhs!.g.dx[i+1]*GR[i+1]+rhs!.g.dx[i]*GR[i])/2;
-        du[3*N+4+i] = fp[i+1]-fp[i]+(rhs!.g.dx[i+1]*GR[i+1]+rhs!.g.dx[i]*GR[i])/2;
-    end
+    
+    
     ### ETM ###
     du[4*N+5] = ϕₑ[1]#-rhs!.ndim.V(t);
     du[4*N+Nₑ+5] = nₑ[1]-1;
-    @inbounds @simd for i in 1:Nₑ-1
+    @inbounds for i in 1:Nₑ-1
         du[4*N+5+i] = mEₑ[i+1]-mEₑ[i]-cdₑ[i]/λₑ²;
         du[4*N+Nₑ+5+i] = fnₑ[i+1]-fnₑ[i]
     end
     ### HTM ###
     du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] + rhs!.ndim.Vbi - rhs!.ndim.V(t);  
     du[4*N+2*Nₑ+2*Nₕ+4] = pₕ[end]-1;
-    @inbounds @simd for i in 1:Nₕ-1
+    @inbounds for i in 1:Nₕ-1
         du[4*N+2*Nₑ+4+i] = mEₕ[i+1]-mEₕ[i]-cdₕ[i]/λₕ²;
         du[4*N+2*Nₑ+Nₕ+4+i] = fpₕ[i+1]-fpₕ[i];
     end
