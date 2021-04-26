@@ -48,5 +48,5 @@ prob_ocvd = OCVDProblem(
 ) 
 
 sol = solve(prob_ocvd)  
-plot(sol.t_decay,sol.V_decay,xscale=:log10,xlims=(1e-8,10))
+plot(sol.t_decay,sol.V_decay,xscale=:log10,xlims=(1e-8,1e5))
 ```
