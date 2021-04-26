@@ -66,9 +66,9 @@ The Fermilevel ``Ef_{e/h}`` in the electron / hole trasportlayer can be expresse
 
 ```math
 \begin{aligned}
-Ef_{e} &= E_{ce} - k_BT \log(N_{ce}/d_e) \\
-Ef_h &= E_{vh} + k_BT \log(N_{vh}/d_h)
-\begin{aligned}
+Ef_{e}  &= E_{ce} - k_BT \log(N_{ce}/d_e) \\
+Ef_h    &= E_{vh} + k_BT \log(N_{vh}/d_h)
+\end{aligned}
 ```
 
 ```@repl interface	
