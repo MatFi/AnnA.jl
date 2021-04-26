@@ -50,7 +50,8 @@ end
 function OCVDSolution(sol::ODESolution)
     parm = sol.prob.f.f
     grid = parm.g
-    OCVDSolution(parm.parameters,todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
+    parm = parm.parameters
+    OCVDSolution(parm,todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
 end
 
 
