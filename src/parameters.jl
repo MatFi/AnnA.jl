@@ -194,7 +194,7 @@ Base.@kwdef mutable struct AlgControl
 
     ss_tol::Float64     = 1e-6      # ftol for steady state detection
     reltol::Float64     = 1e-6      # Relative tolerance for the solvers (auto_abstol =  u*reltol)
-    abstol              = 1e-5
+    abstol              = 1e-6
     autodiff::Bool      = true      # Enable autodifferentiation (highly suggested)
     alg     = Rodas4P2(autodiff=autodiff) # Integrator Algorithm. Optional suggestions are: Rodas5(), ROS34PW2(), ROS3P(), QBDF(), QNDF()
     dtmin   = 1e-15
@@ -202,7 +202,7 @@ Base.@kwdef mutable struct AlgControl
     force_dtmin = true
     progress = false
     progress_steps = 50
-    maxiters = 1000
+    maxiters = 5000
     tstart = 0.0u"s"
     tend = 1e5u"s"
     initializealg = OrdinaryDiffEq.NoInit()
