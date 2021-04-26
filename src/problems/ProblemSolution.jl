@@ -8,10 +8,8 @@ end
 function ProblemSolution(sol::ODESolution)
     parm = sol.prob.f.f
     grid = parm.g
-    ProblemSolution(parm.parameters, todf(sol), grid.xₑ, grid.x, grid.xₕ)
+    ProblemSolution(parm.parameters, todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
 end
-
-
 
 function todf(sol::ODESolution)
     rhs = sol.prob.f.f

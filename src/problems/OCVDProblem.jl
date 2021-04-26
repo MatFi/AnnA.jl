@@ -40,14 +40,17 @@ function OCVDProblem(
 
 end
 
-struct OCVDSolution{S,P} <: AbstractProblemSolution
+struct OCVDSolution{P,S,GE,GP,GH} <: AbstractProblemSolution
+    parameters::P
     df::S
-    #sol_decay::S
-    prob::P
-    #t_on::Array{A,1}
-    #t_decay::Array{A,1}
-    #V_on::Array{B,1}
-    #V_decay::Array{B,1}
+    xₑ::GE
+    x::GP
+    xₕ::GH
+end
+function OCVDSolution(sol::ODESolution)
+    parm = sol.prob.f.f
+    grid = parm.g
+    OCVDSolution(parm.parameters,todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
 end
 
 
@@ -98,6 +101,6 @@ function solve(pp::OCVDProblem, args...)
         )
     c = Cell(parms;mode = :oc,alg_ctl =alg_ctl)
     sol = solve(c)#.u[end]
-    return OCVDSolution(todf(sol), p)
+    return OCVDSolution(sol)
 
 end
