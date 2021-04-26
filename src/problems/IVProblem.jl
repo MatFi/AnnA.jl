@@ -48,10 +48,12 @@ function IVProblem(
     if alg_control isa Missing
 
         alg_control = AlgControl(
-            dtmin = 1e-20,
-            dt = 1e-8,
+            dtmin = ustrip((1e-30 * parm.τᵢ )|>u"s"),
+            dt = ustrip((1e-10 * parm.τᵢ)|>u"s"),
             reltol = 1e-5,
             abstol = 1e-8,
+            force_dtmin=false,
+            ss_tol=1e-5,
             tend = tend*u"s",
         )
     else
