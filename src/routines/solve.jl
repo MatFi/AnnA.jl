@@ -21,8 +21,6 @@ end
 function get_problem(c::Cell;tstart=0.0u"s",tend = 20.0u"s")
     u0 = c.u0
 
-    colorvec = matrix_colors(c.Jac)
-
     odefun = ODEFunction(c.rhs;
         mass_matrix = c.M,
         jac_prototype = c.Jac,
