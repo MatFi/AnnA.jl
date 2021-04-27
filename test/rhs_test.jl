@@ -13,9 +13,9 @@
 
     u=zeros(10)
     bu = BigFloat.(u)
-    lc = lcache()
-    @test get_tmp(lc,u) isa Vector{Float64}
-    @test get_tmp(lc,bu) isa Vector{BigFloat}
-    @test get_tmp(lc,bu) isa Vector{BigFloat}
-    @test get_tmp(lc,u) isa Vector{Float64}
+    lc = AnnA.lcache()
+    @test AnnA.get_tmp(lc,u) isa Vector{Float64}
+    @test AnnA.get_tmp(lc,bu) isa Vector{BigFloat}
+    @test AnnA.get_tmp(lc,bu) isa Vector{BigFloat}
+    @test AnnA.get_tmp(lc,u) isa Vector{Float64}
 end
