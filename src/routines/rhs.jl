@@ -46,7 +46,7 @@ function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol
     end
 
     
-    if numtype == Float64
+    if numtype <: Union{Float64}
         cache = (u,n) -> DiffEqBase.dualcache(u,n)
     else
         cache = (u,n) -> lcache(length(u))
@@ -98,7 +98,6 @@ function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol
 end
 
 function (rhs!::Rhs)(du,u,pr,t)
-    @show t
     δ   = rhs!.ndim.δ
     χ   = rhs!.ndim.χ
     ϰ   = rhs!.ndim.ϰ
