@@ -10,7 +10,7 @@ function initial_conditions(c::Cell)
     #@info "initialisation : nlsolve on first guess in :precondition mode"
     u0 = c.u0
     cc =deepcopy(c)
-    #if c.mode == :oc
+    c.mode == :oc && c.parameters.V(0) !==0 && @warn "Initialisation to jsc conditions"
     ts=[0.0,1e-2,1e256] 
     vs=[ustrip(cc.parameters.Vbi),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
@@ -28,25 +28,14 @@ function initial_conditions(c::Cell)
         @info "initalisatiion: stating conditions in :oc mode"
         u0 = nl_solve_intiter(c,u0;ftol=c.alg_ctl.ss_tol).zero
     end
-#    c_init=deepcopy(c)
 
     @debug "Init_Solve"
     τᵢ = c_init.parameters.τᵢ
     prob = get_problem(c_init,tstart=0.0u"s",tend = 1e60*τᵢ |> u"s")
-    #odefun = ODEFunction(c_init.rhs;
-    #    mass_matrix = c_init.M,
-    #    jac_prototype = c_init.Jac,
-    #    colorvec = matrix_colors(c_init.Jac),
-    #)
-   
-    #prob = ODEProblem(odefun,u0,(0,1e60*ustrip(τᵢ |> u"s")),c_init)
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
     
-    #sol = solve(prob,SSRootfind())
-   # prob = ODEProblem(odefun,sol.u,(0,1e6*ustrip(τᵢ |> u"s")),c_init)
 
-    #abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
     cb = CallbackSet(ss_cb,)#abstol_cb )
     sol = solve(prob,Rodas4P2();
         progress_steps = 50,
@@ -71,20 +60,6 @@ function initial_conditions(c::Cell)
         end
     return sol
 
-#=
-    prob = SteadyStateProblem(
-        odefun,
-        u0,
-        c_init;
-    )
-    sol = solve(prob,DynamicSS(Rodas5();abstol=1e-4,reltol=1e-6,tspan= ustrip(1e4u"s"/c.parameters.τᵢ)),progress = true, progress_steps=10,force_dtmin =true ,callback = AutoAbstol(false;init_curmax=u0 .+ 0.1), dtmin=1e-10*ustrip(τᵢ),abstol=u0.*0,reltol=1e-6)
-    if sol.retcode !=:Success
-        #return u0
-    end
-    return sol
-
-#    return u1.zero
-=#
 end
 
 
