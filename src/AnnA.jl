@@ -8,10 +8,9 @@ module AnnA
     using Interpolations: interpolate, SteffenMonotonicInterpolation
     using LinearAlgebra
     using NumericalIntegration: integrate
-    using OrdinaryDiffEq: Rodas4P, Rodas5
+    using OrdinaryDiffEq: Rodas4P, Rodas4P2, Rodas5, RadauIIA5
     using DiffEqBase 
 	  using OrdinaryDiffEq
-    using RecursiveArrayTools: copyat_or_push!
     using Roots
     using Setfield:setproperties
     using SparseArrays
