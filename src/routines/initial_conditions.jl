@@ -47,7 +47,7 @@ function initial_conditions(c::Cell)
 
     #abstol_cb = AutoAbstol(false;init_curmax=u0 .+ 0.001)
     cb = CallbackSet(ss_cb,)#abstol_cb )
-    sol = solve(prob,Rodas5();
+    sol = solve(prob,Rodas4P2();
         progress_steps = 50,
         progress = c_init.alg_ctl.progress,
         callback = cb,
