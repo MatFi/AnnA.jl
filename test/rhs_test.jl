@@ -13,7 +13,7 @@
 
     u=zeros(10)
     bu = BigFloat.(u)
-    lc = AnnA.lcache()
+    lc = AnnA.lcache(10)
     @test AnnA.get_tmp(lc,u) isa Vector{Float64}
     @test AnnA.get_tmp(lc,bu) isa Vector{BigFloat}
     @test AnnA.get_tmp(lc,bu) isa Vector{BigFloat}
