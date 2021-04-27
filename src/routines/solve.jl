@@ -22,20 +22,20 @@ function solve(c::Cell;tstart=c.alg_ctl.tstart, tend=c.alg_ctl.tend,kwargs...)
 end
 function get_problem(c::Cell;tstart=0.0u"s",tend = 20.0u"s")
 
-    tspan = (convert(Float64,upreferred(tstart/c.parameters.τᵢ)), convert(Float64,upreferred(tend/c.parameters.τᵢ)))
-
-    if c.alg_ctl.numtype <:BigFloat
+     ntype = c.alg_ctl.numtype 
+    if ntype <:BigFloat
         u0 = BigFloat.(c.u0, precision=128)
         jac = Matrix(c.Jac)
         tspan = BigFloat.(tspan,precision=128)
     else
-        u0 = c.u0
-        jac = c.Jac
+        u0 = ntype.(c.u0)
+        Jac = ntype.(c.Jac)
+        M= ntype.(c.M)
     end
     odefun = ODEFunction(c.rhs;
-        mass_matrix = c.M,
-        jac_prototype = jac,
-        colorvec = matrix_colors(c.Jac),
+        mass_matrix = M,
+        jac_prototype = Jac,
+        colorvec = matrix_colors(Jac),
     )
     tspan = (convert(Float64,upreferred(tstart/c.parameters.τᵢ)), convert(Float64,upreferred(tend/c.parameters.τᵢ)))
 
