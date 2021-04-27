@@ -284,7 +284,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     else
         error("simulation mode $(rhs!.mode) is not recongnized")
     end
-
+  
     return nothing
 end
 

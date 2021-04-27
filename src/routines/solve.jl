@@ -37,7 +37,7 @@ function get_problem(c::Cell;tstart=0.0u"s",tend = 20.0u"s")
         jac_prototype = Jac,
         colorvec = matrix_colors(Jac),
     )
-    tspan = (convert(Float64,upreferred(tstart/c.parameters.τᵢ)), convert(Float64,upreferred(tend/c.parameters.τᵢ)))
+    tspan = (convert(ntype,upreferred(tstart/c.parameters.τᵢ)), convert(ntype,upreferred(tend/c.parameters.τᵢ)))
 
     #tol_callback = AutoAbstol(false;init_curmax=u0 .+ 0.1)
 
