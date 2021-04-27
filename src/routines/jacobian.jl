@@ -40,5 +40,5 @@ function get_jac_sparse_pattern(g::Grid;mode::Symbol=:oc)
     else error("simulation mode $mode is not recognised")
     end
 
-    return sparse(J)
+    return dropzeros(sparse(J))
 end

@@ -27,7 +27,7 @@ function Cell(
     end
     grid   = Grid(p)
     ndim= NonDimensionalize(p)
-    operators  = Operators(grid;flavor=op_flavor)
+    operators  = Operators(grid;flavor=op_flavor,alg_ctl.numtype)
     rhs = Rhs(p, grid, ndim, operators, mode, alg_ctl.numtype)
     massMatrix   = mass_matrix(grid, ndim;mode=mode)
     Jac = get_jac_sparse_pattern(grid;mode=mode)

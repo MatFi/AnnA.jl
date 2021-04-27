@@ -18,7 +18,7 @@ end
     Operators(g::Grid;dense::Bool=true)
 Compute the operators based on a given `Grid`. Use the `dense` keyword to switch between sparse ord dens representation
 """
-function Operators(g::Grid;flavor::Symbol=:dense)
+function Operators(g::Grid;flavor::Symbol=:dense,numtype=Float64)
     #for n in fieldnames(Grid)
     #    @eval $n = $g.$(n)
     #end
@@ -49,7 +49,9 @@ function Operators(g::Grid;flavor::Symbol=:dense)
     d[:𝔇]  = Tridiagonal(0 ./dx,vcat(-1 ./dx,0), 1 ./dx)[1:N,1:N+1]
     d[:𝔇ₑ] = Tridiagonal(0 ./dxₑ,vcat(-1 ./dxₑ,0), 1 ./dxₑ)[1:Nₑ,1:Nₑ+1]
     d[:𝔇ₕ] = Tridiagonal(0 ./dxₕ,vcat(-1 ./dxₕ,0), 1 ./dxₕ)[1:Nₕ,1:Nₕ+1]
-
+    for k in keys(d)
+        d[k] = dropzeros(sparse(numtype.(d[k])))
+    end
     if flavor == :matrix_free
         d[:𝕴]  = InterpolationOperator(size(d[:𝕴]))
         d[:𝕴ₑ] = InterpolationOperator(size(d[:𝕴ₑ]))
@@ -68,6 +70,8 @@ function Operators(g::Grid;flavor::Symbol=:dense)
     else
         error("unkown operator flavor $flavor")
     end
+
+
 end
 
 
