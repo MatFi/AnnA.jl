@@ -1,4 +1,4 @@
-struct Rhs{P,NP,G,OP,M,A,AE,AH,AM,AEM,AHM, AP, AEP, AHP, GEN} <: Function
+struct Rhs{P,NP,G,OP,M,A,AT,AE,AH,AM,AEM,AHM, AP, AEP, AHP, GEN} <: Function
     parameters::P
     ndim::NP    # ndim parameters
     g::G        # the grid object
@@ -16,7 +16,8 @@ struct Rhs{P,NP,G,OP,M,A,AE,AH,AM,AEM,AHM, AP, AEP, AHP, GEN} <: Function
     fnₑ::AE  # electron current in ETL
     fp::A   # hole current
     fpₕ::AH  # hole current in HTL
-    GR::A   # generation recombination sum
+    GRu::A   # generation recombination sum
+    GRt::AT
     G::GEN    # generation rate of 1 sun 
   
     Buff_N::A
@@ -64,11 +65,12 @@ function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol
     d[:fp]  = DiffEqBase.dualcache(zeros(g.N),N)
     d[:fnₑ] = DiffEqBase.dualcache(zeros(g.Nₑ),N)
     d[:fpₕ] = DiffEqBase.dualcache(zeros(g.Nₕ),N)
-    d[:GR]  = DiffEqBase.dualcache(zeros(g.N),N)
+    d[:GRu]  = DiffEqBase.dualcache(zeros(g.N),N)
+    d[:GRt]  = DiffEqBase.dualcache(zeros(g.N),Val{1})
     G = zeros(g.N)
     mul!(G, op.𝕴, g.x)
     ndim.G(G, G, missing)
-    d[:G] = G
+    d[:G] = G   
     d[:Buff_N]  = DiffEqBase.dualcache(zeros(g.N),N)
     d[:Buff_Nₑ]  = DiffEqBase.dualcache(zeros(g.Nₑ),N)
     d[:Buff_Nₕ]  = DiffEqBase.dualcache(zeros(g.Nₕ),N)
@@ -197,11 +199,14 @@ function (rhs!::Rhs)(du,u,pr,t)
         mul!(cdₕ,rhs!.o.𝔏ₕ,pₕ)
         cdₕ .= rhs!.g.ddH .- cdₕ
 
-
-    R  = DiffEqBase.get_tmp(rhs!.GR, u)
+    if t isa ForwardDiff.Dual
+        GR = DiffEqBase.get_tmp(rhs!.GRt, t)
+    else
+        GR = DiffEqBase.get_tmp(rhs!.GRu, u)
+    end
         mul!(Buff_N, rhs!.o.𝕴, n)   # Buff_N now contains the interpolatet n
-        mul!(R, rhs!.o.𝕴, p)       # GR contains interpolated p
-        rhs!.ndim.R(R ,Buff_N, R) # GR  contains now the recobination rate
+        mul!(GR, rhs!.o.𝕴, p)       # GR contains interpolated p
+        rhs!.ndim.R(GR ,Buff_N, GR) # GR  contains now the recobination rate
 
    #     mul!(Buff_N, rhs!.o.𝕴, rhs!.g.x) # Buff_N ontains the interpolated x
     #    rhs!.ndim.G(Buff_N, Buff_N, t) # Buff_N contains generation rate
@@ -211,8 +216,7 @@ function (rhs!::Rhs)(du,u,pr,t)
 
     # This is a dirty hack to buffer the timegradient of genereration function 
     # temporarely in the return du vector
-    GR = @view du[end-N+1:end]
-    GR   .= muladd(rhs!.G , l ,-R)
+    GR   .= muladd(rhs!.G , l ,-GR)
   
  
     
