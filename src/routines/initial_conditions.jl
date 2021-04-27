@@ -31,14 +31,15 @@ function initial_conditions(c::Cell)
 #    c_init=deepcopy(c)
 
     @debug "Init_Solve"
- 
-    odefun = ODEFunction(c_init.rhs;
-        mass_matrix = c_init.M,
-        jac_prototype = c_init.Jac,
-        colorvec = matrix_colors(c_init.Jac),
-    )
     τᵢ = c_init.parameters.τᵢ
-    prob = ODEProblem(odefun,u0,(0,1e60*ustrip(τᵢ |> u"s")),c_init)
+    prob = get_problem(c_init,tstart=0.0u"s",tend = 1e60*τᵢ |> u"s")
+    #odefun = ODEFunction(c_init.rhs;
+    #    mass_matrix = c_init.M,
+    #    jac_prototype = c_init.Jac,
+    #    colorvec = matrix_colors(c_init.Jac),
+    #)
+   
+    #prob = ODEProblem(odefun,u0,(0,1e60*ustrip(τᵢ |> u"s")),c_init)
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
     

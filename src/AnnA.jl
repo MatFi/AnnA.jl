@@ -9,7 +9,8 @@ module AnnA
     using LinearAlgebra
     using NumericalIntegration: integrate
     using OrdinaryDiffEq: Rodas4P, Rodas4P2, Rodas5, RadauIIA5
-    using DiffEqBase 
+    using DiffEqBase
+    using DiffEqBase: get_tmp
 	  using OrdinaryDiffEq
     using Roots
     using Setfield:setproperties

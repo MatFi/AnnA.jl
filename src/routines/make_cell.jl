@@ -28,7 +28,7 @@ function Cell(
     grid   = Grid(p)
     ndim= NonDimensionalize(p)
     operators  = Operators(grid;flavor=op_flavor)
-    rhs = Rhs(p,grid,ndim,operators,mode)
+    rhs = Rhs(p, grid, ndim, operators, mode, alg_ctl.numtype)
     massMatrix   = mass_matrix(grid, ndim;mode=mode)
     Jac = get_jac_sparse_pattern(grid;mode=mode)
     u_ini = u0 isa Missing ? init_guess(grid,ndim,p.Vbi/p.q/p.VT) : u0

@@ -11,11 +11,12 @@ function OCVDProblem(
     decay_time::Unitful.AbstractQuantity;
     alg_control = missing,
 )
+    τᵢ = parm.τᵢ
     on_time = (on_time |> u"s")
     if alg_control isa Missing
         alg_control = AlgControl(
-            dtmin = ustrip((1e-30 * parm.τᵢ )|>u"s"),
-            dt = ustrip((1e-10 * parm.τᵢ)|>u"s"),
+            dt =1e-9*ustrip(τᵢ  |> u"s"),
+            dtmin = ustrip(1e-40*τᵢ |> u"s"), #1e-20,
             reltol = 1e-5,
             abstol = 1e-8,
             force_dtmin=false,

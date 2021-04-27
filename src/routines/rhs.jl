@@ -37,12 +37,19 @@ struct Rhs{P,NP,G,OP,M,A,AT,AE,AH,AM,AEM,AHM, AP, AEP, AHP, GEN} <: Function
     pₕ::AHP
 end
 
-function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol)
+function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol,numtype=Float64)
 
 
     d=OrderedDict{Symbol,Any}()
     for key in fieldnames(Rhs)
         d[key]=missing
+    end
+
+    
+    if numtype == Float64
+        cache = (u,n) -> DiffEqBase.dualcache(u,n)
+    else
+        cache = (u,n) -> lcache(length(u))
     end
 
     N = Val{ForwardDiff.pickchunksize(length(g))}
@@ -52,46 +59,46 @@ function Rhs(parameters,g::Grid,ndim::NodimParameters,op::Operators,mode::Symbol
     d[:o] = op
     d[:mode] = mode
 
-    d[:mE]  = DiffEqBase.dualcache(zeros(g.N),N)
-    d[:mEₑ] = DiffEqBase.dualcache(zeros(g.Nₑ),N)
-    d[:mEₕ] = DiffEqBase.dualcache(zeros(g.Nₕ),N)
+    d[:mE]  = cache(zeros(g.N),N)
+    d[:mEₑ] = cache(zeros(g.Nₑ),N)
+    d[:mEₕ] = cache(zeros(g.Nₕ),N)
 
-    d[:cd]  = DiffEqBase.dualcache(zeros(g.N-1),N)
-    d[:cdₑ] = DiffEqBase.dualcache(zeros(g.Nₑ-1),N)
-    d[:cdₕ] = DiffEqBase.dualcache(zeros(g.Nₕ-1),N)
-    d[:FP]  = DiffEqBase.dualcache(zeros(g.N),N)
+    d[:cd]  = cache(zeros(g.N-1),N)
+    d[:cdₑ] = cache(zeros(g.Nₑ-1),N)
+    d[:cdₕ] = cache(zeros(g.Nₕ-1),N)
+    d[:FP]  = cache(zeros(g.N),N)
 
-    d[:fn]  = DiffEqBase.dualcache(zeros(g.N),N)
-    d[:fp]  = DiffEqBase.dualcache(zeros(g.N),N)
-    d[:fnₑ] = DiffEqBase.dualcache(zeros(g.Nₑ),N)
-    d[:fpₕ] = DiffEqBase.dualcache(zeros(g.Nₕ),N)
-    d[:GRu]  = DiffEqBase.dualcache(zeros(g.N),N)
-    d[:GRt]  = DiffEqBase.dualcache(zeros(g.N),Val{1})
+    d[:fn]  = cache(zeros(g.N),N)
+    d[:fp]  = cache(zeros(g.N),N)
+    d[:fnₑ] = cache(zeros(g.Nₑ),N)
+    d[:fpₕ] = cache(zeros(g.Nₕ),N)
+    d[:GRu]  = cache(zeros(g.N),N)
+    d[:GRt]  = cache(zeros(g.N),Val{1})
     G = zeros(g.N)
     mul!(G, op.𝕴, g.x)
     ndim.G(G, G, missing)
     d[:G] = G   
-    d[:Buff_N]  = DiffEqBase.dualcache(zeros(g.N),N)
-    d[:Buff_Nₑ]  = DiffEqBase.dualcache(zeros(g.Nₑ),N)
-    d[:Buff_Nₕ]  = DiffEqBase.dualcache(zeros(g.Nₕ),N)
-    d[:Buff_N₋₁]  = DiffEqBase.dualcache(zeros(g.N-1),N)
-    d[:Buff_Nₑ₋₁]  = DiffEqBase.dualcache(zeros(g.Nₑ-1),N)
-    d[:Buff_Nₕ₋₁]  = DiffEqBase.dualcache(zeros(g.Nₕ-1),N)
+    d[:Buff_N]  = cache(zeros(g.N),N)
+    d[:Buff_Nₑ]  = cache(zeros(g.Nₑ),N)
+    d[:Buff_Nₕ]  = cache(zeros(g.Nₕ),N)
+    d[:Buff_N₋₁]  = cache(zeros(g.N-1),N)
+    d[:Buff_Nₑ₋₁]  = cache(zeros(g.Nₑ-1),N)
+    d[:Buff_Nₕ₋₁]  = cache(zeros(g.Nₕ-1),N)
 
-    d[:ϕ]   = DiffEqBase.dualcache(zeros(g.N+1),N)
-    d[:P]   = DiffEqBase.dualcache(zeros(g.N+1),N)
-    d[:n]   = DiffEqBase.dualcache(zeros(g.N+1),N)
-    d[:p]   = DiffEqBase.dualcache(zeros(g.N+1),N)
-    d[:ϕₑ]  = DiffEqBase.dualcache(zeros(g.Nₑ+1),N)
-    d[:nₑ]  = DiffEqBase.dualcache(zeros(g.Nₑ+1),N)
-    d[:ϕₕ]  = DiffEqBase.dualcache(zeros(g.Nₕ+1),N)
-    d[:pₕ]  = DiffEqBase.dualcache(zeros(g.Nₕ+1),N)
+    d[:ϕ]   = cache(zeros(g.N+1),N)
+    d[:P]   = cache(zeros(g.N+1),N)
+    d[:n]   = cache(zeros(g.N+1),N)
+    d[:p]   = cache(zeros(g.N+1),N)
+    d[:ϕₑ]  = cache(zeros(g.Nₑ+1),N)
+    d[:nₑ]  = cache(zeros(g.Nₑ+1),N)
+    d[:ϕₕ]  = cache(zeros(g.Nₕ+1),N)
+    d[:pₕ]  = cache(zeros(g.Nₕ+1),N)
 
     Rhs(collect(values(d))...)
 end
 
 function (rhs!::Rhs)(du,u,pr,t)
-
+    @show t
     δ   = rhs!.ndim.δ
     χ   = rhs!.ndim.χ
     ϰ   = rhs!.ndim.ϰ
@@ -280,4 +287,24 @@ function (rhs!::Rhs)(du,u,pr,t)
     end
 
     return nothing
+end
+
+
+struct LCache{T,I}
+    du::T
+    length::I
+end
+
+lcache(n::Int) = LCache(Dict{DataType,AbstractArray}(),n)
+
+function DiffEqBase.get_tmp(lc::LCache,u::T)::T where {T<:AbstractArray} 
+    ltype = eltype(u)
+    !(haskey(lc.du,ltype)) && (lc.du[ltype] = u[1:lc.length])
+    return lc.du[ltype]
+end
+
+function DiffEqBase.get_tmp(lc::LCache,u::T)::Array{T,1} where {T<:Number} 
+    
+    !(haskey(lc.du,T)) && (lc.du[T] = Array{T,1}(undef,lc.length))
+    return lc.du[T]
 end

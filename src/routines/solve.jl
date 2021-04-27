@@ -13,17 +13,28 @@ function solve(c::Cell;tstart=c.alg_ctl.tstart, tend=c.alg_ctl.tend,kwargs...)
 #    (sav_callback, sav_sol) = SavingCallback(c)
 #    callbacks = CallbackSet(sav_callback, )
     @debug "Solve"
-
+    τᵢ = c.parameters.τᵢ
+    c.alg_ctl.dt = 1e-9*ustrip(τᵢ  |> u"s")
+    c.alg_ctl.dtmin = ustrip(1e-40*τᵢ |> u"s")
     sol = solve(prob,c.alg_ctl.alg; c.alg_ctl.kwargs...,kwargs... )
     c.sol = sol
     return sol
 end
 function get_problem(c::Cell;tstart=0.0u"s",tend = 20.0u"s")
-    u0 = c.u0
 
+    tspan = (convert(Float64,upreferred(tstart/c.parameters.τᵢ)), convert(Float64,upreferred(tend/c.parameters.τᵢ)))
+
+    if c.alg_ctl.numtype <:BigFloat
+        u0 = BigFloat.(c.u0, precision=128)
+        jac = Matrix(c.Jac)
+        tspan = BigFloat.(tspan,precision=128)
+    else
+        u0 = c.u0
+        jac = c.Jac
+    end
     odefun = ODEFunction(c.rhs;
         mass_matrix = c.M,
-        jac_prototype = c.Jac,
+        jac_prototype = jac,
         colorvec = matrix_colors(c.Jac),
     )
     tspan = (convert(Float64,upreferred(tstart/c.parameters.τᵢ)), convert(Float64,upreferred(tend/c.parameters.τᵢ)))

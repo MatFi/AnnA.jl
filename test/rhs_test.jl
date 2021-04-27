@@ -9,4 +9,13 @@
 
     #alls = @benchmark AnnA.rhs!(du,u,cell,1.0)
     #@test allocs(alls) == 0
+
+
+    u=zeros(10)
+    bu = BigFloat.(u)
+    lc = lcache()
+    @test get_tmp(lc,u) isa Vector{Float64}
+    @test get_tmp(lc,bu) isa Vector{BigFloat}
+    @test get_tmp(lc,bu) isa Vector{BigFloat}
+    @test get_tmp(lc,u) isa Vector{Float64}
 end

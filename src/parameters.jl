@@ -206,7 +206,8 @@ Base.@kwdef mutable struct AlgControl
     tstart = 0.0u"s"
     tend = 1e5u"s"
     initializealg = OrdinaryDiffEq.NoInit()
-
+    numtype = Float64
+    
     kwargs = (; :reltol => reltol,
         :abstol => abstol,
         :dtmin => dtmin,
