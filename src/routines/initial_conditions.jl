@@ -47,6 +47,7 @@ function initial_conditions(c::Cell)
         reltol = c_init.alg_ctl.reltol,
         abstol = c_init.alg_ctl.abstol,#*ones(length(u0)),#u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,
+        save_on=false,
         #initializealg=ShampineCollocationInit(),
         initializealg=OrdinaryDiffEq.NoInit(),
        # initializealg=BrownFullBasicInit(),
