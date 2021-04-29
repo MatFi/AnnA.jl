@@ -8,6 +8,7 @@ using BenchmarkTools
 using Logging
 using Unitful
 using Documenter
+import AnnA: lcache
 
 include("jacobian_test.jl")
 include("operators_test.jl")
