@@ -42,4 +42,4 @@ solve(prob)
 [issues-url]: https://github.com/MatFi/AnnA.jl/issues
 
 [doi-img]: https://zenodo.org/badge/doi/10.5281/zenodo.4733025.svg
-[doi-url]: https://github.com/MatFi/AnnA.jl
+[doi-url]: https://doi.org/10.5281/zenodo.4733025
