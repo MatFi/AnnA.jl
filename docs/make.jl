@@ -24,7 +24,7 @@ makedocs(
             "Problem definition" => "interface/problems.md",
             ],
         "Examples"=>Any[
-            "Predefined Protocols" => "examples/protos_sim.md",
+            "Predefined Protocols" => "examples/proto_sim.md",
             ],
         "API"=>"api.md"
     ],
