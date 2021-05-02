@@ -2,10 +2,9 @@
 &nbsp; &nbsp; &nbsp; &nbsp; _a shameless rewrite of Courtier's [IonMonger](https://github.com/PerovskiteSCModelling/IonMonger) in Julia_
 ___
 
-| **Documentation**          | **Build Status**        |
-|:--------------------------:|:-----------------------:|
-| [![][docs-dev-img]][docs-dev-url] | [![][ci-img]][ci-url] [![][codecov-img]][codecov-url]|
-[![][doi-img]][doi-url]
+| **Documentation**          | **Build Status**        | **DOI**
+|:--------------------------:|:----------------:|:-------------:
+| [![][docs-dev-img]][docs-dev-url] | [![][ci-img]][ci-url] [![][codecov-img]][codecov-url]|[![][doi-img]][doi-url]
 
 ## Purpose and Aim of this package
 This package implements basic functionality to conduct time resolved drift-diffusion simulations of ionic solar cells like perovskites and related systems in one spatial dimension. It applies Courtier's finite element scheme and solves the resulting equations using the awesome [DifferentialEquations.jl](https://github.com/JuliaDiffEq/DifferentialEquations.jl) package by [Chris Rackauckas](https://github.com/JuliaDiffEq/DifferentialEquations.jl/commits?author=ChrisRackauckas).
@@ -41,5 +40,5 @@ solve(prob)
 
 [issues-url]: https://github.com/MatFi/AnnA.jl/issues
 
-[doi-img]: https://zenodo.org/badge/doi/10.5281/zenodo.4733025.svg
-[doi-url]: https://doi.org/10.5281/zenodo.4733025
+[doi-img]: https://zenodo.org/badge/356375703.svg
+[doi-url]: https://zenodo.org/badge/latestdoi/356375703
