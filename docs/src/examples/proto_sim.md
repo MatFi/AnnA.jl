@@ -1,3 +1,5 @@
+# Predefined Protocols
+Convenient wrappers a predefined to simplify the simulation of most important protocols.
 # IV Simulations
 The simulation of an IV curve can be done by the `IVProblem` constructor
 
