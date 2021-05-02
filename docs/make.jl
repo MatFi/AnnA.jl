@@ -18,7 +18,7 @@ makedocs(
     checkdocs = :exports,
     pages = Any[
         "Home"=>"index.md",
-        "Working principle" => "working_principle.md"
+        "Working principle" => "working_principle.md",
         "Interface"=>Any[
             "Simulation parameters" => "interface/parameters.md",
             "Problem definition" => "interface/problems.md",
