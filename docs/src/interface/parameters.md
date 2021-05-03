@@ -3,7 +3,7 @@ CurrentModule = AnnA
 ```
 
 # Simulation Parameters
-The interface is designed for a convenient access to the core functionality. One of the most important aspects the user schould be able to control are the input Parameters. This can be archieved via the `Parameters()` constructor.
+The interface is designed for a convenient access to the core functionality. One of the most important aspects the user should be able to control are the input Parameters. This can be archived via the `Parameters()` constructor.
 
 ```@docs
 Parameters
@@ -26,7 +26,7 @@ end
 Parameters(light = l)       # Sinusiodal light excitation with 1 Sun amplitude
 ``` 
 
-The solver generaly likes continous functions, but may also work for a broad range of discontinous `light`. 
+The solver generally likes continuous functions, but may also work for a broad range of discontinuous `light`. 
 
 ### Ionic Motion
 
@@ -62,7 +62,7 @@ n_i^2 = N_{c}N_{v} \cdot e^\frac{- E_g }{k_B T}
 parm.nᵢ
 ```
 ### Fermi Level
-The Fermilevel ``Ef_{e/h}`` in the electron / hole trasportlayer can be expressed by thair doping density  ``d_{e/h}``, effective DOS and bandenergy ``E_{ce} / E_{vh} ``,  
+The Fermi-level ``Ef_{e/h}`` in the electron / hole trasportlayer can be expressed by thair doping density  ``d_{e/h}``, effective DOS and bandenergy ``E_{ce} / E_{vh} ``,  
 
 ```math
 \begin{aligned}

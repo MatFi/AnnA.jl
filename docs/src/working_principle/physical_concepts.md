@@ -1,6 +1,3 @@
-# Working Principle
-The implementation is based on Courtiers finite element scheme. The original Matlab implementation [IonMonger](https://github.com/PerovskiteSCModelling/IonMonger) and internally uses the same numerical finite element scheme.
-
 # Physical Concepts
 ## Fundamental Conservation Laws
 In a homogeneous thin-film solar cell where the device area is magnitudes larger than the thickness, it is sufficient to consider only the out of plane dimension. The electrons ``n``, holes ``p``, and ionic species ``P`` obey the conservation laws listed below: 
@@ -31,38 +28,15 @@ Its important to note, that this assumption may be incorrect in case of thin dev
 ### Recombination mechanisms
 The bulk recombination behavior in the simulations is composed of Shokley-Read-Hall, and bimolecular recombination 
 ```math
-    R\bigl(n,p\bigr) = \frac{(n\cdot p - n_i)}{\tau_p \cdot n+\tau_n \cdot p}+k_{rad}\cdot(n\cdot p - n_i)
+    R\bigl(n,p\bigr) = \frac{(n\cdot p - n_i)}{\tau_p \cdot (n + n_t) +\tau_n \cdot (p+p_t)}+k_{rad}\cdot(n\cdot p - n_i)
 ```
-For surface recombination a similar expression is assumed. Here, the charge carriers from the transport layers are assumed to recombine together with their opposite ones from the active layer. We also allow the surface recombinationion velocities ``\nu_{p_E}, \nu_{n_E}`` at the ETM/active layer interface to differ from ``\nu_{p_H}, \nu_{n_H}`` at the active layer/HTM interface.
+Thereby it is approximated, that the defects are located close to center of the band gap so that we can simplify the equation with ``n_t =p_t = n_i``
+For surface recombination a similar expression is assumed. Here, the charge carriers from the transport layers are assumed to recombine together with their opposite ones from the active layer. We also allow the surface recombination velocities ``\nu_{p_E}, \nu_{n_E}`` at the ETM/active layer interface to differ from ``\nu_{p_H}, \nu_{n_H}`` at the active layer/HTM interface.
 ```math
-    R_{E/H}\bigl(n_{l/r},p_{r/l}\bigr) = \frac{(n_{l/r}\cdot p_{r/l} - n_i)}{\nu_{p_{E/H}} \cdot n_{l/r}+\nu_{n_{E/H}} \cdot p_{r/l}}
+    R_{E/H}\bigl(n_{l/r},p_{r/l}\bigr) = \frac{(n_{l/r}\cdot p_{r/l} - n_i)}{1/\nu_{p_{E/H}} \cdot (n_{l/r}+ n_{t~l/r})+1/\nu_{n_{E/H}} \cdot (p_{r/l} + p_{t~r/l})}
 ```
 where ``n_{l/r}, p_{l/r}``, indicates the carrier densities left/right of the interface if the layer sequence ETM-Intrinsic-HTM is present.
 
         
 ### Density of states and doping
 ### Intrinsic carrier density and temperature
-
-# Couriers Finite Element Scheme
-The interested reader should consult Courtiers original publications [^1]
-here we will provide only a few important fundamentals necessary to understand a few important limitations from fundamental physical perspective as well as in some numerical aspects.
-## Spatial *tanh* grid
-In order to coupe with the spatial stiffness the PDE is descretized by a non uniform grid which is more dense within the ionic accumulation layers at the interface. This helps to overcome numerical inaccuracies the finite difference gradients during the integration of the PDE.  
-## Non dimensionalization
-# Implementation
-## OrdinaryDiffEq.jl Solvers
-## Sparsity
-## Automatic Differentiation
-
-
-[^1]:
-
-    ```
-    Courtier, N.E., Cave, J.M., Walker, A.B. et al.
-    IonMonger: a free and fast planar perovskite solar cell simulator with coupled ion vacancy and charge carrier dynamics.
-    J Comput Electron 18, 1435–1449 (2019). https://doi.org/10.1007/s10825-019-01396-2
-    ```
-
-
-
-

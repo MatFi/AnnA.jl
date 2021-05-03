@@ -18,13 +18,19 @@ makedocs(
     checkdocs = :exports,
     pages = Any[
         "Home"=>"index.md",
-        "Working principle" => "working_principle.md",
+        "Working principle"=>Any[
+            "Physical Concepts" => "working_principle/physical_concepts.md",
+            "Finite Element Scheme" => "working_principle/finite_element_scheme.md",
+            ],
         "Interface"=>Any[
             "Simulation parameters" => "interface/parameters.md",
             "Problem definition" => "interface/problems.md",
             ],
         "Examples"=>Any[
-            "Predefined Protocols" => "examples/proto_sim.md",
+            "Problems" => "examples/proto_sim.md",
+        #    "JscVoc" => "examples/jscvoc_sim.md",
+        #    "OCVD"  =>   "examples/ocvd_sim.md",
+        #    "TPV"  =>   "examples/tpv_sim.md",
             ],
         "API"=>"api.md"
     ],
