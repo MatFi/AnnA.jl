@@ -1,5 +1,5 @@
 # AnnA.jl
-&nbsp; &nbsp; &nbsp; &nbsp; _a shameless rewrite of Courtier's [IonMonger](https://github.com/PerovskiteSCModelling/IonMonger) in Julia_
+&nbsp; &nbsp; &nbsp; &nbsp; _a rewrite of Courtier's [IonMonger](https://github.com/PerovskiteSCModelling/IonMonger) in Julia_
 ___
 
 | **Documentation**          | **Build Status**        | **DOI**
