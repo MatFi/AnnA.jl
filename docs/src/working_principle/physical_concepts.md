@@ -19,14 +19,14 @@ The respective current densities ``j_n``, ``j_p`` and ``j_{ion}`` are composed o
 For the transport layers simplified equations were applied. These specifically consisted of the assumptions that the HTM / ETM only conducts holes / electrons ``(D^- / D^+ = 0 )`` and zero charge generation ``G`` and recombination ``R`` takes place, as well as there are no mobile ions present ``(P=N_{ion}=0)``.
 In case of the active layer we assumed an absence of doping, so that ``d_n = d_p = 0``. ``D^-`` and ``D^+`` are the corresponding diffusion coefficients.
 For neutrality reasons the Poisson equation must also contain the immobile counterpart of the mobile ionic species, which is assumed to be uniformly distributed in the active layer.
-### Generation profile
+## Generation profile
 For charge carrier generation ``G(x)`` a simple Lambert Beer absorption of the incident photon flux ``F-{ph}`` is assumed
 ```math
     G(x) = F_{ph} e^{-\alpha x}.
 ```
 Its important to note, that this assumption may be incorrect in case of thin devices where interference can happen.
-### Recombination mechanisms
-The bulk recombination behavior in the simulations is composed of Shokley-Read-Hall, and bimolecular recombination 
+## Recombination mechanisms
+The bulk recombination behavior in the simulations is composed of Shockley-Read-Hall, and bimolecular recombination 
 ```math
     R\bigl(n,p\bigr) = \frac{(n\cdot p - n_i)}{\tau_p \cdot (n + n_t) +\tau_n \cdot (p+p_t)}+k_{rad}\cdot(n\cdot p - n_i)
 ```
@@ -38,5 +38,5 @@ For surface recombination a similar expression is assumed. Here, the charge carr
 where ``n_{l/r}, p_{l/r}``, indicates the carrier densities left/right of the interface if the layer sequence ETM-Intrinsic-HTM is present.
 
         
-### Density of states and doping
-### Intrinsic carrier density and temperature
+## Density of states and doping
+## Intrinsic carrier density and temperature
