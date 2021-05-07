@@ -98,14 +98,15 @@ xi
 xi=zero(b)
 
 #include("./src/linsolvers/idrs.jl")
-itr = AnnA.idrs_iterable!(xi, A, b;)
+itr = AnnA.idrs_iterable!(xi, A, b;s=40)
 for i in itr
+    @show itr.R[1]
 end
 norm(b)
 eltype(b)(1)  isa typeof(norm(b))
 
 for _ = itr
-    iterate(itr)
+
 end
 itr.X
 itr.R
