@@ -109,4 +109,5 @@ for _ = itr
 
 end
 itr.X
+A*itr.X -b
 itr.R
