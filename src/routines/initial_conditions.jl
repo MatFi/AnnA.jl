@@ -22,7 +22,7 @@ function initial_conditions(c::Cell)
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
-    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl)
+    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=cc.u0)
 
     if  c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
@@ -31,7 +31,7 @@ function initial_conditions(c::Cell)
 
     @debug "Init_Solve"
     τᵢ = c_init.parameters.τᵢ
-    prob = get_problem(c_init,tstart=0.0u"s",tend = 1e60*τᵢ |> u"s")
+    prob = get_problem(c_init,tstart=0.0u"s",tend = 1e6*τᵢ |> u"s")
 
     ss_cb = TerminateSteadyState(c.alg_ctl.ss_tol,c.alg_ctl.ss_tol)
     
