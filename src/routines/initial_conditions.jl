@@ -22,7 +22,7 @@ function initial_conditions(c::Cell)
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
-    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=cc.u0)
+    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=Float64.(cc.u0))
 
     if  c.mode == :occ  #legacy
         @info "initalisatiion: stating conditions in :oc mode"
@@ -37,13 +37,13 @@ function initial_conditions(c::Cell)
     
 
     cb = CallbackSet(ss_cb,)#abstol_cb )
-    sol = solve(prob,Rodas4P2();
-        progress_steps = 50,
+    sol = solve(prob,c_init.alg_ctl.alg;
+        progress_steps = 10,
         progress = c_init.alg_ctl.progress,
         callback = cb,
         dt =1e-9*ustrip(τᵢ  |> u"s"),
         dtmin = ustrip(1e-40*τᵢ |> u"s"), #1e-20,
-        force_dtmin = false,
+        force_dtmin = true,
         reltol = c_init.alg_ctl.reltol,
         abstol = c_init.alg_ctl.abstol,#*ones(length(u0)),#u0 .* 0, #1e-12,#c.u0 .* 0,
         maxiters= 5000,

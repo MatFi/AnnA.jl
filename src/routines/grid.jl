@@ -81,7 +81,7 @@ end
 
 decompose(u::Array{Array{Float64,1},1}, g::Grid) = decompose.(u, g)
 
-function decompose(u::Array{Float64,1}, g::Grid)
+function decompose(u::AbstractArray, g::Grid)
     N = g.N
     Nₑ = g.Nₑ
     Nₕ = g.Nₕ

@@ -196,7 +196,7 @@ Base.@kwdef mutable struct AlgControl
     reltol::Float64     = 1e-6      # Relative tolerance for the solvers (auto_abstol =  u*reltol)
     abstol              = 1e-6
     autodiff::Bool      = true      # Enable autodifferentiation (highly suggested)
-    alg     = Rodas4P2(autodiff=autodiff) # Integrator Algorithm. Optional suggestions are: Rodas5(), ROS34PW2(), ROS3P(), QBDF(), QNDF()
+    alg     = Rodas4P2() # Integrator Algorithm. Optional suggestions are: Rodas5(), ROS34PW2(), ROS3P(), QBDF(), QNDF()
     dtmin   = 1e-15
     dt      = 1e-14
     force_dtmin = true
@@ -207,7 +207,7 @@ Base.@kwdef mutable struct AlgControl
     tend = 1e5u"s"
     initializealg = OrdinaryDiffEq.NoInit()
     numtype = Float64
-    
+    linsolve=OrdinaryDiffEq.DefaultLinSolve()
     kwargs = (; :reltol => reltol,
         :abstol => abstol,
         :dtmin => dtmin,
