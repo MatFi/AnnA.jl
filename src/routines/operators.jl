@@ -56,12 +56,12 @@ function Operators(g::Grid;flavor::Symbol=:dense,numtype=Float64)
         d[:𝕴]  = InterpolationOperator(size(d[:𝕴]))
         d[:𝕴ₑ] = InterpolationOperator(size(d[:𝕴ₑ]))
         d[:𝕴ₕ] = InterpolationOperator(size(d[:𝕴ₕ]))
-        d[:𝔏]  = LinOperator(d[:𝔏], size(d[:𝔏]))
-        d[:𝔏ₑ] = LinOperator(d[:𝔏ₑ], size(d[:𝔏ₑ]))
-        d[:𝔏ₕ] = LinOperator(d[:𝔏ₕ], size(d[:𝔏ₕ]))
-        d[:𝔇]  = DiffOperator(d[:𝔇], size(d[:𝔇]))
-        d[:𝔇ₑ] = DiffOperator(d[:𝔇ₑ], size(d[:𝔇ₑ]))
-        d[:𝔇ₕ] = DiffOperator(d[:𝔇ₕ], size(d[:𝔇ₕ]))
+        d[:𝔏]  = LinOperator(d[:𝔏])#, size(d[:𝔏]))
+        d[:𝔏ₑ] = LinOperator(d[:𝔏ₑ])#, size(d[:𝔏ₑ]))
+        d[:𝔏ₕ] = LinOperator(d[:𝔏ₕ])#, size(d[:𝔏ₕ]))
+        d[:𝔇]  = DiffOperator(d[:𝔇])#, size(d[:𝔇]))
+        d[:𝔇ₑ] = DiffOperator(d[:𝔇ₑ])#, size(d[:𝔇ₑ]))
+        d[:𝔇ₕ] = DiffOperator(d[:𝔇ₕ])#, size(d[:𝔇ₕ]))
         Operators(collect(values(d))...)
     elseif flavor ==:dense
         Operators(Matrix.(collect(values(d)))...)
@@ -80,13 +80,22 @@ struct DiffOperator{T,S} <:AbstractOperators
     dx::T
     size::S
 end
-function LinearAlgebra.mul!(dfdx,dx::DiffOperator,f)
-    if dx.size[2] != length(f)
-        error("length of operator is $(dx.size[2]), while length(f) is $(length(f)) ")
+function DiffOperator(dx)
+    for i in 1:size(dx,1)
+        dx[i,1] = dx[i,i] 
+        dx[i,2] = dx[i,i+1]
     end
+    DiffOperator(dx,size(dx))
 
-    for i in 1:dx.size[1]
-        dfdx[i] = f[i+1]*dx.dx[i,i+1]+f[i]*dx.dx[i,i]
+end
+
+function LinearAlgebra.mul!(dfdx,dx::DiffOperator,f)
+  #  if dx.size[2] != length(f)
+  #      error("length of operator is $(dx.size[2]), while length(f) is $(length(f)) ")
+  #  end
+
+    @avx for i in 1:dx.size[1]
+        dfdx[i] = f[i+1]*dx.dx[i,2]+f[i]*dx.dx[i,1]
     end
     nothing
 end
@@ -96,10 +105,10 @@ struct InterpolationOperator{S} <:AbstractOperators
     size::S
 end
 function LinearAlgebra.mul!(interp,o::InterpolationOperator,f)
-    if o.size[2] != length(f)
-        error("length of operator is $(o.size[2]), while length(f) is $(length(f)) ")
-    end
-    for i in 1:o.size[1]
+  #  if o.size[2] != length(f)
+  #      error("length of operator is $(o.size[2]), while length(f) is $(length(f)) ")
+  #  end
+   @avx for i in 1:o.size[1]
         interp[i] = (f[i+1]+f[i])/2.0
     end
     nothing
@@ -114,12 +123,21 @@ struct LinOperator{T,S} <: AbstractOperators
     dx::T
     size::S
 end
-function LinearAlgebra.mul!(lin,o::LinOperator,f)
-    if o.size[2] != length(f)
-        error("length of operator is $(o.size[2]), while length(f) is $(length(f)) ")
+function LinOperator(dx)
+    for i in 1:size(dx,1)
+        dx[i,1] = dx[i,i] 
+        dx[i,2] = dx[i,i+1]
+        dx[i,3] = dx[i,i+2]
     end
-    for i in 1:o.size[1]
-        lin[i] = f[i]*o.dx[i,i]+f[i+1]*o.dx[i,i+1]+f[i+2]*o.dx[i,i+2]
+    LinOperator(dx,size(dx))
+
+end
+function LinearAlgebra.mul!(lin,o::LinOperator,f)
+ #   if o.size[2] != length(f)
+ #       error("length of operator is $(o.size[2]), while length(f) is $(length(f)) ")
+ #   end
+    @avx for i in 1:o.size[1]
+        lin[i] = f[i]*o.dx[i,1]+f[i+1]*o.dx[i,2]+f[i+2]*o.dx[i,3]
     end
     nothing
 end

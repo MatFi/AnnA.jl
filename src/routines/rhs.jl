@@ -120,7 +120,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     ϕ   = DiffEqBase.get_tmp(rhs!.ϕ,u)
     n   = DiffEqBase.get_tmp(rhs!.n,u)
     p   =  DiffEqBase.get_tmp(rhs!.p,u)
-    @inbounds for i in 1:N+1
+    @avx for i in 1:N+1
         P[i]   = u[i]
         ϕ[i]    = u[N+1+i]
         n[i]    = u[2*N+2+i]
@@ -130,7 +130,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     ϕₑ  = DiffEqBase.get_tmp(rhs!.ϕₑ,u)
     nₑ  = DiffEqBase.get_tmp(rhs!.nₑ,u)
 
-    @inbounds for i in 1:rhs!.g.Nₑ
+    @avx for i in 1:rhs!.g.Nₑ
         ϕₑ[i]   = u[4*N+4+i]
         nₑ[i]   = u[4*N+Nₑ+4+i]
     end
@@ -142,7 +142,7 @@ function (rhs!::Rhs)(du,u,pr,t)
     ϕₕ[1]=ϕ[N+1]
     pₕ[1]=p[N+1]/rhs!.ndim.kₕ
     #@inbounds @simd
-    @inbounds for i in 1:rhs!.g.Nₕ
+    @avx for i in 1:rhs!.g.Nₕ
         ϕₕ[i+1]  = u[4*N+2*Nₑ+4+i]
         pₕ[i+1]  = u[4*N+2*Nₑ+Nₕ+4+i]
     end
@@ -224,8 +224,9 @@ function (rhs!::Rhs)(du,u,pr,t)
     # temporarely in the return du vector
     GR   .= muladd(rhs!.G , l ,-GR)
   
- 
-    
+    @avx for i in 1:N-1
+        du[N+2+i] = mE[i+1]-mE[i]-cd[i]/λ²;
+    end
     @inbounds for i in 1:N-1
         if !rhs!.parameters.freeze_ions
             du[i+1] = FP[i+1] - FP[i];
@@ -233,7 +234,7 @@ function (rhs!::Rhs)(du,u,pr,t)
             du[i+1]=0
         end
         genrec = (rhs!.g.dx[i+1]*GR[i+1]+rhs!.g.dx[i]*GR[i])/2
-        du[N+2+i] = mE[i+1]-mE[i]-cd[i]/λ²;
+       
         du[2*N+3+i] = fn[i+1]-fn[i]+genrec;
         du[3*N+4+i] = fp[i+1]-fp[i]+genrec;
     end
@@ -258,14 +259,14 @@ function (rhs!::Rhs)(du,u,pr,t)
     ### ETM ###
     du[4*N+5] = ϕₑ[1]#-rhs!.ndim.V(t);
     du[4*N+Nₑ+5] = nₑ[1]-1;
-    @inbounds for i in 1:Nₑ-1
+    @avx for i in 1:Nₑ-1
         du[4*N+5+i] = mEₑ[i+1]-mEₑ[i]-cdₑ[i]/λₑ²;
         du[4*N+Nₑ+5+i] = fnₑ[i+1]-fnₑ[i]
     end
     ### HTM ###
     du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] + rhs!.ndim.Vbi - rhs!.ndim.V(t);  
     du[4*N+2*Nₑ+2*Nₕ+4] = pₕ[end]-1;
-    @inbounds for i in 1:Nₕ-1
+    @avx for i in 1:Nₕ-1
         du[4*N+2*Nₑ+4+i] = mEₕ[i+1]-mEₕ[i]-cdₕ[i]/λₕ²;
         du[4*N+2*Nₑ+Nₕ+4+i] = fpₕ[i+1]-fpₕ[i];
     end

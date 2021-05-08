@@ -18,7 +18,7 @@ module AnnA
     using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
     using Unitful
     using Unitful.DefaultSymbols
-    
+    using LoopVectorization
   	import Base:length, getproperty, setproperty!, propertynames
 
     abstract type AbstractProblem end
