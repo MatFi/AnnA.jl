@@ -32,7 +32,7 @@
     @test cd_dense ≈ cd_sparse
 
    # Test.@test_throws ErrorException AnnA.Cell(
-                                            AnnA.Parameters();op_flavor=:err)
+   #                                         AnnA.Parameters();op_flavor=:err)
    # Test.@test_throws ErrorException mul!(mE_free,cell_a.o.𝕴, ϕ[2:end] )
    # Test.@test_throws ErrorException mul!(mE_free,cell_a.o.𝔇, ϕ[2:end] )
    # Test.@test_throws ErrorException mul!(cd_free,cell_a.o.𝔏, ϕ[2:end] )
