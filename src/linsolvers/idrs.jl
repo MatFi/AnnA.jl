@@ -3,7 +3,7 @@ Taken and modified from the IterativeSolvers.jl package
 """
 
 export idrs, idrs!
-
+import Base: iterate
 using Random, UnPack,LinearAlgebra
 
 """
@@ -54,7 +54,7 @@ function idrs!(x, A, b;
 end
 
 
-mutable struct IDRSIterable{UT,AT,US,MT,CS,T,EUT,S}
+mutable struct IDRSIterable{UT,AT,US,MT,CS,T,EUT,S,O}
     X::UT
     A::AT
     C::UT
@@ -74,22 +74,20 @@ mutable struct IDRSIterable{UT,AT,US,MT,CS,T,EUT,S}
     normR::EUT
     tol::EUT
     s::S
-    om::EUT
+    om::O
 end
-function idrs_iterable!(x, A, b;
-                        s = 8,
-                        abstol::Real = zero(real(eltype(b))),
-                        reltol::Real = sqrt(eps(real(eltype(b)))),
-                        maxiter=size(A, 2),
+function idrs_iterable!(x, A, b,args...;
+                        s = 5,
+                        abstol::Real =1e-6, #zero(real(eltype(b))),
+                        reltol::Real =1e-6,# sqrt(eps(real(eltype(b)))),
+                        maxiter=100,
                         log::Bool=false,
                         kwargs...)
-    #history = ConvergenceHistory(partial=!log)
-    #history[:abstol] = abstol
-    #history[:reltol] = reltol
-    #log && reserve!(history, :resnorm, maxiter)
+    
     zb = zero(b)
     R= b-A*x
     T=typeof(b)
+    x.=one.(x)
     IDRSIterable(
         x,A,b,
         R,
@@ -145,7 +143,7 @@ function iterate(g::IDRSIterable, iteration::Int=start(g))
     for k in 1:s
         # Solve small system and make v orthogonal to P
         
-        c = @views LowerTriangular(M[k:s,k:s])\f[k:s]
+        c =  Matrix(LowerTriangular(M[k:s,k:s]))\f[k:s]
         V .= c[1] .* G[k]
         Q .= c[1] .* U[k]
 
@@ -180,10 +178,11 @@ function iterate(g::IDRSIterable, iteration::Int=start(g))
         R .-= beta .* G[k]
         X .+= beta .* U[k]
 
-        normR = norm(R)
+        g.normR = norm(R)
        
         
-        #verbose && @printf("%3d\t%1.2e\n",iter,normR)
+        #verbose && 
+     #   @printf("%3d\t%1.2e\n",iter,normR)
       #  if normR < tol || iteration == maxiter
       #      setconv(log, 0<=normR<tol)
       #      return X
@@ -199,11 +198,11 @@ function iterate(g::IDRSIterable, iteration::Int=start(g))
     copyto!(V, R)
     
     mul!(Q, A, V)
-    om = omega(Q, R)
+    g.om = omega(Q, R)
     R .-= om .* Q
     X .+= om .* V
 
-    normR = norm(R)
+    g.normR = norm(R)
 
    # nextiter!(log, mvps=1)
    # push!(log, :resnorm, normR)

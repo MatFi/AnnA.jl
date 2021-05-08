@@ -48,6 +48,7 @@ module AnnA
     include("./problems/ProblemSolution.jl")
 
     include("./linsolvers/idrs.jl")
+    include("./linsolvers/linsover.jl")
     export solve, IVProblem, JscVocProblem, OCVDProblem, TPVProblem, Parameters
 
 end # module
