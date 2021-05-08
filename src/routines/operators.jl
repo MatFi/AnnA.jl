@@ -50,7 +50,7 @@ function Operators(g::Grid;flavor::Symbol=:dense,numtype=Float64)
     d[:𝔇ₑ] = Tridiagonal(0 ./dxₑ,vcat(-1 ./dxₑ,0), 1 ./dxₑ)[1:Nₑ,1:Nₑ+1]
     d[:𝔇ₕ] = Tridiagonal(0 ./dxₕ,vcat(-1 ./dxₕ,0), 1 ./dxₕ)[1:Nₕ,1:Nₕ+1]
     for k in keys(d)
-        d[k] = dropzeros(sparse(numtype.(d[k])))
+        d[k] = dropzeros(sparse(d[k]))
     end
     if flavor == :matrix_free
         d[:𝕴]  = InterpolationOperator(size(d[:𝕴]))
@@ -90,10 +90,6 @@ function DiffOperator(dx)
 end
 
 function LinearAlgebra.mul!(dfdx,dx::DiffOperator,f)
-  #  if dx.size[2] != length(f)
-  #      error("length of operator is $(dx.size[2]), while length(f) is $(length(f)) ")
-  #  end
-
     @avx for i in 1:dx.size[1]
         dfdx[i] = f[i+1]*dx.dx[i,2]+f[i]*dx.dx[i,1]
     end
