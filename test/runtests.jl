@@ -16,6 +16,7 @@ include("cell_test.jl")
 include("rhs_test.jl")
 include("solve_test.jl")
 include("problems_test.jl")
+include("load_parameter_test.jl")
 
 DocMeta.setdocmeta!(AnnA, :DocTestSetup, :(using AnnA, Unitful); recursive=true)
 @testset "Doctests" begin
