@@ -91,6 +91,6 @@ include("./problems/TPVProblem.jl")
 include("./problems/ProblemSolution.jl")
 
 export solve, IVProblem, JscVocProblem, OCVDProblem, TPVProblem, 
-		Parameters, pulse, load_parameters
+		Parameters, pulse, load_parameters, write_template
 export @u_str
 end # module
