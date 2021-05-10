@@ -68,19 +68,36 @@ load_parameters(file::String; kwargs...) = load_parameters(Parameters(), file; k
 Creates a new template at the path specified in `filename`, defaults to `Parameters.jl` in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
 """	
 function write_template(parm=Parameters(),filename::String="./Parameters.jl";force=false)
+	template = joinpath(@__DIR__,"../Parameters.jl")
+	cp(joinpath(@__DIR__,"../Parameters.jl"),filename;force=force)
 
+
+	p= unpac_struct(parm,privates=false)
+
+	lns =readlines(filename,keep=false)
 	open(filename,"w") do f
-		# Make sure we write 64bit integer in little-endian byte order
-		p= unpac_struct(parm,privates=false)
-		for (k,v) in zip(keys(p),values(p))
-			if v isa Unitful.Quantity
-				write(f, k," = ",ustrip(v),"u\"",unit(v),"\"\n")
+		for line in lns
+			#grep parametername
+			pname = match(r"\s*(\S+)\s*=",line)
+		
+			if pname !== nothing
+				pval = p[Symbol(pname[1])]
+				regx = Regex("\\s+($(pname[1]))\\s*=\\s*([-\\+0-9\\.]+\\s*\\**\\s*[\\S]+)(\\s*#.*)")
+	
+				if pval isa Unitful.Quantity		
+					subs = SubstitutionString("    \\1 = $(string(ustrip(pval))*"u\""*string(unit(pval))*"\",")\\3")
+					@show subs
+				elseif pval isa Number
+					subs =  SubstitutionString("    \\1 = $(pval),\\3")
+				else
+					subs =  SubstitutionString("    \\1 = t->0,\\3")
+				end
+				println(f, replace(line,regx => subs) )
 			else
-				write(f, k," = ",v,"\n")
+				println(f,line)
 			end
 		end
 	end
-	#cp(joinpath(@__DIR__,"../Parameters.jl"),filename;force=force)
 end
 
 
