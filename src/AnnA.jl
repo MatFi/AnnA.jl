@@ -63,17 +63,14 @@ load_parameters(file::String; kwargs...) = load_parameters(Parameters(), file; k
 
 
 """
-	write_template(filename::String="./Parameters.jl"; force=false)
+	write_template(parm=Parameters(), filename::String="./Parameters.jl"; force=false)
 
 Creates a new template at the path specified in `filename`, defaults to `Parameters.jl` in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
 """	
-function write_template(parm=Parameters(),filename::String="./Parameters.jl";force=false)
+function write_template(parm=Parameters(), filename::String="./Parameters.jl";force=false)
 	template = joinpath(@__DIR__,"../Parameters.jl")
 	cp(joinpath(@__DIR__,"../Parameters.jl"),filename;force=force)
-
-
 	p= unpac_struct(parm,privates=false)
-
 	lns =readlines(filename,keep=false)
 	open(filename,"w") do f
 		for line in lns
@@ -82,11 +79,13 @@ function write_template(parm=Parameters(),filename::String="./Parameters.jl";for
 		
 			if pname !== nothing
 				pval = p[Symbol(pname[1])]
+
 				regx = Regex("\\s+($(pname[1]))\\s*=\\s*([-\\+0-9\\.]+\\s*\\**\\s*[\\S]+)(\\s*#.*)")
 	
-				if pval isa Unitful.Quantity		
-					subs = SubstitutionString("    \\1 = $(string(ustrip(pval))*"u\""*string(unit(pval))*"\",")\\3")
-					@show subs
+				if pval isa Unitful.Quantity	
+					ustring= string(unit(pval))
+					ustring = replace(ustring,r"(\s)" => s"*" )	
+					subs = SubstitutionString("    \\1 = $(string(ustrip(pval))*"u\""*ustring*"\",")\\3")
 				elseif pval isa Number
 					subs =  SubstitutionString("    \\1 = $(pval),\\3")
 				else
@@ -99,6 +98,7 @@ function write_template(parm=Parameters(),filename::String="./Parameters.jl";for
 		end
 	end
 end
+write_template(filename::String="./Parameters.jl";kwargs...) = write_template(Parameters(), filename; kwargs...)
 
 
 include("./routines/helpers.jl")
