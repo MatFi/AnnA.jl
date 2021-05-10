@@ -1,12 +1,13 @@
 @testset "load_parameters" begin
-   @test AnnA.load_parameters(;N=200) isa AbstractParameters
-   
-   #test for failure
+   #should fail in test directory
+   @test_throws LoadError load_parameters(;N=200)
+   #but should wour if we create the template
+   write_template()
+   @test load_parameters(;N=200) isa AnnA.AbstractParameters
+   rm("Parameters.jl")
    cpath= pwd()
    cd("..")
-   @test_throws LoadError AnnA.load_parameters(;N=200)
-   write_template()
-   @test load_parameters(;N=200) isa AbstractParameters
-   rm("Parameters.jl")
-   cd(cpath)
+   # it should reflect the cd()
+   @test AnnA.load_parameters(;N=200) isa AnnA.AbstractParameters
+
 end

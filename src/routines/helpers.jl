@@ -88,11 +88,11 @@ end
 
 Returns a `OrderedDict` containing all `field => value` pairs. Allows for multiple structs as input. The result is then a single Dict. The letter arguments will overwrite previous one is existing already
 """
-function unpac_struct(s...)
+function unpac_struct(s...;privates=true)
 
     p=OrderedDict{Symbol,Any}()
     for arg in s
-        prm_names = propertynames(arg,true)
+        prm_names = propertynames(arg,privates)
         for n in prm_names
             #@eval $n = $p.$(n)
             p[n] = getproperty(arg,n)

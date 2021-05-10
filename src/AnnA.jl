@@ -63,13 +63,26 @@ load_parameters(file::String; kwargs...) = load_parameters(Parameters(), file; k
 
 
 """
-	write_template(;force=false)
+	write_template(filename::String="./Parameters.jl"; force=false)
 
-Creates a new `Parameters.jl` template in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
+Creates a new template at the path specified in `filename`, defaults to `Parameters.jl` in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
 """	
-function write_template(;force=false)
-	cp(joinpath(@__DIR__,"../Parameters.jl"),"./Parameters.jl";force=force)
+function write_template(parm=Parameters(),filename::String="./Parameters.jl";force=false)
+
+	open(filename,"w") do f
+		# Make sure we write 64bit integer in little-endian byte order
+		p= unpac_struct(parm,privates=false)
+		for (k,v) in zip(keys(p),values(p))
+			if v isa Unitful.Quantity
+				write(f, k," = ",ustrip(v),"u\"",unit(v),"\"\n")
+			else
+				write(f, k," = ",v,"\n")
+			end
+		end
+	end
+	#cp(joinpath(@__DIR__,"../Parameters.jl"),filename;force=force)
 end
+
 
 include("./routines/helpers.jl")
 include("./routines/nondimensionalise.jl")
