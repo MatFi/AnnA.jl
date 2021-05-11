@@ -1,15 +1,16 @@
-struct ProblemSolution <: AbstractProblemSolution
+struct GeneralSolution end
+struct ProblemSolution{T} <: AbstractProblemSolution
     parameters
     df
     xₑ
     x
     xₕ
 end
-function ProblemSolution(sol::ODESolution)
+function ProblemSolution(sol::ODESolution, tag::Type=GeneralSolution)
     parm = sol.prob.f.f
     grid = parm.g
     parm = parm.parameters
-    ProblemSolution(parm, todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
+    ProblemSolution{tag}(parm, todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
 end
 
 function todf(sol::ODESolution)
@@ -76,6 +77,3 @@ function todf(sol::ODESolution)
         pₕf=pₕf,
     )
 end
-
-
-

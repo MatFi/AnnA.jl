@@ -1,3 +1,4 @@
+#struct JscVocSolution end
 struct JscVocProblem{V<:Number,VR<:Number,P<:Parameters,C<:AlgControl} <: AbstractProblem
     parameters::P
     max_intensity::V

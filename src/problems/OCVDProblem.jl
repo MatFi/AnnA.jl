@@ -1,3 +1,4 @@
+struct OCVDSolution end
 struct OCVDProblem{P<:AbstractParameters,T<:Number,C<:AlgControl}  <: AbstractProblem
     parameters::P
     on_time::T
@@ -41,61 +42,21 @@ function OCVDProblem(
 
 end
 
-struct OCVDSolution{P,S,GE,GP,GH} <: AbstractProblemSolution
-    parameters::P
-    df::S
-    xₑ::GE
-    x::GP
-    xₕ::GH
-end
-function OCVDSolution(sol::ODESolution)
-    parm = sol.prob.f.f
-    grid = parm.g
-    parm = parm.parameters
-    OCVDSolution(parm,todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
-end
+# backwards compatibility and conveniant dispatches
+getproperty(p::ProblemSolution{OCVDSolution},n::Symbol) = getproperty(p, Val{n}())
+getproperty(p::ProblemSolution{OCVDSolution},::Val{S}) where {S} = getfield(p, S)
+getproperty(p::ProblemSolution{OCVDSolution},::Val{:t_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.t end
+getproperty(p::ProblemSolution{OCVDSolution},::Val{:t_decay}) = filter(row -> row.t >= 0u"s", p.df).t
+getproperty(p::ProblemSolution{OCVDSolution},::Val{:V_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.V end
+getproperty(p::ProblemSolution{OCVDSolution},::Val{:V_decay}) = filter(row -> row.t >= 0u"s", p.df).V
+getproperty(p::ProblemSolution{OCVDSolution},::Val{:sol_on}) =begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r end
+getproperty(p::ProblemSolution{OCVDSolution},::Val{:sol_decay}) = filter(row -> row.t >= 0u"s", p.df)
 
-
-# backwards compatibility
-
-getproperty(p::OCVDSolution,n::Symbol) = getproperty(p::OCVDSolution, Val{n}())
-getproperty(p::OCVDSolution,::Val{S}) where {S} = getfield(p, S)
-getproperty(p::OCVDSolution,::Val{:t_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.t end
-getproperty(p::OCVDSolution,::Val{:t_decay}) = filter(row -> row.t >= 0u"s", p.df).t
-getproperty(p::OCVDSolution,::Val{:V_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.V end
-getproperty(p::OCVDSolution,::Val{:V_decay}) = filter(row -> row.t >= 0u"s", p.df).V
-getproperty(p::OCVDSolution,::Val{:sol_on}) =begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r end
-getproperty(p::OCVDSolution,::Val{:sol_decay}) = filter(row -> row.t >= 0u"s", p.df)
-
-
-# OCVDSolution(on, decay, p::OCVDProblem) = OCVDSolution(
-#     on,
-#     decay,
-#     p,
-#     get_t(on) ,
-#     get_t(decay),
-#     get_V(on),
-#     get_V(decay),
-# )
 
 function solve(pp::OCVDProblem, args...)
     p=deepcopy(pp)
     tend = p.on_time
     parms= p.parameters
-
-    #  init_c = Cell(parms;mode = :oc,alg_ctl = p.alg_control)
-
-    # @debug p.on_time
-    #s1 = solve(init_c,tend=p.on_time)
-
-    #@debug (get_V(s1))[1] (get_V(s1))[end]
-
-    #t0=ustrip(upreferred(copy(p.on_time)))
-    #p2 = setproperties(
-    #    p.parameters,
-    #    light  = t -> p.parameters.light(t+t0),
-    #)
-
     alg_ctl =  setproperties(
             p.alg_control,
             tend= p.decay_time,
@@ -103,6 +64,5 @@ function solve(pp::OCVDProblem, args...)
         )
     c = Cell(parms;mode = :oc,alg_ctl =alg_ctl)
     sol = solve(c)#.u[end]
-    return OCVDSolution(sol)
-
+    return ProblemSolution(sol, OCVDSolution)
 end

@@ -1,3 +1,4 @@
+struct IVSoultion end
 struct IVProblem{
     B<:Bool,
     V<:Union{AbstractArray,Tuple},
@@ -91,7 +92,7 @@ function solve(p::IVProblem, alg_control = p.alg_control, args...)
     )
     s1 = solve(init_c)
 
-    s=ProblemSolution(s1)
+    s=ProblemSolution(s1,IVSoultion)
 
     d = diff(s.df.V).>=0u"V"    
     s.df.fwd=vcat(d[1],d)

@@ -63,11 +63,11 @@ load_parameters(file::String; kwargs...) = load_parameters(Parameters(), file; k
 
 
 """
-	write_template(parm=Parameters(), filename::String="./Parameters.jl"; force=false)
+	write_template([parm::AbstracParameters=Parameters()], filename::String="./Parameters.jl"; force=false)
 
-Creates a new template at the path specified in `filename`, defaults to `Parameters.jl` in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
+Creates a new template from an optinally provided `Parameters` struct at the path specified in `filename`, defaults to `Parameters.jl` in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
 """	
-function write_template(parm=Parameters(), filename::String="./Parameters.jl";force=false)
+function write_template(parm::AbstractParameters=Parameters(), filename::String="./Parameters.jl";force=false)
 	template = joinpath(@__DIR__,"../Parameters.jl")
 	cp(joinpath(@__DIR__,"../Parameters.jl"),filename;force=force)
 	p= unpac_struct(parm,privates=false)
@@ -114,11 +114,12 @@ include("./routines/solve.jl")
 include("./routines/redimensionalize.jl")
 include("./routines/calculate_externals.jl")
 
+include("./problems/ProblemSolution.jl")
 include("./problems/IVProblem.jl") 
 include("./problems/JscVocProblem.jl")
 include("./problems/OCVDProblem.jl")
 include("./problems/TPVProblem.jl")
-include("./problems/ProblemSolution.jl")
+
 
 export solve, IVProblem, JscVocProblem, OCVDProblem, TPVProblem, 
 		Parameters, pulse, load_parameters, write_template

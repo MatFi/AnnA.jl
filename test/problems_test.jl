@@ -21,6 +21,6 @@
 
     #test the ocvd  
     prob_ocvd = AnnA.OCVDProblem(parameters,10u"s",1e3u"s")
-    @test  AnnA.solve(prob_ocvd) isa AnnA.OCVDSolution
+    @test  AnnA.solve(prob_ocvd) isa AnnA.ProblemSolution{OCVDSolution}
     
 end
