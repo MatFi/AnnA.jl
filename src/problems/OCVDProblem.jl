@@ -1,4 +1,4 @@
-struct OCVDSolution end
+struct OCVD end
 struct OCVDProblem{P<:AbstractParameters,T<:Number,C<:AlgControl}  <: AbstractProblem
     parameters::P
     on_time::T
@@ -43,14 +43,14 @@ function OCVDProblem(
 end
 
 # backwards compatibility and conveniant dispatches
-getproperty(p::ProblemSolution{OCVDSolution},n::Symbol) = getproperty(p, Val{n}())
-getproperty(p::ProblemSolution{OCVDSolution},::Val{S}) where {S} = getfield(p, S)
-getproperty(p::ProblemSolution{OCVDSolution},::Val{:t_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.t end
-getproperty(p::ProblemSolution{OCVDSolution},::Val{:t_decay}) = filter(row -> row.t >= 0u"s", p.df).t
-getproperty(p::ProblemSolution{OCVDSolution},::Val{:V_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.V end
-getproperty(p::ProblemSolution{OCVDSolution},::Val{:V_decay}) = filter(row -> row.t >= 0u"s", p.df).V
-getproperty(p::ProblemSolution{OCVDSolution},::Val{:sol_on}) =begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r end
-getproperty(p::ProblemSolution{OCVDSolution},::Val{:sol_decay}) = filter(row -> row.t >= 0u"s", p.df)
+getproperty(p::ProblemSolution{OCVD},n::Symbol) = getproperty(p, Val{n}())
+getproperty(p::ProblemSolution{OCVD},::Val{S}) where {S} = getfield(p, S)
+getproperty(p::ProblemSolution{OCVD},::Val{:t_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.t end
+getproperty(p::ProblemSolution{OCVD},::Val{:t_decay}) = filter(row -> row.t >= 0u"s", p.df).t
+getproperty(p::ProblemSolution{OCVD},::Val{:V_on}) = begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r.V end
+getproperty(p::ProblemSolution{OCVD},::Val{:V_decay}) = filter(row -> row.t >= 0u"s", p.df).V
+getproperty(p::ProblemSolution{OCVD},::Val{:sol_on}) =begin r=filter(row -> row.t <= 0u"s", p.df); r.t .-=r.t[1]; r end
+getproperty(p::ProblemSolution{OCVD},::Val{:sol_decay}) = filter(row -> row.t >= 0u"s", p.df)
 
 
 function solve(pp::OCVDProblem, args...)
@@ -64,5 +64,5 @@ function solve(pp::OCVDProblem, args...)
         )
     c = Cell(parms;mode = :oc,alg_ctl =alg_ctl)
     sol = solve(c)#.u[end]
-    return ProblemSolution(sol, OCVDSolution)
+    return ProblemSolution(sol, OCVD)
 end

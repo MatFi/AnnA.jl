@@ -122,6 +122,7 @@ include("./problems/TPVProblem.jl")
 
 
 export solve, IVProblem, JscVocProblem, OCVDProblem, TPVProblem, 
-		Parameters, pulse, load_parameters, write_template
+		Parameters, pulse, load_parameters, write_template,
+		AlgControl
 export @u_str
 end # module
