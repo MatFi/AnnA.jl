@@ -32,7 +32,7 @@
     @test sol.t_on[end] ≈ 10u"s"
     @test sol.t_decay[end] ≈ 1000u"s"
     @test sol.V_on[end] > 1.2u"V"
-    @test sol.V_decay[end] ≈ 0.1597653552u"V"
+    @test isapprox(sol.V_decay[end],0.1597653552u"V",rtol=1e-4)
 
 
 end
