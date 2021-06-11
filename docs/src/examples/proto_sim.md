@@ -7,7 +7,7 @@ The simulation of an IV curve can be done by the `IVProblem` constructor
 ```@docs
 IVProblem
 ```
-Here is a simple example on how to us
+Here is a simple example on how to use
 ```@example iv
 using AnnA
 using Unitful, UnitfulRecipes
