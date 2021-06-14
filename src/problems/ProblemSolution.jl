@@ -52,6 +52,19 @@ function todf(sol::ODESolution)
     pₕf = map((e,p) -> (e .+ parm.kB .* parm.T .* log.(parm.gvₕ ./ abs.(p))),Evh,p_htm)
     
 
+
+
+    un = decompose.(sol.u,grid)
+    np= rhs.ndim
+    dx = diff(grid.x)
+    Rrad=[]
+    for s in un
+
+        r = integrate(grid.x.*parm.b,(s[3][2].*s[4][1].-np.R.nᵢ²)*np.R.kk)*parm.jay/parm.b
+       # r +=   ((s[3][2][end].*s[4][2][1].-np.Rᵣ.nᵢ²)*np.Rᵣ.kk)*parm.jay/parm.b
+       # r +=   ((s[4][1][1].*s[3][1][end].-np.Rₗ.nᵢ²)*np.Rₗ.kk)*parm.jay/parm.b
+        push!(Rrad,r|>upreferred)
+    end
     light = parm.light.(ustrip(sol.t * τᵢ .|> u"s"))
 
     df = DataFrame(
@@ -75,5 +88,6 @@ function todf(sol::ODESolution)
         nf=nf,
         pf=pf,
         pₕf=pₕf,
+        Rrad=Rrad,
     )
 end
