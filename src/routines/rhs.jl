@@ -288,11 +288,6 @@ function (rhs!::Rhs)(du,u,pr,t)
         du[4*N+2*Nₑ+Nₕ+4] =  ϕₑ[1] # Potential reference at etl contact
         #du[N+1] = integrate(rhs!.g.x,P)-1;
         #du[N+1] = integrate(rhs!.g.x,P)-1)^4;
-    elseif rhs!.mode == :precondition
-        # Overwrite right-hand BC to ensure conservation of ion vacancies
-        #du[4*N+2*Nₑ+Nₕ+4] =  ϕₑ[1]
-        du[N+1] = ((integrate(rhs!.g.x,abs.(P))-1));
-        #du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] +rhs!.ndim.Vbi - rhs!.ndim.V(t)
     else
         error("simulation mode $(rhs!.mode) is not recongnized")
     end

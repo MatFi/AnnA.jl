@@ -7,7 +7,6 @@ Returns the steady state solution vector.
 """
 function initial_conditions(c::Cell)
 
-    #@info "initialisation : nlsolve on first guess in :precondition mode"
     u0 = c.u0
     cc =deepcopy(c)
     c.mode == :oc && c.parameters.V(0) !==0 && @warn "Initialisation to jsc conditions"

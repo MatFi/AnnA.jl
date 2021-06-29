@@ -38,9 +38,6 @@ function get_jac_sparse_pattern(g::Grid;mode::Symbol=:oc)
         #Shunt resitance dependant current
         J[4*N+5,4*N+4+2*Nₑ+Nₕ]=1
         J[4*N+2*Nₑ+Nₕ+4,:] =  [zeros(1,4*N+4) [1] zeros(1,Nₑ-1) zeros(1,Nₑ) zeros(1,Nₕ-1) [0] zeros(1,Nₕ)]
-    elseif mode == :precondition
-        # enforces the conservation on ions
-        J[N+1,:] = [ones(1,N+1) zeros(1,3*N+2*Nₑ+2*Nₕ+3)]
     elseif mode == :cc
     else error("simulation mode $mode is not recognised")
     end
