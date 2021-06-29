@@ -62,7 +62,7 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     λₕ::T     # relaitve HTL Debye Length
     nᵢ²::T     #nodim intrinsc conc
     σₛₕ::T # nundim Shunt conductivity
-
+    σₛ::T  # nundim series conductivity
     """Interface parameters"""
     kₑ::T     # ratio between electron densities ETL/perovskite interface
     kₕ::T     # ratio between hole densities perovkite/HTL interface
@@ -124,6 +124,7 @@ function NonDimensionalize(parm::AbstractParameters)
     d[:kₕ]  = p[:gv]/p[:gvₕ]*exp((p[:Ev]-p[:Evₕ])/(p[:kB]*p[:T]))
 
     d[:σₛₕ] = 1/p[:Rₛₕ]/p[:jay]*p[:VT]
+    d[:σₛ] = 1/p[:Rₛ]/p[:jay]*p[:VT]
     d[:nᵢ²] = uconvert(Unitful.NoUnits,p[:nᵢ]^2/(p[:dₑ]*p[:dₕ]))
     #Test for nodimensionalty
     for i in eachindex(d)

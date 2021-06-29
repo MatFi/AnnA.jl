@@ -111,6 +111,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     light::Function = pulse(tₑ=1.0,w=2.)     # Light(t) function  [Sun]
     V::Function = t -> 0               # Voltage(t) function [V]
     Rₛₕ = 1e6u"V/A*m^2"       # Shunt resistance
+    Rₛ = 1e0u"V/A*m^2"        # Series resistance
 
     # Recombination Parameters
     τₙ = 3e-7u"s"             # electron pseudo lifetime

@@ -28,6 +28,11 @@ function get_jac_sparse_pattern(g::Grid;mode::Symbol=:oc)
             J71 J72 J71 J72 J75 J75 J77 J78
             J71 J72 J71 J72 J75 J75 J78 J77 ]
 
+    #shunt currents
+    if mode == :cc
+        J[4*N+2*Nₑ+Nₕ+4,4*N+Nₑ+4+1:4*N+Nₑ+6] .=1
+        J[4*N+2*Nₑ+Nₕ+4,4*N+4+1:4*N+6] .=1
+    end
     if mode == :oc
         J[4*N+5,:] = [zeros(1,4*N+4) [1] [1] zeros(1,Nₑ-2) [1] [1] zeros(1,Nₑ-2) zeros(1,2*Nₕ)]
         #Shunt resitance dependant current

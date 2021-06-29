@@ -62,9 +62,13 @@ end
 
 function get_V(sol::DiffEqBase.ODESolution;t=[])#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
     p = sol.prob.f.f
-
-#    u = decompose.(sol.u,p.g)
-
+    # return external voltage if cc
+    if p.mode == :cc
+        t= sol.t .*p.parameters.τᵢ
+        V= p.parameters.V.(t) .*u"V"
+        return V
+    end
+    
     u = isempty(t) ? rdim_sol(sol) : rdim_sol(sol,t)
     V =Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(u))
     for (i,uu) in enumerate(u)

@@ -264,14 +264,25 @@ function (rhs!::Rhs)(du,u,pr,t)
         du[4*N+Nₑ+5+i] = fnₑ[i+1]-fnₑ[i]
     end
     ### HTM ###
-    du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] + rhs!.ndim.Vbi - rhs!.ndim.V(t);  
+   # du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] + rhs!.ndim.Vbi - rhs!.ndim.V(t);  
     du[4*N+2*Nₑ+2*Nₕ+4] = pₕ[end]-1;
     @avx for i in 1:Nₕ-1
         du[4*N+2*Nₑ+4+i] = mEₕ[i+1]-mEₕ[i]-cdₕ[i]/λₕ²;
         du[4*N+2*Nₑ+Nₕ+4+i] = fpₕ[i+1]-fpₕ[i];
     end
     # Perform any additional step requested by the optional input argument rhs!.mode
-    if rhs!.mode == :cc  # cosed circuit is default
+
+
+    if rhs!.mode == :cc  # closed circuit is default
+        if rhs!.ndim.σₛ == Inf
+            ϕ_end = rhs!.ndim.V(t)
+        else
+            Vr= rhs!.ndim.V(t)
+            σₛₕ=rhs!.ndim.σₛₕ
+            σₛ=rhs!.ndim.σₛ
+            ϕ_end = (Vr*σₛ+fnₑ[1])/( σₛₕ+ σₛ)
+        end
+        du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] +rhs!.ndim.Vbi - ϕ_end
     elseif rhs!.mode == :oc #oopen circuit
         du[4*N+5] = (fnₑ[1]-( ϕₕ[end] +rhs!.ndim.Vbi) *rhs!.ndim.σₛₕ) ;  # no flux except shunt
         du[4*N+2*Nₑ+Nₕ+4] =  ϕₑ[1] # Potential reference at etl contact
