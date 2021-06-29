@@ -67,7 +67,7 @@ load_parameters(file::String; kwargs...) = load_parameters(Parameters(), file; k
 
 Creates a new template from an optinally provided `Parameters` struct at the path specified in `filename`, defaults to `Parameters.jl` in the current working directory. An existing file can be overwritten using the `force=true` keyword argument.
 """	
-function write_template(parm::AbstractParameters=Parameters(), filename::String="./Parameters.jl";force=false)
+function write_template(parm::AbstractParameters, filename::String;force=false)
 	template = joinpath(@__DIR__,"../Parameters.jl")
 	cp(joinpath(@__DIR__,"../Parameters.jl"),filename;force=force)
 	p= unpac_struct(parm,privates=false)
@@ -98,7 +98,10 @@ function write_template(parm::AbstractParameters=Parameters(), filename::String=
 		end
 	end
 end
+
 write_template(filename::String="./Parameters.jl";kwargs...) = write_template(Parameters(), filename; kwargs...)
+write_template(parm::AbstractParameters;kwargs...) = write_template(parm, "./Parameters.jl"; kwargs...)
+
 
 
 include("./routines/helpers.jl")
