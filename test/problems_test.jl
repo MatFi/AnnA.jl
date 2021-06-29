@@ -1,5 +1,5 @@
 @testset "Problems" begin
-    parameters= Parameters(light = t->0,Rₛₕ =Inf*1u"V/A*m^2" )
+    parameters= Parameters(light = t->0,Rₛₕ =Inf*1u"V/A*m^2",Rₛ =0*1u"V/A*m^2" )
     prob = IVProblem(parameters,[-0.2,1.4]u"V",0.005u"V/s")
     @test prob isa AnnA.IVProblem
 
@@ -20,6 +20,7 @@
     @test !isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4)
 
     #test the ocvd  
+    parameters= Parameters(light = t->0,Rₛₕ =Inf*1u"V/A*m^2",Rₛ =Inf*1u"V/A*m^2" )
     @test OCVDProblem(parameters,10u"s",1e3u"s",alg_control=AlgControl()) isa OCVDProblem
     prob_ocvd = AnnA.OCVDProblem(parameters,10u"s",1e3u"s")
     sol = AnnA.solve(prob_ocvd)

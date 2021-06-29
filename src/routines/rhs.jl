@@ -277,19 +277,15 @@ function (rhs!::Rhs)(du, u, pr, t)
     σₛ = rhs!.ndim.σₛ(t)
     
     if rhs!.mode == :cc  # closed circuit is default
-        # hackish fallback to enable initialisation
         ϕ_end = Vr / ( σₛₕ / σₛ + 1) + fnₑ[1] / ( σₛₕ + σₛ)
-        if σₛₕ == 0 && σₛ == 0
+        # hackish fallback to fix initialisation
+        if σₛₕ ≈ 0 && σₛ ≈ 0
             ϕ_end = ϕₕ[end] + rhs!.ndim.Vbi
         end
         du[4 * N + 2 * Nₑ + Nₕ + 4] = ϕₕ[end] + rhs!.ndim.Vbi - ϕ_end
     elseif rhs!.mode == :oc # open circuit
         ϕend = ϕₕ[end] + rhs!.ndim.Vbi
-        if (σₛₕ == 0) && (σₛ == 0)
-            du[4 * N + 5] = fnₑ[1] # no flux  
-        else
-            du[4 * N + 5] = (fnₑ[1] - (ϕend) * σₛₕ - ( ϕend - Vr) * σₛ);  # no flux except shunt
-        end
+        du[4 * N + 5] = (fnₑ[1] - (ϕend) * σₛₕ - ( ϕend - Vr) * σₛ);  # shunt und series resist flux
         du[4 * N + 2 * Nₑ + Nₕ + 4] =  ϕₑ[1] # Potential reference at etl contact
         # du[N+1] = integrate(rhs!.g.x,P)-1;
         # du[N+1] = integrate(rhs!.g.x,P)-1)^4;

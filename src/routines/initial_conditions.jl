@@ -20,8 +20,9 @@ function initial_conditions(c::Cell)
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
-    if (ustrip(p_init.Rₛₕ) == Inf) && (ustrip(p_init.Rₛ) == Inf)  
-        p_init.Rₛ=1e60u"V/A*m^2"
+    if ustrip(p_init.Rₛ)==Inf
+        @warn "initialization could not be performed with Rₛ=Inf, used 0 instead"
+        p_init.Rₛ=0u"V/A*m^2"
     end
     c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=Float64.(cc.u0))
 
