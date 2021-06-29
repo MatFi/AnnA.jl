@@ -6,7 +6,7 @@ mutable struct Cell{V,M,J,G,O,P,NP,C,S,A<:AlgControl,B}
     parameters::P   # User choosen input parameters
     ndim::NP    # Non dimensionalized parameters
     rhs::C      # Rhs! function
-    mode::S     # :cc  closes circuit, :oc open circuit, :precondition
+    mode::S     # :cc  closes circuit, :oc open circuit
     alg_ctl::A  # Alg control type
     u0::V       # Initial_conditions
     initialized::B
