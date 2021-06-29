@@ -9,7 +9,6 @@ function initial_conditions(c::Cell)
 
     u0 = c.u0
     cc =deepcopy(c)
-    c.mode == :oc && c.parameters.V(0) !==0 && @warn "Initialisation to jsc conditions"
     ts=[0.0,1e-2,1e256] 
     vs=[ustrip(cc.parameters.Vbi),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
@@ -21,6 +20,9 @@ function initial_conditions(c::Cell)
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
+    if (ustrip(p_init.Rₛₕ) == Inf) && (ustrip(p_init.Rₛ) == Inf)  
+        p_init.Rₛ=1e60u"V/A*m^2"
+    end
     c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=Float64.(cc.u0))
 
     if  c.mode == :occ  #legacy
