@@ -85,7 +85,7 @@ function write_template(parm::AbstractParameters, filename::String;force=false)
 				if pval isa Unitful.Quantity	
 					ustring= string(unit(pval))
 					ustring = replace(ustring,r"(\s)" => s"*" )	
-					subs = SubstitutionString("    \\1 = $(string(ustrip(pval))*"u\""*ustring*"\",")\\3")
+					subs = SubstitutionString("    \\1 = $(string(ustrip(pval))*"*u\""*ustring*"\",")\\3")
 				elseif pval isa Number
 					subs =  SubstitutionString("    \\1 = $(pval),\\3")
 				else
