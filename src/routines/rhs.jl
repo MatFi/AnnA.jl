@@ -279,7 +279,7 @@ function (rhs!::Rhs)(du,u,pr,t)
         else
             Vr= rhs!.ndim.V(t)
             σₛₕ=rhs!.ndim.σₛₕ
-            σₛ=rhs!.ndim.σₛ
+            σₛ=rhs!.ndim.σₛ(t)
             ϕ_end = (Vr*σₛ+fnₑ[1])/( σₛₕ+ σₛ)
         end
         du[4*N+2*Nₑ+Nₕ+4] = ϕₕ[end] +rhs!.ndim.Vbi - ϕ_end

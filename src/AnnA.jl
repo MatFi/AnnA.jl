@@ -48,7 +48,7 @@ Creates a new `Parameters` object. A list of modifications to the defaults can b
 """	
 function load_parameters(
 	p::AbstractParameters=Parameters(),
-	file::String=joinpath(@__DIR__,"../Parameters.jl");
+	file::String=joinpath(pwd(),"Parameters.jl");
 	kwargs...)
 
 	if isfile(file)

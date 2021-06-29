@@ -34,7 +34,7 @@ holds all nondimensionalized parameters
 - `G`: Carrier generation function
 - `V`: Voltage/kt
 """
-struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv<:Function}
+struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv<:Function, Frs<:Function}
 
     λ::T     #Debye length
     λ²::T     #Debye length square
@@ -62,7 +62,7 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     λₕ::T     # relaitve HTL Debye Length
     nᵢ²::T     #nodim intrinsc conc
     σₛₕ::T # nundim Shunt conductivity
-    σₛ::T  # nundim series conductivity
+    σₛ::Frs  # nundim series conductivity
     """Interface parameters"""
     kₑ::T     # ratio between electron densities ETL/perovskite interface
     kₕ::T     # ratio between hole densities perovkite/HTL interface
@@ -124,7 +124,13 @@ function NonDimensionalize(parm::AbstractParameters)
     d[:kₕ]  = p[:gv]/p[:gvₕ]*exp((p[:Ev]-p[:Evₕ])/(p[:kB]*p[:T]))
 
     d[:σₛₕ] = 1/p[:Rₛₕ]/p[:jay]*p[:VT]
-    d[:σₛ] = 1/p[:Rₛ]/p[:jay]*p[:VT]
+   
+    if p[:Rₛ] isa Function
+        d[:σₛ] = t-> 1/p[:Rₛ](t)/p[:jay]*p[:VT]
+    else
+        d[:σₛ] = t-> 1/p[:Rₛ]/p[:jay]*p[:VT]
+    end
+
     d[:nᵢ²] = uconvert(Unitful.NoUnits,p[:nᵢ]^2/(p[:dₑ]*p[:dₕ]))
     #Test for nodimensionalty
     for i in eachindex(d)
