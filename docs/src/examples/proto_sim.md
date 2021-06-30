@@ -26,7 +26,7 @@ If we just want to plot the IV characteristics we can do:
 ```@example iv
 using Plots
 using UnitfulRecipes  # To interface Unitful with Plots
-
+gr()
 sol=sol.df
 sol.j = sol.j .|>u"mA/cm^2" # scale to common units
 plt = plot(sol.V[sol.fwd], sol.j[sol.fwd],label="Forward", ylims=(-25,40),xlims=(-0.5,1.3),legend=:topleft);
