@@ -70,11 +70,8 @@ function get_V(sol::DiffEqBase.ODESolution,t)
         V= p.parameters.V(t)*u"V"
         return V
     end
-    
     u = rdim_sol(sol,t)
-
     V= u[2][3][end]+p.ndim.Vbi*p.parameters.VT
-  
     return V
 end
 
