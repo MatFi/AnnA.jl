@@ -24,10 +24,6 @@ function Cell(
     if (mode==:cc) && (ustrip(p.Rₛₕ) == Inf) && (ustrip(p.Rₛ) == Inf)  
         error("at least one of both Rₛ or Rₛₕ needs to have a finite value in cc-mode ")
     end
-    if mode == :oc && p.V(0)>0
-        @warn "nonzero potential at t=0 in :oc mode
-            will be ignored during the initialisation"
-    end
     grid   = Grid(p)
     ndim= NonDimensionalize(p)
     operators  = Operators(grid;flavor=op_flavor,alg_ctl.numtype)
