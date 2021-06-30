@@ -28,10 +28,11 @@
     α  = 1.3e7u"1/m",          # Perovskite absorption coefficient
     Fₚₕ = 1.4e21u"m^-2*s^-1",  # 1 Sun photonflux  
     dir = 1,                   # Light trough  1 -> ETL, -1 -> HTL
-    light = pulse(tₑ=1.0, w=2.),     # Light(t) function  [Sun]
+    light = pulse(tₑ=1.0, w=2.),  # Light(t) function  [Sun]
     V = t -> 0,                # Voltage(t) function [V]
     Rₛₕ = 1e6u"V/A*m^2",       # Shunt resistance
-
+    Rₛ = 1e-4u"V/A*m^2",        # Series resistance
+   
     # Recombination Parameters
     τₙ = 3e-7u"s",             # electron pseudo lifetime
     τₚ = 3e-7u"s",             # hole pseudo lifetime
