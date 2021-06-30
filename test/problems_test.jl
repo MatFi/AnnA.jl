@@ -18,7 +18,21 @@
     sol = AnnA.solve(prob) 
     @test sol isa AnnA.ProblemSolution{AnnA.IV}
     @test !isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4)
-
+    
+    alg_control = AlgControl(
+        dtmin = ustrip((1e-30 * parameters.τᵢ )|>u"s"),
+        dt = ustrip((1e-10 * parameters.τᵢ)|>u"s"),
+        reltol = 1e-5,
+        abstol = 1e-8,
+        force_dtmin=false,
+        ss_tol=1e-5,
+        tend = 124*u"s",
+    )
+    prob = AnnA.IVProblem(parameters,[1.2,0.4]u"V",0.005u"V/s",double_sweep=false,alg_control = alg_control)
+    sol = AnnA.solve(prob) 
+    @test sol isa AnnA.ProblemSolution{AnnA.IV}
+    @test !isapprox(sol.df.V[1] - sol.df.V[end] .|> ustrip, 0; atol=1e-4)
+   
     #test the ocvd  
     parameters= Parameters(light = t->0,Rₛₕ =Inf*1u"V/A*m^2",Rₛ =Inf*1u"V/A*m^2" )
     @test OCVDProblem(parameters,10u"s",1e3u"s",alg_control=AlgControl()) isa OCVDProblem

@@ -26,11 +26,6 @@ function initial_conditions(c::Cell)
     end
     c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=Float64.(cc.u0))
 
-    if  c.mode == :occ  #legacy
-        @info "initalisatiion: stating conditions in :oc mode"
-        u0 = nl_solve_intiter(c,u0;ftol=c.alg_ctl.ss_tol).zero
-    end
-
     @debug "Init_Solve"
     τᵢ = c_init.parameters.τᵢ
     prob = get_problem(c_init,tstart=0.0u"s",tend = 1e6*τᵢ |> u"s")
@@ -120,13 +115,13 @@ function init_guess(g::Grid, ndim::NodimParameters,Vbikt)
     phi_init = zeros(size(g.x))
     dn,dp = (0.0,0.0)
 
-    if ndim.ϰ >0
-        dn =  abs(ndim.ϰ )/ ndim.δ
-        dp = ndim.nᵢ²*exp(Vbikt)/dn
-    else
-        dp = abs(ndim.ϰ)/(ndim.δ*ndim.χ)
-        dn = ndim.nᵢ²*exp(Vbikt)/dp
-    end
+    # if ndim.ϰ >0
+    #     dn =  abs(ndim.ϰ )/ ndim.δ
+    #     dp = ndim.nᵢ²*exp(Vbikt)/dn
+    # else
+    #     dp = abs(ndim.ϰ)/(ndim.δ*ndim.χ)
+    #     dn = ndim.nᵢ²*exp(Vbikt)/dp
+    # end
 
     dnend =   ndim.nᵢ²*exp(Vbikt)/ndim.kₕ
     n_init = ones(size(g.x)) .*range( ndim.kₑ,dnend, length = g.N + 1) #* 
