@@ -7,10 +7,8 @@ Returns the steady state solution vector.
 """
 function initial_conditions(c::Cell)
 
-    #@info "initialisation : nlsolve on first guess in :precondition mode"
     u0 = c.u0
     cc =deepcopy(c)
-    c.mode == :oc && c.parameters.V(0) !==0 && @warn "Initialisation to jsc conditions"
     ts=[0.0,1e-2,1e256] 
     vs=[ustrip(cc.parameters.Vbi),
         cc.parameters.V(convert(Float64,upreferred(cc.alg_ctl.tstart/cc.parameters.τᵢ))),
@@ -22,12 +20,11 @@ function initial_conditions(c::Cell)
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
-    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=Float64.(cc.u0))
-
-    if  c.mode == :occ  #legacy
-        @info "initalisatiion: stating conditions in :oc mode"
-        u0 = nl_solve_intiter(c,u0;ftol=c.alg_ctl.ss_tol).zero
+    if ustrip(p_init.Rₛ)==Inf
+        @warn "initialization could not be performed with Rₛ=Inf, used 0 instead"
+        p_init.Rₛ=0u"V/A*m^2"
     end
+    c_init = Cell(p_init;mode = :cc, alg_ctl = cc.alg_ctl, u0=Float64.(cc.u0))
 
     @debug "Init_Solve"
     τᵢ = c_init.parameters.τᵢ
@@ -118,13 +115,13 @@ function init_guess(g::Grid, ndim::NodimParameters,Vbikt)
     phi_init = zeros(size(g.x))
     dn,dp = (0.0,0.0)
 
-    if ndim.ϰ >0
-        dn =  abs(ndim.ϰ )/ ndim.δ
-        dp = ndim.nᵢ²*exp(Vbikt)/dn
-    else
-        dp = abs(ndim.ϰ)/(ndim.δ*ndim.χ)
-        dn = ndim.nᵢ²*exp(Vbikt)/dp
-    end
+    # if ndim.ϰ >0
+    #     dn =  abs(ndim.ϰ )/ ndim.δ
+    #     dp = ndim.nᵢ²*exp(Vbikt)/dn
+    # else
+    #     dp = abs(ndim.ϰ)/(ndim.δ*ndim.χ)
+    #     dn = ndim.nᵢ²*exp(Vbikt)/dp
+    # end
 
     dnend =   ndim.nᵢ²*exp(Vbikt)/ndim.kₕ
     n_init = ones(size(g.x)) .*range( ndim.kₑ,dnend, length = g.N + 1) #* 

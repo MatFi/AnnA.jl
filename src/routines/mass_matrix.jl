@@ -48,12 +48,8 @@ function mass_matrix(g::Grid, p::NodimParameters;mode=:oc)
     elseif mode==:oc
         M[4*p[:N]+5, 4*p[:N]+p[:Nₑ]+5 : 4*p[:N]+p[:Nₑ]+6] = p[:σ]*p[:dxₑ][1]*[1/3, 1/6]
     #    M[1:p[:N]+1,:] = p[:σ]*M[1:p[:N]+1, :]
-        
-    elseif mode==:precondition
-        M[1:p[:N]+1,:] = p[:σ]*M[1:p[:N]+1, :]
-        
-    else
-        error("Simulation mode $mode is not known, use :oc, :cc or :precondition")
+    else 
+        error("Simulation mode $mode is not known, use :oc or :cc")
     end
     dropzeros(sparse(M))
 

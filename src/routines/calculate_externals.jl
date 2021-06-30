@@ -59,35 +59,26 @@ function calculate_currents(sol::DiffEqBase.ODESolution)
     return J
 end
 
-
-function get_V(sol::DiffEqBase.ODESolution;t=[])#::Array{Quantity{Float64,𝐋^2*𝐌*𝐈^-1*𝐓^-3,Unitful.FreeUnits{(Unitful.V,),𝐋^2*𝐌*𝐈^-1*𝐓^-3,nothing}},1}
+get_V(sol::DiffEqBase.ODESolution,t::AbstractArray=sol.t .*sol.prob.f.f.parameters.τᵢ) = get_V.((sol,),t)
+function get_V(sol::DiffEqBase.ODESolution,t)
     p = sol.prob.f.f
-
-#    u = decompose.(sol.u,p.g)
-
-    u = isempty(t) ? rdim_sol(sol) : rdim_sol(sol,t)
-    V =Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(u))
-    for (i,uu) in enumerate(u)
-        V[i]= uu[2][3][end]+p.ndim.Vbi*p.parameters.VT
+    if !(typeof(t) isa Unitful.AbstractQuantity)
+        t = t*u"s"
     end
-    return V
-end
-function get_V(c::Cell,sol::DiffEqBase.ODESolution)
-    p = sol.prob.f.f
-    p = c.rhs
-    V = Array{typeof(p.ndim.Vbi*p.parameters.VT |>u"V")}(undef,length(sol.t))
-#    u = decompose.(sol.u,p.g)
-    u = rdim_sol(c,sol)
-    for (uu,i) in zip(u,eachindex(sol.t))
-        V[i]= uu[2][3][end]+p.ndim.Vbi*p.parameters.VT
+    # return external voltage if cc
+    if p.mode == :cc
+        V= p.parameters.V(t)*u"V"
+        return V
     end
-
+    u = rdim_sol(sol,t)
+    V= u[2][3][end]+p.ndim.Vbi*p.parameters.VT
     return V
 end
 
 get_t(sol::DiffEqBase.ODESolution) = upreferred.(sol.t*sol.prob.f.f.parameters.τᵢ )
 
 function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
+
     p = f.prob.f.f
     sol_vec = rdim_sol(f,t)
     r=Dict{Symbol,Any}()
@@ -103,7 +94,7 @@ function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
     r[:p]=sol_vec[4][1]
     r[:pₕ]=sol_vec[4][2]
     getQFL!(r,p.parameters)
-    r[:V]=sol_vec[2][3][end]+p.ndim.Vbi*p.parameters.VT
+    r[:V]=get_V(f,t)
     #calculate current wo dispacement
     t_ndim =Float64(t/p.parameters.τᵢ)
     ndim_sol=decompose(f(t_ndim), p.g)

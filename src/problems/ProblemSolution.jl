@@ -1,5 +1,6 @@
 struct GeneralSolution end
 struct ProblemSolution{T} <: AbstractProblemSolution
+    sol
     parameters
     df
     xₑ
@@ -10,7 +11,7 @@ function ProblemSolution(sol::ODESolution, tag::Type=GeneralSolution)
     parm = sol.prob.f.f
     grid = parm.g
     parm = parm.parameters
-    ProblemSolution{tag}(parm, todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
+    ProblemSolution{tag}(sol,parm, todf(sol), grid.xₑ.*parm.b, grid.x.*parm.b, grid.xₕ.*parm.b)
 end
 
 function todf(sol::ODESolution)
@@ -24,7 +25,6 @@ function todf(sol::ODESolution)
     t = sol.t * τᵢ .|> u"s" 
 
     d = rdim_sol(sol)
-  #  d= decompose(s_redim, grid)
     
     phi_etm = map(a -> a[2][1], d)
     n_etm =  map(a -> a[3][1], d)

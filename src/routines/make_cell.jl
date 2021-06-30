@@ -6,7 +6,7 @@ mutable struct Cell{V,M,J,G,O,P,NP,C,S,A<:AlgControl,B}
     parameters::P   # User choosen input parameters
     ndim::NP    # Non dimensionalized parameters
     rhs::C      # Rhs! function
-    mode::S     # :cc  closes circuit, :oc open circuit, :precondition
+    mode::S     # :cc  closes circuit, :oc open circuit
     alg_ctl::A  # Alg control type
     u0::V       # Initial_conditions
     initialized::B
@@ -21,9 +21,8 @@ function Cell(
     mode::Symbol=:cc,
     alg_ctl::AlgControl=AlgControl()
 )
-    if mode == :oc && p.V(0)>0
-        @warn "nonzero potential at t=0 in :oc mode
-            will be ignored during the initialisation"
+    if (mode==:cc) && (ustrip(p.Rₛₕ) == Inf) && (ustrip(p.Rₛ) == Inf)  
+        error("at least one of both Rₛ or Rₛₕ needs to have a finite value in cc-mode ")
     end
     grid   = Grid(p)
     ndim= NonDimensionalize(p)
