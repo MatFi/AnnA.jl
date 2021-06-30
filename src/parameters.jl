@@ -155,8 +155,8 @@ setproperty!(p::AbstractParameters,::Val{S},x) where {S} = setfield!(p, S, x)
 setproperty!(p::AbstractParameters, ::Val{:nᵢ},x) = begin
     @warn "nᵢ is transformed to gc and gv via gv=gc = sqrt(nᵢ²exp(Eg/kT))"
     g = sqrt(x^2 * exp(uconvert(Unitful.NoUnits, p.Eg / (p.kB * p.T))));
-    setfield!(p, :gc, g);
-    setfield!(p, :gv, g);
+    setproperty!(p, :gc, g);
+    setproperty!(p, :gv, g);
 end
 setproperty!(p::AbstractParameters, ::Val{:gc},x) = setfield!(p, :mₑ, (x / 2)^(2 / 3) * (4.13566769692e-15u"eV*s")^2 / (2π * 9.10938356e-31u"kg" * p.kB * p.T) |> upreferred)
 setproperty!(p::AbstractParameters, ::Val{:gv},x) = setfield!(p, :mₕ, (x / 2)^(2 / 3) * (4.13566769692e-15u"eV*s")^2 / (2π * 9.10938356e-31u"kg" * p.kB * p.T) |> upreferred)
