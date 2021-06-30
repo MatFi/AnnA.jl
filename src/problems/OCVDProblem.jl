@@ -36,7 +36,7 @@ function OCVDProblem(
         Δt = 1e-12,
     )
 
-    parm = setproperties(parm; light =lght, V= (t)->0)
+    parm = setproperties(parm; light =lght, V= (t)->0, Rₛ= Inf*u"V/A*m^2")
 
     prob = OCVDProblem(parm, promote(on_time, decay_time)..., alg_control)
 
