@@ -15,6 +15,6 @@
    prm.nᵢ=1e11u"cm^-3"
    prm.gcₑ= prm.gc 
    prm.gvₕ= prm.gv 
-   @test prm.gc  ≈ prm.gv  ≈ prm.gcₑ  ≈ prm.gvₕ ≈ 2.750508782111764e30u"m^-3"
+   @test prm.Nc  ≈ prm.Nv  ≈ prm.Ncₑ  ≈ prm.Nvₕ ≈ 2.750508782111764e30u"m^-3"
    
 end

@@ -278,10 +278,6 @@ function (rhs!::Rhs)(du, u, pr, t)
     
     if rhs!.mode == :cc  # closed circuit is default
         ϕ_end = Vr / ( σₛₕ / σₛ + 1) + fnₑ[1] / ( σₛₕ + σₛ)
-        # hackish fallback to fix initialisation
-        if σₛₕ ≈ 0 && σₛ ≈ 0
-            ϕ_end = ϕₕ[end] + rhs!.ndim.Vbi
-        end
         du[4 * N + 2 * Nₑ + Nₕ + 4] = ϕₕ[end] + rhs!.ndim.Vbi - ϕ_end
     elseif rhs!.mode == :oc # open circuit
         ϕend = ϕₕ[end] + rhs!.ndim.Vbi
@@ -289,8 +285,6 @@ function (rhs!::Rhs)(du, u, pr, t)
         du[4 * N + 2 * Nₑ + Nₕ + 4] =  ϕₑ[1] # Potential reference at etl contact
         # du[N+1] = integrate(rhs!.g.x,P)-1;
         # du[N+1] = integrate(rhs!.g.x,P)-1)^4;
-    else
-        error("simulation mode $(rhs!.mode) is not recongnized")
     end
   
     return nothing
