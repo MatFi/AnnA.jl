@@ -35,7 +35,7 @@ abstract type AbstractParameters end
         light = pulse(tₑ=1.0,w=2.),     # Light(t) function 
         V = t -> 0,                # Voltage(t) function
         Rₛₕ = 1e6u"V/A*m^2",       # Shunt resistance
-        Rₛ = 1e-4u"V/A*m^2"        # Series resistance
+        Rₛ = 1e-4u"V/A*m^2",        # Series resistance
         # Recombination Parameters
         τₙ = 3e-7u"s",             # electron pseudo lifetime
         τₚ = 3e-7u"s",             # hole pseudo lifetime
