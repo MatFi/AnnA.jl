@@ -1,4 +1,4 @@
-# Couriers Finite Element Scheme
+# Courtiers Finite Element Scheme
 The interested reader should consult Courtiers original publications [^1]
 here we will provide only a few important fundamentals necessary to understand a few important limitations from fundamental physical perspective as well as in some numerical aspects.
 ## Spatial *tanh* grid
