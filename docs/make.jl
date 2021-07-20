@@ -2,7 +2,7 @@
 
 using Documenter
 using AnnA
-
+ENV["GKSwstype"] = "100"
 
 doctest = "fix" in ARGS ? :fix : true
 
