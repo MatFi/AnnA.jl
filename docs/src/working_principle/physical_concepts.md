@@ -28,7 +28,7 @@ Its important to note, that this assumption may be incorrect in case of thin dev
 ## Recombination mechanisms
 The bulk recombination behavior in the simulations is composed of Shockley-Read-Hall, and bimolecular recombination 
 ```math
-    R\bigl(n,p\bigr) = \frac{(n\cdot p - n_i)}{\tau_p \cdot (n + n_t) +\tau_n \cdot (p+p_t)}+k_{rad}\cdot(n\cdot p - n_i)
+    R\bigl(n,p\bigr) = \frac{(n\cdot p - n_i^2)}{\tau_p \cdot (n + n_t) +\tau_n \cdot (p+p_t)}+k_{rad}\cdot(n\cdot p - n_i^2)
 ```
 Thereby it is approximated, that the defects are located close to center of the band gap so that we can simplify the equation with ``n_t =p_t = n_i``
 For surface recombination a similar expression is assumed. Here, the charge carriers from the transport layers are assumed to recombine together with their opposite ones from the active layer. We also allow the surface recombination velocities ``\nu_{p_E}, \nu_{n_E}`` at the ETM/active layer interface to differ from ``\nu_{p_H}, \nu_{n_H}`` at the active layer/HTM interface.
