@@ -20,7 +20,7 @@ function initial_conditions(c::Cell)
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
-    if ustrip(p_init.Rₛ)==Inf
+    if c.ndim.σₛ(0)==0
         @warn "initialization could not be performed with Rₛ=Inf, used 0 instead"
         p_init.Rₛ=0u"V/A*m^2"
     end

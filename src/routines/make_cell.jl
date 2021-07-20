@@ -21,11 +21,12 @@ function Cell(
     mode::Symbol=:cc,
     alg_ctl::AlgControl=AlgControl()
 )
-    if (mode==:cc) && (ustrip(p.Rₛₕ) == Inf) && (ustrip(p.Rₛ) == Inf)  
-        error("at least one of both Rₛ or Rₛₕ needs to have a finite value in cc-mode ")
-    end
+   
     grid   = Grid(p)
     ndim= NonDimensionalize(p)
+    if (mode==:cc) && (ustrip(p.Rₛₕ) == Inf) && (ndim.σₛ(0)==0)  
+        error("at least one of both Rₛ or Rₛₕ needs to have a finite value in cc-mode ")
+    end
     operators  = Operators(grid;flavor=op_flavor,alg_ctl.numtype)
     rhs = Rhs(p, grid, ndim, operators, mode, alg_ctl.numtype)
     massMatrix   = mass_matrix(grid, ndim;mode=mode)

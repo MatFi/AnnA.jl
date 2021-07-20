@@ -66,7 +66,7 @@ JscVocSolution(sol_oc, sol_cc, p::JscVocProblem) = JscVocSolution(
     p,
     #get_V(sol_cc;t=sol_oc.t*p.parameters.τᵢ)./1e-12u"V/A*m^2",
     calculate_currents(sol_cc),
-    get_V(sol_oc, t = sol_cc.t * p.parameters.τᵢ),
+    get_V(sol_oc, sol_oc.t * p.parameters.τᵢ),
     p.parameters.light.(ustrip(sol_cc.t * p.parameters.τᵢ)),
 )
 
@@ -77,7 +77,9 @@ function solve(p::JscVocProblem; alg_control = p.alg_control, kwargs...)
     #init
 
     tstops = 10.0 .^ (-13:0.3:log10(ustrip(tend / p.parameters.τᵢ)))
-    init_oc = Cell(p.parameters, mode = :oc, alg_ctl = alg_control)
+    pp=deepcopy(p.parameters)
+    pp.Rₛ = Inf * u"V/A*m^2"
+    init_oc = Cell(pp, mode = :oc, alg_ctl = alg_control)
     sol_oc = solve(init_oc, tstops = tstops)
 
     init_cc = Cell(

@@ -34,7 +34,7 @@ holds all nondimensionalized parameters
 - `G`: Carrier generation function
 - `V`: Voltage/kt
 """
-struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv<:Function, Frs<:Function}
+struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv<:Function, σ}
 
     λ::T     #Debye length
     λ²::T     #Debye length square
@@ -62,7 +62,7 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     λₕ::T     # relaitve HTL Debye Length
     nᵢ²::T     #nodim intrinsc conc
     σₛₕ::T # nundim Shunt conductivity
-    σₛ::Frs  # nundim series conductivity
+    σₛ::σ  # nundim series conductivity
     """Interface parameters"""
     kₑ::T     # ratio between electron densities ETL/perovskite interface
     kₕ::T     # ratio between hole densities perovkite/HTL interface
@@ -126,12 +126,13 @@ function NonDimensionalize(parm::AbstractParameters)
     d[:σₛₕ] = 1/p[:Rₛₕ]/p[:jay]*p[:VT]
 
     ti=ustrip(p[:τᵢ]|> u"s")
+ 
     if p[:Rₛ] isa Function
         d[:σₛ] = t-> 1/p[:Rₛ](t*ti)/p[:jay]*p[:VT]
     else
         d[:σₛ] = t-> 1/p[:Rₛ]/p[:jay]*p[:VT]
     end
-
+    d[:σₛ] = σ(p[:Rₛ],parm)
     d[:nᵢ²] = uconvert(Unitful.NoUnits,p[:nᵢ]^2/(p[:dₑ]*p[:dₕ]))
     #Test for nodimensionalty
     for i in eachindex(d)
@@ -310,3 +311,68 @@ Returns the nondimensionalized potential at time `t`
 function (v::Pot_function)(t)
     v.V(t*v.tion)/v.VT
 end
+
+struct TVariable end
+struct TConstant end
+struct σ{FTag,T}
+    s::T
+end
+"""
+    σ(R,p::AbstractParameters)
+
+Wrapper for nondimensionalization of timedependant conductivity
+
+
+# Example
+```jldoctest
+julia> p = Parameters(Rₛ = 1.0e-20 * u"V/A*mm^2",);
+
+julia> s = AnnA.σ(p.Rₛ,p)
+AnnA.σ{AnnA.TConstant, Float64}(1.15893217665509e22)
+
+julia> s.(0:4)
+5-element Vector{Float64}:
+ 1.15893217665509e22
+ 1.15893217665509e22
+ 1.15893217665509e22
+ 1.15893217665509e22
+ 1.15893217665509e22
+
+julia> pt = Parameters(Rₛ = t-> cos(t)^2*1.0e-20 * u"V/A*mm^2",);
+
+julia> st = AnnA.σ(pt.Rₛ,pt)
+AnnA.σ{AnnA.TVariable, Function}(AnnA.var"#22#23"{var"#1#2", Parameters, Float64}(var"#1#2"(), Parameters(400, 8.854187817e-12 F m^-1, 1.6021766209e-19 C, 8.61733035e-5 eV K^-1, 4.0e-7 m, 24.1, -3.7 eV, -5.3 eV, 0 m^-3, 0.00017 m^2 s^-1, 0.00017 m^2 s^-1, 0.2, 0.2, 1.6e24 m^-3, 6.5e-8 m^2 s^-1, 0.58 eV, false, 300 K, 1.3e7 m^-1, 1.4e21 m^-2 s^-1, 1, AnnA.Pulse{Float64, Vector{Float64}, Float64, Vector{Float64}, Interpolations.MonotonicInterpolation{Float64, Float64, Float64, Float64, Float64, Interpolations.SteffenMonotonicInterpolation, Vector{Float64}, Vector{Float64}}}(1.0, 0.0, 2.0, 1.0e-12, 1.0, [-1.0e308, -1.000000000001, -1.0, 1.0, 1.000000000001, 1.0e308], [0.0, 0.0, 1.0, 1.0, 0.0, 0.0], 6-element interpolate(::Vector{Float64}, ::Vector{Float64}, Interpolations.SteffenMonotonicInterpolation()) with element type Float64:
+  0.0
+  0.0
+  1.0000000000000002
+  1.0
+ -2.220446049250313e-16
+  0.0), AnnA.var"#3#5"(), 1.0e6 m^2 V A^-1, var"#1#2"(), 3.0e-7 s, 3.0e-7 s, 3.22e-17 m^3 s^-1, 0 m^4 s^-1, 0 m^4 s^-1, 0 m s^-1, 0 m s^-1, 0 m s^-1, 0 m s^-1, 1.0e18 cm^-3, 1.5, -4.0 eV, 1.0e-7 m, 3, 1.0e-7 m^2 s^-1, 1.0e18 cm^-3, 12, -5 eV, 1.0e-7 m, 3, 1.0e-7 m^2 s^-1), 158.17425072938966))
+
+julia> st.(0:4)
+5-element Vector{Float64}:
+ 1.15893217665509e22
+ 5.5156335151157665e22
+ 3.4478995483303833e22
+ 1.182707158333871e22
+ 1.0789052098079947e23
+
+```
+"""
+function σ(R,p::AbstractParameters)
+    if R isa Function
+        ti=ustrip(p.τᵢ|> u"s")
+        σ{TVariable,Function}(t-> uconvert(Unitful.NoUnits,1/R(t*ti)/p.jay*p.VT))
+    else
+        s=uconvert(Unitful.NoUnits,1/R/p.jay*p.VT)
+        σ{TConstant,typeof(s)}(s)
+    end
+end
+function (s::σ{TVariable,T})(t) where T
+    s.s(t)
+end
+function (s::σ{TConstant,T})(t) where T
+    s.s
+end
+
+
