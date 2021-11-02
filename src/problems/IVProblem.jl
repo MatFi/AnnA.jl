@@ -68,7 +68,7 @@ function IVProblem(
     amplitude = abs(first(range) - last(range))
     freq= π/2/tend * (1+double_sweep)
     if rev
-        Vt= t -> amplitude*(1+trianglewave(-freq*ustrip(t)))+minimum(range)
+        Vt= t -> amplitude*(trianglewave(-freq*ustrip(t)))+minimum(range)
     else
         Vt= t -> amplitude*(trianglewave(freq*ustrip(t)))+minimum(range)
     end
