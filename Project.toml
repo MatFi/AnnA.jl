@@ -20,6 +20,7 @@ Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 SparseDiffTools = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
+SparseMatricesCSR = "a0a7dd2c-ebf4-11e9-1f05-cf50bc540ca1"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
