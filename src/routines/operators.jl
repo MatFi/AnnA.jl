@@ -90,7 +90,7 @@ function DiffOperator(dx)
 end
 
 function LinearAlgebra.mul!(dfdx,dx::DiffOperator,f)
-    @avx for i in 1:dx.size[1]
+    @avx warn_check_args=false for i in 1:dx.size[1]
         dfdx[i] = f[i+1]*dx.dx[i,2]+f[i]*dx.dx[i,1]
     end
     nothing
@@ -104,7 +104,7 @@ function LinearAlgebra.mul!(interp,o::InterpolationOperator,f)
   #  if o.size[2] != length(f)
   #      error("length of operator is $(o.size[2]), while length(f) is $(length(f)) ")
   #  end
-   @avx for i in 1:o.size[1]
+   @avx warn_check_args=false for i in 1:o.size[1]
         interp[i] = (f[i+1]+f[i])/2.0
     end
     nothing
@@ -132,7 +132,7 @@ function LinearAlgebra.mul!(lin,o::LinOperator,f)
  #   if o.size[2] != length(f)
  #       error("length of operator is $(o.size[2]), while length(f) is $(length(f)) ")
  #   end
-    @avx for i in 1:o.size[1]
+    @avx warn_check_args=false for i in 1:o.size[1]
         lin[i] = f[i]*o.dx[i,1]+f[i+1]*o.dx[i,2]+f[i+2]*o.dx[i,3]
     end
     nothing

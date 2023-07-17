@@ -50,9 +50,9 @@ function initial_conditions(c::Cell)
        # initializealg=BrownFullBasicInit(),
     )
 
-        if sol.retcode ==:Success
+        if !(SciMLBase.successful_retcode(sol))
             @warn "Initialisation did not reach steady state within ss_tol"
-        elseif sol.retcode  !=:Terminated
+        #elseif sol.retcode  != ReturnCode.Terminated
             @warn "Initialisation failed"
             #@show "Initialized V_oc =" get_V(c,sol)[end] sol.t[end]*c.parameters.τᵢ
         end

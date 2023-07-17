@@ -143,7 +143,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     Dₕ = 1e-7u"m^2/s"         # HTL electron diffusion coefficient
 end
 
-propertynames(p::AbstractParameters,private::Bool=true) = begin
+propertynames(p::AbstractParameters,private::Bool=false) = begin
     pubs = fieldnames(typeof(p))
     privs = (:gc, :gv, :gcₑ, :gvₕ, :εₚ, :εₕ, :εₑ, :Eg, :Dᵢ, :nᵢ, :Efₑ, :Efₕ, :Vbi, :VT, :τᵢ, :G₀, :jay, :n0, :p0)
     private && return (pubs..., privs...)
