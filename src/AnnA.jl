@@ -19,6 +19,7 @@ using SparseDiffTools: matrix_colors, forwarddiff_color_jacobian!
 using Unitful
 using Unitful.DefaultSymbols
 using LoopVectorization
+import PreallocationTools
 import Base:length, getproperty, setproperty!, propertynames
 
 using SparseMatricesCSR
@@ -46,7 +47,7 @@ Creates a new `Parameters` object. A list of modifications to the defaults can b
 
 !!! note "Parameters.jl file" 
 
-	The `Parameters.jl` file does not have do contain the full specifications of all parameters., it will fallback to the `AbstractParameters` struct when specified or to the internal defaults if not.  
+	The `Parameters.jl` fil]e does not have do contain the full specifications of all parameters., it will fallback to the `AbstractParameters` struct when specified or to the internal defaults if not.  
 
 """	
 function load_parameters(

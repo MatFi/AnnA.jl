@@ -47,7 +47,7 @@ function Rhs(parameters, g::Grid, ndim::NodimParameters, op::Operators, mode::Sy
 
     
     if numtype <: Union{Float64}
-        cache = (u, n) -> DiffEqBase.dualcache(u, n)
+        cache = (u, n) -> PreallocationTools.dualcache(u, n)
     else
         cache = (u, n) -> lcache(length(u))
     end
@@ -116,10 +116,10 @@ function (rhs!::Rhs)(du, u, pr, t)
     Nₑ = rhs!.g.Nₑ
     Nₕ = rhs!.g.Nₕ
 
-    P   = DiffEqBase.get_tmp(rhs!.P, u)
-    ϕ   = DiffEqBase.get_tmp(rhs!.ϕ, u)
-    n   = DiffEqBase.get_tmp(rhs!.n, u)
-    p   =  DiffEqBase.get_tmp(rhs!.p, u)
+    P   = PreallocationTools.get_tmp(rhs!.P, u)
+    ϕ   = PreallocationTools.get_tmp(rhs!.ϕ, u)
+    n   = PreallocationTools.get_tmp(rhs!.n, u)
+    p   =  PreallocationTools.get_tmp(rhs!.p, u)
 
     @avx warn_check_args=false for i in 1:N + 1
         P[i]   = u[i]
@@ -128,8 +128,8 @@ function (rhs!::Rhs)(du, u, pr, t)
         p[i]    = u[3 * N + 3 + i]
     end
 
-    ϕₑ  = DiffEqBase.get_tmp(rhs!.ϕₑ, u)
-    nₑ  = DiffEqBase.get_tmp(rhs!.nₑ, u)
+    ϕₑ  = PreallocationTools.get_tmp(rhs!.ϕₑ, u)
+    nₑ  = PreallocationTools.get_tmp(rhs!.nₑ, u)
 
     @avx warn_check_args=false for i in 1:rhs!.g.Nₑ
         ϕₑ[i]   = u[4 * N + 4 + i]
@@ -138,8 +138,8 @@ function (rhs!::Rhs)(du, u, pr, t)
     ϕₑ[Nₑ + 1] = ϕ[1]
     nₑ[Nₑ + 1] = n[1] / rhs!.ndim.kₑ
 
-    ϕₕ  = DiffEqBase.get_tmp(rhs!.ϕₕ, u)
-    pₕ  = DiffEqBase.get_tmp(rhs!.pₕ, u)
+    ϕₕ  = PreallocationTools.get_tmp(rhs!.ϕₕ, u)
+    pₕ  = PreallocationTools.get_tmp(rhs!.pₕ, u)
     ϕₕ[1] = ϕ[N + 1]
     pₕ[1] = p[N + 1] / rhs!.ndim.kₕ
     # @inbounds @simd
@@ -148,49 +148,49 @@ function (rhs!::Rhs)(du, u, pr, t)
         pₕ[i + 1]  = u[4 * N + 2 * Nₑ + Nₕ + 4 + i]
     end
 
-    mE = DiffEqBase.get_tmp(rhs!.mE, u)
+    mE = PreallocationTools.get_tmp(rhs!.mE, u)
     mul!(mE, rhs!.o.𝔇, ϕ)
-    mEₑ = DiffEqBase.get_tmp(rhs!.mEₑ, u)
+    mEₑ = PreallocationTools.get_tmp(rhs!.mEₑ, u)
     mul!(mEₑ, rhs!.o.𝔇ₑ, ϕₑ)
-    mEₕ = DiffEqBase.get_tmp(rhs!.mEₕ, u)
+    mEₕ = PreallocationTools.get_tmp(rhs!.mEₕ, u)
     mul!(mEₕ, rhs!.o.𝔇ₕ, ϕₕ)
 
-    Buff_N = DiffEqBase.get_tmp(rhs!.Buff_N, u)
-    Buff_Nₑ = DiffEqBase.get_tmp(rhs!.Buff_Nₑ, u)
-    Buff_Nₕ = DiffEqBase.get_tmp(rhs!.Buff_Nₕ, u)
+    Buff_N = PreallocationTools.get_tmp(rhs!.Buff_N, u)
+    Buff_Nₑ = PreallocationTools.get_tmp(rhs!.Buff_Nₑ, u)
+    Buff_Nₕ = PreallocationTools.get_tmp(rhs!.Buff_Nₕ, u)
 
     if rhs!.parameters.freeze_ions
-        FP = DiffEqBase.get_tmp(rhs!.FP, u) .* 0
+        FP = PreallocationTools.get_tmp(rhs!.FP, u) .* 0
     else
-        FP  = DiffEqBase.get_tmp(rhs!.FP, u)
+        FP  = PreallocationTools.get_tmp(rhs!.FP, u)
         mul!(FP, rhs!.o.𝕴, P); FP .= FP .* mE;
         mul!(Buff_N, rhs!.o.𝔇, P)
         FP .= λ .* (Buff_N .+ FP)
     end
 
-    fn  = DiffEqBase.get_tmp(rhs!.fn, u)
+    fn  = PreallocationTools.get_tmp(rhs!.fn, u)
     mul!(fn, rhs!.o.𝕴, n); fn .= fn .* mE;
     mul!(Buff_N, rhs!.o.𝔇, n)
     fn .= κₙ .* (Buff_N .- fn)
 
-    fp  = DiffEqBase.get_tmp(rhs!.fp, u)
+    fp  = PreallocationTools.get_tmp(rhs!.fp, u)
     mul!(fp, rhs!.o.𝕴, p); fp .= fp .* mE;
     mul!(Buff_N, rhs!.o.𝔇, p)
     fp .= κₚ .* (Buff_N .+ fp)
 
-    fnₑ  = DiffEqBase.get_tmp(rhs!.fnₑ, u)
+    fnₑ  = PreallocationTools.get_tmp(rhs!.fnₑ, u)
     mul!(fnₑ, rhs!.o.𝕴ₑ, nₑ); fnₑ .= fnₑ .* mEₑ;
     mul!(Buff_Nₑ, rhs!.o.𝔇ₑ, nₑ)
     fnₑ .= κₑ .* (Buff_Nₑ .- fnₑ)
 
-    fpₕ  = DiffEqBase.get_tmp(rhs!.fpₕ, pₕ)
+    fpₕ  = PreallocationTools.get_tmp(rhs!.fpₕ, pₕ)
     mul!(fpₕ, rhs!.o.𝕴ₕ, pₕ); fpₕ .= fpₕ .* mEₕ;
     mul!(Buff_Nₕ, rhs!.o.𝔇ₕ, pₕ)
     fpₕ .= κₕ .* (Buff_Nₕ .+ fpₕ)
 
-    cd  = DiffEqBase.get_tmp(rhs!.cd, u)
+    cd  = PreallocationTools.get_tmp(rhs!.cd, u)
     
-    cd_buff = DiffEqBase.get_tmp(rhs!.Buff_N₋₁, u)
+    cd_buff = PreallocationTools.get_tmp(rhs!.Buff_N₋₁, u)
     mul!(cd_buff, rhs!.o.𝔏, P)
     cd .= rhs!.g.NN .- cd_buff .- ϰ
     mul!(cd_buff, rhs!.o.𝔏, n)
@@ -198,18 +198,18 @@ function (rhs!::Rhs)(du, u, pr, t)
     mul!(cd_buff, rhs!.o.𝔏, p)
     cd .= cd .- δ .* χ .* cd_buff
 
-    cdₑ  = DiffEqBase.get_tmp(rhs!.cdₑ, u)
+    cdₑ  = PreallocationTools.get_tmp(rhs!.cdₑ, u)
     mul!(cdₑ, rhs!.o.𝔏ₑ, nₑ)
     cdₑ .= cdₑ .- rhs!.g.ddE
 
-    cdₕ  = DiffEqBase.get_tmp(rhs!.cdₕ, u)
+    cdₕ  = PreallocationTools.get_tmp(rhs!.cdₕ, u)
     mul!(cdₕ, rhs!.o.𝔏ₕ, pₕ)
     cdₕ .= rhs!.g.ddH .- cdₕ
 
     if t isa ForwardDiff.Dual
-        GR = DiffEqBase.get_tmp(rhs!.GRt, t)
+        GR = PreallocationTools.get_tmp(rhs!.GRt, t)
     else
-        GR = DiffEqBase.get_tmp(rhs!.GRu, u)
+        GR = PreallocationTools.get_tmp(rhs!.GRu, u)
     end
     mul!(Buff_N, rhs!.o.𝕴, n)   # Buff_N now contains the interpolatet n
     mul!(GR, rhs!.o.𝕴, p)       # GR contains interpolated p
@@ -299,13 +299,13 @@ end
 
 lcache(n::Int) = LCache(Dict{DataType,AbstractArray}(), n)
 
-function DiffEqBase.get_tmp(lc::LCache, u::T)::T where {T <: AbstractArray} 
+function PreallocationTools.get_tmp(lc::LCache, u::T)::T where {T <: AbstractArray} 
     ltype = eltype(u)
     !(haskey(lc.du, ltype)) && (lc.du[ltype] = u[1:lc.length])
     return lc.du[ltype]
 end
 
-function DiffEqBase.get_tmp(lc::LCache, u::T)::Array{T,1} where {T <: Number} 
+function PreallocationTools.get_tmp(lc::LCache, u::T)::Array{T,1} where {T <: Number} 
     
     !(haskey(lc.du, T)) && (lc.du[T] = Array{T,1}(undef, lc.length))
     return lc.du[T]
