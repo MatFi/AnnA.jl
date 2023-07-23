@@ -46,11 +46,11 @@ function Rhs(parameters, g::Grid, ndim::NodimParameters, op::Operators, mode::Sy
     end
 
     
-    if numtype <: Union{Float64}
+  #  if numtype <: Union{Float64}
         cache = (u, n) -> PreallocationTools.dualcache(u, n)
-    else
-        cache = (u, n) -> lcache(length(u))
-    end
+  #  else
+   #     cache = (u, n) -> lcache(length(u))
+   # end
 
     N = Val{ForwardDiff.pickchunksize(length(g))}
     d[:parameters] = parameters
@@ -101,16 +101,16 @@ function (rhs!::Rhs)(du, u, pr, t)
     δ   = rhs!.ndim.δ
     χ   = rhs!.ndim.χ
     ϰ   = rhs!.ndim.ϰ
-    λ   = rhs!.ndim.λ
-    λ²  = rhs!.ndim.λ²
-    λₑ² = rhs!.ndim.λₑ²
-    λₕ² = rhs!.ndim.λₕ²
+    λ   = uconvert(Unitful.NoUnits,rhs!.ndim.λ(t) )
+    λ²  = uconvert(Unitful.NoUnits,rhs!.ndim.λ²(t))
+    λₑ² = uconvert(Unitful.NoUnits,rhs!.ndim.λₑ²(t))
+    λₕ² = uconvert(Unitful.NoUnits,rhs!.ndim.λₕ²(t))
     κₙ  = rhs!.ndim.κₙ
     κₚ  = rhs!.ndim.κₚ
     κₑ  = rhs!.ndim.κₑ
     κₕ  = rhs!.ndim.κₕ
-    rₑ  = rhs!.ndim.rₑ
-    rₕ  = rhs!.ndim.rₕ
+    rₑ  = uconvert(Unitful.NoUnits,rhs!.ndim.rₑ(t))
+    rₕ  = uconvert(Unitful.NoUnits,rhs!.ndim.rₕ(t))
 
     N = rhs!.g.N
     Nₑ = rhs!.g.Nₑ

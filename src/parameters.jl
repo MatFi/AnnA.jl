@@ -88,7 +88,7 @@ Base.@kwdef mutable struct Parameters <: AbstractParameters
     
     # Perovskite parameters
     b  = 400e-9u"m"           # Perovskite Layer thickness
-    ε = 24.1                  # Perovskite permitivity
+    ε = t-> 24.1*(1-0*t)                  # Perovskite permitivity
     Ec = -3.7u"eV"            # Perovskite Conduction band energy
     Ev = -5.3u"eV"            # Perovskite Valence band energy
     dₚ   = 0u"m^-3"           # Peroviskite doping concentration
@@ -165,7 +165,7 @@ setproperty!(p::AbstractParameters, ::Val{:gvₕ},x) = setfield!(p, :mvₕ, (x /
 
 getproperty(p::AbstractParameters,n::Symbol) = getproperty(p::AbstractParameters, Val{n}())
 getproperty(p::AbstractParameters,::Val{S}) where {S} = getfield(p, S)
-getproperty(p::AbstractParameters,::Val{:εₚ}) = p.ε * p.ε₀
+getproperty(p::AbstractParameters,::Val{:εₚ}) = t-> p.ε(t) * p.ε₀
 getproperty(p::AbstractParameters,::Val{:εₕ}) = p.εₕᵣ * p.ε₀
 getproperty(p::AbstractParameters,::Val{:εₑ}) = p.εₑᵣ * p.ε₀
 getproperty(p::AbstractParameters,::Val{:Eg}) = p.Ec - p.Ev |> u"eV"
@@ -175,7 +175,7 @@ getproperty(p::AbstractParameters,::Val{:Efₑ}) = p.Ecₑ - p.kB * p.T * log(p.
 getproperty(p::AbstractParameters,::Val{:Efₕ}) = p.Evₕ + p.kB * p.T * log(p.gvₕ / p.dₕ) |> u"eV"
 getproperty(p::AbstractParameters,::Val{:Vbi}) = (p.Efₑ - p.Efₕ) |> u"eV"
 getproperty(p::AbstractParameters,::Val{:VT}) = p.kB * p.T / p.q  |> u"V"
-getproperty(p::AbstractParameters,::Val{:τᵢ}) = p.b / p.Dᵢ * sqrt(p.kB * p.T * p.εₚ / p.N₀ / p.q^2) |> u"s"
+getproperty(p::AbstractParameters,::Val{:τᵢ}) = 1u"s"
 getproperty(p::AbstractParameters,::Val{:G₀}) = p.Fₚₕ / p.b * (1 - exp(-p.α * p.b)) |> upreferred
 getproperty(p::AbstractParameters,::Val{:jay}) = p.q * p.G₀ * p.b |> u"A/m^2"
 getproperty(p::AbstractParameters,::Val{:n0}) = p.dₑ * p.gc / p.gcₑ * exp((p.Ecₑ - p.Ec) / (p.kB * p.T))  |> u"m^-3"

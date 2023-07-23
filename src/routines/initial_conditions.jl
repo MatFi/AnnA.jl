@@ -19,6 +19,7 @@ function initial_conditions(c::Cell)
         cc.parameters, 
         V = (t) -> v_itp(t),
         light=t->c.parameters.light(ustrip(upreferred(cc.alg_ctl.tstart))),
+        ε=t->c.parameters.ε(ustrip(upreferred(cc.alg_ctl.tstart))),
     )
     if c.ndim.σₛ(0)==0
         @warn "initialization could not be performed with Rₛ=Inf, used 0 instead"

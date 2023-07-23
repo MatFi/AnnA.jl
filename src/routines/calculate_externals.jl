@@ -3,12 +3,13 @@
 
 Calculates the total current in the center of the device see: DOI: 0.1007/s10825-019-01396-2
 """
-function calculate_currents(g,ndim, sol, dt, sol_prev)
+function calculate_currents(g,ndim, sol, dt, sol_prev,t)
     if dt == 0
         dt = Inf
     end
     N = g.Nₑ
     N = g.N
+    
     κₙ = ndim.κₑ
 #    κₙ = ndim.κₙ
     κₚ = ndim.κₚ
@@ -39,22 +40,23 @@ function calculate_currents(g,ndim, sol, dt, sol_prev)
 #    jp = -κₚ ./ dx[pos] .*
 #         (p[pos+1] - p[pos] + (p[pos+1] + p[pos]) .* (ϕ[pos+1] - ϕ[pos]) ./ 2)
 
-    jd = dpt ./ dx[pos] .* (ϕ[pos+1] - ϕ[pos] - ϕ_prev[pos+1] + ϕ_prev[pos]) ./ dt
+  #  jd = dpt.(t) ./ dx[pos] .* (ϕ[pos+1] - ϕ[pos] - ϕ_prev[pos+1] + ϕ_prev[pos]) ./ dt
 #    jf = -dpf ./ dx[pos] .*
 #         (P[pos+1] - P[pos] + (P[pos+1] + P[pos]) .* (ϕ[pos+1] - ϕ[pos]) ./ 2)
 
     jₛₕ = -(sol[2][3][end] +ndim.Vbi) *ndim.σₛₕ
-    return jn+ - jd + jₛₕ
-    return jn + jp - jd -jf + jₛₕ
+    return jn + jₛₕ
+  #  return jn+ - jd + jₛₕ
+  #  return jn + jp - jd -jf + jₛₕ
 end
-calculate_currents(p::Rhs, sol, dt, sol_prev) = calculate_currents(p.g,p.ndim, sol, dt, sol_prev)
+calculate_currents(p::Rhs, sol, dt, sol_prev,t) = calculate_currents(p.g,p.ndim, sol, dt, sol_prev,t)
 function calculate_currents(sol::DiffEqBase.ODESolution)
     p = sol.prob.f.f
     J = Array{typeof(p.parameters.jay |> u"A/m^2")}(undef,length(sol.t))
     u = decompose.(sol.u,p.g)
-    J[1] =calculate_currents(p, u[1], Inf, u[1]) * p.parameters.jay
+    J[1] =calculate_currents(p, u[1], Inf, u[1],sol.t[1]) * p.parameters.jay
     for (u,dt,u_prev,i) in zip(u[2:end],diff(sol.t),u[1:end-1],1:length(sol.t)-1)
-        J[i+1]= calculate_currents(p, u, dt, u_prev) * p.parameters.jay
+        J[i+1]= calculate_currents(p, u, dt, u_prev,sol.t) * p.parameters.jay
     end
     return J
 end
@@ -101,7 +103,7 @@ function (f::DiffEqBase.ODESolution)(t::Unitful.AbstractQuantity)
     dt = minimum(abs.(f.t .- t_ndim))
     ndim_sol_prev=(f(t_ndim-abs(dt)), p.g)
     ndim_sol_pre=decompose(f(Float64(t/p.parameters.τᵢ)), p.g)
-    r[:j]= -calculate_currents(p.g,p.ndim, ndim_sol, dt, ndim_sol)* p.parameters.jay
+    r[:j]= -calculate_currents(p.g,p.ndim, ndim_sol, dt, ndim_sol,t)* p.parameters.jay
     return r
 end
 

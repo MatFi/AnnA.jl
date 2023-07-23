@@ -34,10 +34,10 @@ holds all nondimensionalized parameters
 - `G`: Carrier generation function
 - `V`: Voltage/kt
 """
-struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv<:Function, σ}
+struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv<:Function, σ, Tf1,Tf2,Tf3,Tf4,Tf5,Tf6,Tf7,Tf8,Tf9}
 
-    λ::T     #Debye length
-    λ²::T     #Debye length square
+    λ::Tf1     #Debye length
+    λ²::Tf2     #Debye length square
     δ::T      #ratio of typical electron/ion densities
     χ::T      #ratio of typical hole/electron densities
     ϰ::T  # ratio of perovskite doping and ionic concentration
@@ -45,7 +45,7 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     κₚ::T     #hole current Parameter
     κₙ::T     #electron current parameter
     αb::T     #Beer-Lambert Law parameter
-    dpt::T    # Dislacement current density factor
+    dpt::Tf3    # Dislacement current density factor
     dpf::T    # ionic flux displacement factor
 
     Vbi::T     #Built in potential
@@ -54,12 +54,12 @@ struct NodimParameters{T,F<:Function,Fl<:Function,Fr<:Function, Fg<:Function, Fv
     wₕ::T     # relative width of HTL
     κₑ::T     # ETL current parameter
     κₕ::T     # HTL current parameter
-    rₑ::T     # relative ETL permitivity
-    rₕ::T     # relaitve HTL permitivity
-    λₑ::T     # relative ETL Debye length
-    λₑ²::T    # relative ETL Debye length square
-    λₕ²::T    # relaitve HTL Debye length square
-    λₕ::T     # relaitve HTL Debye Length
+    rₑ::Tf4     # relative ETL permitivity
+    rₕ::Tf5     # relaitve HTL permitivity
+    λₑ::Tf6     # relative ETL Debye length
+    λₑ²::Tf7    # relative ETL Debye length square
+    λₕ²::Tf8    # relaitve HTL Debye length square
+    λₕ::Tf9     # relaitve HTL Debye Length
     nᵢ²::T     #nodim intrinsc conc
     σₛₕ::T # nundim Shunt conductivity
     σₛ::σ  # nundim series conductivity
@@ -95,9 +95,9 @@ function NonDimensionalize(parm::AbstractParameters)
     #recalc
 
 
-    LD= sqrt(p[:kB]*p[:T]*p[:εₚ]/(p[:q]^2*p[:N₀]))
-    d[:λ]   = LD/p[:b]
-    d[:λ²]  = d[:λ]^2
+    LD= t-> sqrt(p[:kB]*p[:T]*p[:εₚ](t)/(p[:q]^2*p[:N₀]))
+    d[:λ]   = t-> LD(t)/p[:b]
+    d[:λ²]  = t->d[:λ](t)^2
     #d[:nᵢ²] = nᵢ^2/(dₑ*dₕ)
     d[:δ]   = p[:dₑ]/p[:N₀]
     d[:χ]   = p[:dₕ]/p[:dₑ]
@@ -106,19 +106,19 @@ function NonDimensionalize(parm::AbstractParameters)
     d[:κₚ]  = p[:Dₚ]*p[:dₕ]/(p[:G₀]*p[:b]^2)
     d[:κₙ]  = p[:Dₙ]*p[:dₑ]/(p[:G₀]*p[:b]^2)
     d[:αb]  = p[:α]*p[:b]
-    d[:dpt] = p[:εₚ]*p[:VT]/(p[:q]*p[:G₀]*p[:b]^2*p[:τᵢ])
+    d[:dpt] = t-> p[:εₚ](t)*uconvert(Unitful.NoUnits,p[:VT]/(p[:q]*p[:G₀]*p[:b]^2*p[:τᵢ]))
     d[:dpf] = p[:Dᵢ]*p[:N₀]/(p[:G₀]*p[:b]^2)
     d[:Vbi] = p[:Vbi]/p[:VT]/p[:q]
     d[:wₑ]  = p[:bₑ]/p[:b]
     d[:wₕ]  = p[:bₕ]/p[:b]
     d[:κₑ]  = p[:Dₑ]*d[:κₙ]/p[:Dₙ]
     d[:κₕ]  = p[:Dₕ]*d[:κₚ]/p[:Dₚ]
-    d[:rₑ]  = p[:εₑ]/p[:εₚ]
-    d[:rₕ]  = p[:εₕ]/p[:εₚ]
-    d[:λₑ²] = d[:rₑ]*p[:N₀]/p[:dₑ]*d[:λ²]
-    d[:λₑ]  = sqrt(d[:λₑ²])
-    d[:λₕ²] = d[:rₕ]*p[:N₀]/p[:dₕ]*d[:λ²]
-    d[:λₕ]  = sqrt(d[:λₕ²])
+    d[:rₑ]  = t->p[:εₑ]/p[:εₚ](t)
+    d[:rₕ]  = t->p[:εₕ]/p[:εₚ](t)
+    d[:λₑ²] = t-> d[:rₑ](t)*p[:N₀]/p[:dₑ]*d[:λ²](t)
+    d[:λₑ]  = t-> sqrt(d[:λₑ²](t))
+    d[:λₕ²] = t->d[:rₕ](t)*p[:N₀]/p[:dₕ]*d[:λ²](t)
+    d[:λₕ]  = t->sqrt(d[:λₕ²](t))
 
     d[:kₑ]  = p[:gc]/p[:gcₑ]*exp((p[:Ecₑ]-p[:Ec])/(p[:kB]*p[:T]))
     d[:kₕ]  = p[:gv]/p[:gvₕ]*exp((p[:Ev]-p[:Evₕ])/(p[:kB]*p[:T]))
